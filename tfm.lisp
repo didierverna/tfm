@@ -111,8 +111,12 @@ If LIMIT, check that the number lies within [-16,16]."
    (design-size :accessor design-size)
    (min-code :accessor min-code)
    (max-code :accessor max-code)
-   (character-info :initform (make-array 127 :fill-pointer 0 :adjustable t)
-		   :reader character-info))
+   (character-info :initform (make-array 256 :fill-pointer 0)
+		   :reader character-info)
+   (width :initform (make-array 256 :fill-pointer 0) :reader width)
+   (height :initform (make-array 16 :fill-pointer 0) :reader height)
+   (depth :initform (make-array 16 :fill-pointer 0) :reader depth)
+   (italic :initform (make-array 64 :fill-pointer 0) :reader italic))
   (:documentation "The TeX Font Metrics class."))
 
 (defmethod print-object ((tfm tfm) stream)
@@ -172,8 +176,8 @@ If LIMIT, check that the number lies within [-16,16]."
 (defun parse-character-info (stream tfm)
   "Parse a TFM character info table in STREAM."
   (loop :repeat (+ (max-code tfm) (- (min-code tfm)) 1)
-	:do (vector-push-extend (make-character-info (read-u32 stream))
-				(character-info tfm))))
+	:do (vector-push (make-character-info (read-u32 stream))
+			 (character-info tfm))))
 
 
 
@@ -213,6 +217,10 @@ If LIMIT, check that the number lies within [-16,16]."
 	(error "Invalid header length: too small."))
       (parse-header stream lh tfm)
       (parse-character-info stream tfm)
+      (loop :repeat nw :do (vector-push (read-fix stream t) (width tfm)))
+      (loop :repeat nh :do (vector-push (read-fix stream t) (height tfm)))
+      (loop :repeat nd :do (vector-push (read-fix stream t) (depth tfm)))
+      (loop :repeat ni :do (vector-push (read-fix stream t) (italic tfm)))
       ))
   tfm)
 
