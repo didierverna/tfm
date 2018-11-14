@@ -110,7 +110,9 @@ If LIMIT, check that the number lies within [-16,16]."
    (checksum :accessor checksum)
    (design-size :accessor design-size)
    (min-code :accessor min-code)
-   (max-code :accessor max-code))
+   (max-code :accessor max-code)
+   (character-info :initform (make-array 127 :fill-pointer 0 :adjustable t)
+		   :reader character-info))
   (:documentation "The TeX Font Metrics class."))
 
 (defmethod print-object ((tfm tfm) stream)
@@ -135,6 +137,43 @@ If LIMIT, check that the number lies within [-16,16]."
     (error "Design size should be >= 1: ~A" (design-size tfm)))
   ;; #### NOTE: FILE-POSITION maybe?
   (loop :repeat (- length 2) :do (read-u32 stream)))
+
+
+
+;; ==========================================================================
+;; Character Info
+;; ==========================================================================
+
+(defclass character-info ()
+  ((width-index :initarg :width-index :reader width-index)
+   (height-index :initarg :height-index :reader height-index)
+   (depth-index :initarg :depth-index :reader depth-index)
+   (italic-index :initarg :italic-index :reader italic-index)
+   (ligature/kerning-index :initform nil :reader ligature/kerning-index)
+   (next-larger-character :initform nil :reader next-larger-character)
+   (extensible-index :initform nil :reader extensible-index))
+  (:documentation "The character info class."))
+
+(defun make-character-info (u32)
+  (let ((char-info (make-instance 'character-info
+		     :width-index (ldb (byte 8 24) u32)
+		     :height-index (ldb (byte 4 20) u32)
+		     :depth-index (ldb (byte 4 16) u32)
+		     :italic-index (ldb (byte 6 10) u32)
+		     ))
+	(tag (ldb (byte 2 8) u32))
+	(remainder (ldb (byte 8 0) u32)))
+    (case tag
+      (1 (setf (slot-value char-info 'ligature/kerning-index) remainder))
+      (2 (setf (slot-value char-info 'next-larger-character) remainder))
+      (3 (setf (slot-value char-info 'extensible-index) remainder)))
+    char-info))
+
+(defun parse-character-info (stream tfm)
+  "Parse a TFM character info table in STREAM."
+  (loop :repeat (+ (max-code tfm) (- (min-code tfm)) 1)
+	:do (vector-push-extend (make-character-info (read-u32 stream))
+				(character-info tfm))))
 
 
 
@@ -173,6 +212,7 @@ If LIMIT, check that the number lies within [-16,16]."
       (unless (>= lh 2)
 	(error "Invalid header length: too small."))
       (parse-header stream lh tfm)
+      (parse-character-info stream tfm)
       ))
   tfm)
 
