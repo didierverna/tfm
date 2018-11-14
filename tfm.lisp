@@ -131,10 +131,10 @@ If LIMIT, check that the number lies within [-16,16]."
 ;; ==========================================================================
 
 (defun parse-header (stream length tfm)
-  "Parse a TFM hedaer of LENGTH in STREAM."
-  ;; #### WARNING: comparative tests with tftopl show a different checkum, but
-  ;; the checkum I see doesn't fit 32 bits, so I don't understand what they're
-  ;; doing...
+  "Parse a TFM header of LENGTH in STREAM."
+  ;; #### WARNING: comparative tests with tftopl show a different checksum,
+  ;; but the checksum I see doesn't fit 32 bits, so I don't understand what
+  ;; they're doing...
   (setf (checksum tfm) (read-u32 stream))
   (setf (design-size tfm) (read-fix stream))
   (if (< (design-size tfm) 1)
