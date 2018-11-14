@@ -158,7 +158,7 @@ If LIMIT, check that the number lies within [-16,16]."
    (italic-correction :initarg :italic-correction :reader italic-correction)
    (ligature/kerning-index :initform nil :reader ligature/kerning-index)
    (next-larger-character :initform nil :reader next-larger-character)
-   (extensible-index :initform nil :reader extensible-index))
+   (extensible-recipe :initform nil :reader extensible-recipe))
   (:documentation "The character info class."))
 
 (defun make-character-info (u32)
@@ -172,7 +172,7 @@ If LIMIT, check that the number lies within [-16,16]."
     (case tag
       (1 (setf (slot-value char-info 'ligature/kerning-index) remainder))
       (2 (setf (slot-value char-info 'next-larger-character) remainder))
-      (3 (setf (slot-value char-info 'extensible-index) remainder)))
+      (3 (setf (slot-value char-info 'extensible-recipe) remainder)))
     char-info))
 
 (defun parse-character-info (stream tfm)
@@ -246,7 +246,28 @@ If LIMIT, check that the number lies within [-16,16]."
 			(aref depths (depth character-info))
 			(slot-value character-info 'italic-correction)
 			(aref italic-corrections
-			      (italic-correction character-info)))))
+			      (italic-correction character-info)))
+	      :when (next-larger-character character-info)
+		:do (setf (slot-value character-info 'next-larger-character)
+			  (aref (character-info tfm)
+				(next-larger-character character-info)))
+	      :when (extensible-recipe character-info)
+		:do (setf (slot-value character-info 'extensible-recipe)
+			  (let* ((recipe
+				   (aref extensible-recipes
+					 (extensible-recipe character-info)))
+				 (top (ldb (byte 8 24) recipe))
+				 (mid (ldb (byte 8 16) recipe))
+				 (bot (ldb (byte 8  8) recipe))
+				 (rep (ldb (byte 8  0) recipe)))
+			    (list (unless (zerop top)
+				    (aref (character-info tfm) top))
+				  (unless (zerop mid)
+				    (aref (character-info tfm) mid))
+				  (unless (zerop bot)
+				    (aref (character-info tfm) bot))
+				  (aref (character-info tfm) rep))))
+	      ))
       (when (>= np 1) (setf (slant tfm) (read-fix stream)))
       (when (>= np 2) (setf (interword-space tfm) (read-fix stream t)))
       (when (>= np 3) (setf (interword-stretch tfm) (read-fix stream t)))
