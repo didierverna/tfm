@@ -118,8 +118,7 @@ If LIMIT, check that the number lies within [-16,16]."
    (extra-space :initform 0 :accessor extra-space)
    (min-code :accessor min-code)
    (max-code :accessor max-code)
-   (character-info :initform (make-array 256 :fill-pointer 0)
-		   :reader character-info))
+   (characters :initform (make-array 256 :fill-pointer 0) :reader characters))
   (:documentation "The TeX Font Metrics class."))
 
 (defmethod print-object ((tfm tfm) stream)
@@ -151,18 +150,19 @@ If LIMIT, check that the number lies within [-16,16]."
 ;; Character Info
 ;; ==========================================================================
 
-(defclass character-info ()
-  ((width :initarg :width :reader width)
-   (height :initarg :height :reader height)
-   (depth :initarg :depth :reader depth)
-   (italic-correction :initarg :italic-correction :reader italic-correction)
-   (ligature/kerning-index :initform nil :reader ligature/kerning-index)
-   (next-larger-character :initform nil :reader next-larger-character)
-   (extensible-recipe :initform nil :reader extensible-recipe))
-  (:documentation "The character info class."))
+(defclass character-metrics ()
+  ((width :initarg :width :accessor width)
+   (height :initarg :height :accessor height)
+   (depth :initarg :depth :accessor depth)
+   (italic-correction :initarg :italic-correction :accessor italic-correction)
+   (ligature/kerning-index :initform nil :accessor ligature/kerning-index)
+   (next-larger-character :initform nil :accessor next-larger-character)
+   (extensible-recipe :initform nil :accessor extensible-recipe))
+  (:documentation "The Character Metrics class."))
 
-(defun make-character-info (u32)
-  (let ((char-info (make-instance 'character-info
+(defun make-character-metrics (u32)
+  "Make a CHARACTER-METRICS instance out of U32 word."
+  (let ((character (make-instance 'character-metrics
 		     :width (ldb (byte 8 24) u32)
 		     :height (ldb (byte 4 20) u32)
 		     :depth (ldb (byte 4 16) u32)
@@ -170,16 +170,16 @@ If LIMIT, check that the number lies within [-16,16]."
 	(tag (ldb (byte 2 8) u32))
 	(remainder (ldb (byte 8 0) u32)))
     (case tag
-      (1 (setf (slot-value char-info 'ligature/kerning-index) remainder))
-      (2 (setf (slot-value char-info 'next-larger-character) remainder))
-      (3 (setf (slot-value char-info 'extensible-recipe) remainder)))
-    char-info))
+      (1 (setf (ligature/kerning-index character) remainder))
+      (2 (setf (next-larger-character character) remainder))
+      (3 (setf (extensible-recipe character) remainder)))
+    character))
 
-(defun parse-character-info (stream tfm)
+(defun parse-characters (stream tfm)
   "Parse a TFM character info table in STREAM."
   (loop :repeat (+ (max-code tfm) (- (min-code tfm)) 1)
-	:do (vector-push (make-character-info (read-u32 stream))
-			 (character-info tfm))))
+	:do (vector-push (make-character-metrics (read-u32 stream))
+			 (characters tfm))))
 
 
 
@@ -218,7 +218,7 @@ If LIMIT, check that the number lies within [-16,16]."
       (unless (>= lh 2)
 	(error "Invalid header length: too small."))
       (parse-header stream lh tfm)
-      (parse-character-info stream tfm)
+      (parse-characters stream tfm)
       (let ((widths (make-array 256 :fill-pointer 0))
 	    (heights (make-array 16 :fill-pointer 0))
 	    (depths (make-array 16 :fill-pointer 0))
@@ -237,36 +237,32 @@ If LIMIT, check that the number lies within [-16,16]."
 	(loop :repeat ne :do (vector-push (read-u32 stream)
 					  extensible-recipes))
 
-	(loop :for character-info :across (character-info tfm)
-	      :do (setf (slot-value character-info 'width)
-			(aref widths (width character-info))
-			(slot-value character-info 'height)
-			(aref heights (height character-info))
-			(slot-value character-info 'depth)
-			(aref depths (depth character-info))
-			(slot-value character-info 'italic-correction)
-			(aref italic-corrections
-			      (italic-correction character-info)))
-	      :when (next-larger-character character-info)
-		:do (setf (slot-value character-info 'next-larger-character)
-			  (aref (character-info tfm)
-				(next-larger-character character-info)))
-	      :when (extensible-recipe character-info)
-		:do (setf (slot-value character-info 'extensible-recipe)
-			  (let* ((recipe
-				   (aref extensible-recipes
-					 (extensible-recipe character-info)))
+	(loop :for character :across (characters tfm)
+	      :do (setf (width character) (aref widths (width character))
+			(height character) (aref heights (height character))
+			(depth character) (aref depths (depth character))
+			(italic-correction character) (aref italic-corrections
+							    (italic-correction
+							     character)))
+	      :when (next-larger-character character)
+		:do (setf (next-larger-character character)
+			  (aref (characters tfm) (next-larger-character
+						  character)))
+	      :when (extensible-recipe character)
+		:do (setf (extensible-recipe character)
+			  (let* ((recipe (aref extensible-recipes
+					       (extensible-recipe character)))
 				 (top (ldb (byte 8 24) recipe))
 				 (mid (ldb (byte 8 16) recipe))
 				 (bot (ldb (byte 8  8) recipe))
 				 (rep (ldb (byte 8  0) recipe)))
 			    (list (unless (zerop top)
-				    (aref (character-info tfm) top))
+				    (aref (characters tfm) top))
 				  (unless (zerop mid)
-				    (aref (character-info tfm) mid))
+				    (aref (characters tfm) mid))
 				  (unless (zerop bot)
-				    (aref (character-info tfm) bot))
-				  (aref (character-info tfm) rep))))
+				    (aref (characters tfm) bot))
+				  (aref (characters tfm) rep))))
 	      ))
       (when (>= np 1) (setf (slant tfm) (read-fix stream)))
       (when (>= np 2) (setf (interword-space tfm) (read-fix stream t)))
