@@ -182,6 +182,22 @@ If LIMIT, check that the number lies within [-16,16]."
 			 (characters tfm))))
 
 
+;; ------------------
+;; Extensible Recipes
+;; ------------------
+
+(defun make-extensible-recipe (u32 characters)
+  "Make an extensible recipe out of U32 on CHARACTERS."
+  (let ((top (ldb (byte 8 24) u32))
+	(mid (ldb (byte 8 16) u32))
+	(bot (ldb (byte 8  8) u32))
+	(rep (ldb (byte 8  0) u32)))
+    (list (unless (zerop top) (aref characters top))
+	  (unless (zerop mid) (aref characters mid))
+	  (unless (zerop bot) (aref characters bot))
+	  (aref characters rep))))
+
+
 
 ;; ==========================================================================
 ;; Entry Point
@@ -250,19 +266,10 @@ If LIMIT, check that the number lies within [-16,16]."
 						  character)))
 	      :when (extensible-recipe character)
 		:do (setf (extensible-recipe character)
-			  (let* ((recipe (aref extensible-recipes
-					       (extensible-recipe character)))
-				 (top (ldb (byte 8 24) recipe))
-				 (mid (ldb (byte 8 16) recipe))
-				 (bot (ldb (byte 8  8) recipe))
-				 (rep (ldb (byte 8  0) recipe)))
-			    (list (unless (zerop top)
-				    (aref (characters tfm) top))
-				  (unless (zerop mid)
-				    (aref (characters tfm) mid))
-				  (unless (zerop bot)
-				    (aref (characters tfm) bot))
-				  (aref (characters tfm) rep))))
+			  (make-extensible-recipe
+			   (aref extensible-recipes
+				 (extensible-recipe character))
+			   (characters tfm)))
 	      ))
       (when (>= np 1) (setf (slant tfm) (read-fix stream)))
       (when (>= np 2) (setf (interword-space tfm) (read-fix stream t)))
