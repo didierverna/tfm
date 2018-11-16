@@ -153,6 +153,69 @@ TFM files."
 
 
 ;; ==========================================================================
+;; Character Metrics
+;; ==========================================================================
+
+;; -----
+;; Class
+;; -----
+
+(defclass character-metrics ()
+  ((code :initarg :code :reader code)
+   (width :initarg :width :reader width)
+   (height :initarg :height :reader height)
+   (depth :initarg :depth :reader depth)
+   (italic-correction :initarg :italic-correction :reader italic-correction)
+   (ligature/kerning-program :initform nil :accessor ligature/kerning-program)
+   (next-larger-character :initform nil :accessor next-larger-character)
+   (extension-recipe :initform nil :accessor extension-recipe))
+  (:documentation "The Character Metrics class."))
+
+(defmethod print-object ((character character-metrics) stream)
+  "Print CHARACTER unreadably with its code to STREAM."
+  (print-unreadable-object (character stream :type t)
+    (princ (code character) stream)))
+
+(defun make-character-metrics (code width height depth italic-correction)
+  "Make a CHARACTER-METRICS instance."
+  (make-instance 'character-metrics
+    :code code
+    :width width
+    :height height
+    :depth depth
+    :italic-correction italic-correction))
+
+
+;; ----------------
+;; Pseudo-accessors
+;; ----------------
+
+;; #### NOTE: for now, extension recipes are stored as an array of top,
+;; middle, bottom and repeated characters. I'm not sure whether storing
+;; extension recipes within characters is the right way to do it (as opposed
+;; to, for example, in the TFM instance directly). I guess I'll have to wait
+;; until it's actually used to figure this out... The pseudo-accessors below
+;; assume that an extension recipe exists in the target character.
+
+(defun top-character (character)
+  "Return the top character in CHARACTER's extension recipe, or NIL."
+  (aref (extension-recipe character) 0))
+
+(defun middle-character (character)
+  "Return the middle character in CHARACTER's extension recipe, or NIL."
+  (aref (extension-recipe character) 1))
+
+(defun bottom-character (character)
+  "Return the bottom character in CHARACTER's extension recipe, or NIL."
+  (aref (extension-recipe character) 2))
+
+(defun repeated-character (character)
+  "Return the repeated character in CHARACTER's extension recipe."
+  (aref (extension-recipe character) 3))
+
+
+
+;; ==========================================================================
 ;; TeX Font Metrics
 ;; ==========================================================================
 
@@ -183,70 +246,17 @@ TFM files."
   (print-unreadable-object (tfm stream :type t)
     (princ (name tfm) stream)))
 
+(defun character-by-code (code tfm &optional errorp)
+  "Return a character metrics object for CODE from TFM.
+If ERRORP, signal an error if not found."
+  (or (gethash code (characters-by-code tfm))
+      (when errorp (error "Character code ~A not found." code))))
 
+(defun (setf character-by-code) (character-metrics tfm)
+  "Make CHARACTER-METRICS accessible by code in TFM."
+  (setf (gethash (code character-metrics) (characters-by-code tfm))
+	character-metrics))
 
-;; ==========================================================================
-;; Header
-;; ==========================================================================
-
-(defun parse-header (stream length tfm)
-  "Parse a TFM header of LENGTH in STREAM."
-  ;; #### WARNING: comparative tests with tftopl show a different checksum,
-  ;; but the checksum I see doesn't fit 32 bits, so I don't understand what
-  ;; they're doing...
-  (setf (checksum tfm) (read-u32 stream))
-  (setf (design-size tfm) (read-fix stream))
-  (if (< (design-size tfm) 1)
-    (error "Design size should be >= 1: ~A" (design-size tfm)))
-  ;; #### NOTE: FILE-POSITION maybe?
-  (loop :repeat (- length 2) :do (read-u32 stream)))
-
-
-
-;; ==========================================================================
-;; Character Info
-;; ==========================================================================
-
-(defclass character-metrics ()
-  ((code :initarg :code :reader code)
-   (width :initarg :width :reader width)
-   (height :initarg :height :reader height)
-   (depth :initarg :depth :reader depth)
-   (italic-correction :initarg :italic-correction :reader italic-correction)
-   (ligature/kerning-program :initform nil :accessor ligature/kerning-program)
-   (next-larger-character :initform nil :accessor next-larger-character)
-   (extensible-recipe :initform nil :accessor extensible-recipe))
-  (:documentation "The Character Metrics class."))
-
-(defmethod print-object ((character character-metrics) stream)
-  "Print CHARACTER unreadably with its code to STREAM."
-  (print-unreadable-object (character stream :type t)
-    (princ (code character) stream)))
-
-(defun make-character-metrics (code width height depth italic-correction)
-  "Make a CHARACTER-METRICS instance."
-  (make-instance 'character-metrics
-    :code code
-    :width width
-    :height height
-    :depth depth
-    :italic-correction italic-correction))
-
-
-;; ------------------
-;; Extensible Recipes
-;; ------------------
-
-(defun make-extensible-recipe (u32 characters)
-  "Make an extensible recipe out of U32 on CHARACTERS."
-  (let ((top (ldb (byte 8 24) u32))
-	(mid (ldb (byte 8 16) u32))
-	(bot (ldb (byte 8  8) u32))
-	(rep (ldb (byte 8  0) u32)))
-    (list (unless (zerop top) (aref characters top))
-	  (unless (zerop mid) (aref characters mid))
-	  (unless (zerop bot) (aref characters bot))
-	  (aref characters rep))))
 
 
 ;; ---------------------------
@@ -326,6 +336,31 @@ This program may involve KERNINGS and CHARACTERS."
    instructions kernings characters))
 
 
+;; ==========================================================================
+;; Parsing
+;; ==========================================================================
+
+;; ------
+;; Header
+;; ------
+
+(defun parse-header (stream length tfm)
+  "Parse a TFM header of LENGTH in STREAM."
+  ;; #### WARNING: comparative tests with tftopl show a different checksum,
+  ;; but the checksum I see doesn't fit 32 bits, so I don't understand what
+  ;; they're doing...
+  (setf (checksum tfm) (read-u32 stream))
+  (setf (design-size tfm) (read-fix stream))
+  (if (< (design-size tfm) 1)
+    (error "Design size should be >= 1: ~A" (design-size tfm)))
+  ;; #### NOTE: FILE-POSITION maybe?
+  (loop :repeat (- length 2) :do (read-u32 stream)))
+
+
+;; ---------------------
+;; Character Information
+;; ---------------------
+
 (defun parse-character-information (stream nc nw nh nd ni nl nk ne tfm)
   "Parse the 8 TFM character information tables in STREAM."
   (let ((char-info (make-array nc :fill-pointer 0))
@@ -344,7 +379,7 @@ This program may involve KERNINGS and CHARACTERS."
     (loop :repeat ni :do (vector-push (read-fix stream t) italic))
     (loop :repeat nl :do (vector-push (read-u32 stream) lig/kern))
     (loop :repeat nk :do (vector-push (read-fix stream t) kern))
-    (loop :repeat ne :do (vector-push (read-u32 stream) exten))
+    (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) exten))
 
     (loop :for array :in (list width height depth italic)
 	  :for name :in (list "width" "height" "depth" "italic correction")
@@ -356,7 +391,7 @@ This program may involve KERNINGS and CHARACTERS."
     (loop :for info :across char-info
 	  :for code :from (min-code tfm)
 	  :unless (zerop (width-index info))
-	    :do (setf (gethash code (characters-by-code tfm))
+	    :do (setf (character-by-code tfm)
 		      (make-character-metrics
 		       code
 		       (aref width (width-index info))
@@ -364,6 +399,29 @@ This program may involve KERNINGS and CHARACTERS."
 		       (aref depth (depth-index info))
 		       (aref italic (italic-index info)))))
     (setf (characters tfm) (hash-table-count (characters-by-code tfm)))
+
+    ;; Now that we have all the characters registered, we can start processing
+    ;; mutual references.
+
+    ;; 2. Create extension recipes.
+    (loop :for info :across char-info
+	  :for code :from (min-code tfm)
+	  :when (exten-index info)
+	    :do (let ((recipe (aref exten (exten-index info)))
+		      (extension (make-array 4 :initial-element nil)))
+		  (unless (zerop (top recipe))
+		    (setf (aref extension 0)
+			  (character-by-code (top recipe) tfm t)))
+		  (unless (zerop (mid recipe))
+		    (setf (aref extension 1)
+			  (character-by-code (mid recipe) tfm t)))
+		  (unless (zerop (bot recipe))
+		    (setf (aref extension 2)
+			  (character-by-code (bot recipe) tfm t)))
+		  (setf (aref extension 3)
+			(character-by-code (rep recipe) tfm t))
+		  (setf (extension-recipe (character-by-code code tfm t))
+			extension)))
 
     #+()(loop :for character :across (characters tfm)
 	  :do (setf (width character) (aref widths (width character))
@@ -376,12 +434,6 @@ This program may involve KERNINGS and CHARACTERS."
 	    :do (setf (next-larger-character character)
 		      (aref (characters tfm) (next-larger-character
 					      character)))
-	  :when (extensible-recipe character)
-	    :do (setf (extensible-recipe character)
-		      (make-extensible-recipe
-		       (aref extensible-recipes
-			     (extensible-recipe character))
-		       (characters tfm)))
 	  :when (ligature/kerning-program character)
 	    :do (setf (ligature/kerning-program character)
 		      (make-ligature/kerning-program
@@ -392,9 +444,9 @@ This program may involve KERNINGS and CHARACTERS."
 	      )))
 
 
-;; ==========================================================================
+;; ----------
 ;; Parameters
-;; ==========================================================================
+;; ----------
 
 (defun parse-parameters (stream length tfm)
   "Parse a TFM parameters section in STREAM."
@@ -450,8 +502,7 @@ This program may involve KERNINGS and CHARACTERS."
 	    :unless (<= min length max)
 	      :do (error "Invalid ~A table length (out of range): ~A."
 			 name length))
-      (unless (>= lh 2)
-	(error "Invalid header length (too small): ~A." lh))
+      (unless (>= lh 2) (error "Invalid header length (too small): ~A." lh))
       ;; 2. Read the header section.
       (parse-header stream lh tfm)
       ;; 3. Read the 8 character-related sections.
