@@ -147,6 +147,22 @@ If LIMIT, check that the number lies within [-16,16]."
 
 
 ;; ==========================================================================
+;; Parameters
+;; ==========================================================================
+
+(defun parse-parameters (stream length tfm)
+  "Parse a TFM parameters section in STREAM."
+  (when (>= length 1) (setf (slant tfm) (read-fix stream)))
+  (when (>= length 2) (setf (interword-space tfm) (read-fix stream t)))
+  (when (>= length 3) (setf (interword-stretch tfm) (read-fix stream t)))
+  (when (>= length 4) (setf (interword-shrink tfm) (read-fix stream t)))
+  (when (>= length 5) (setf (ex tfm) (read-fix stream t)))
+  (when (>= length 6) (setf (em tfm) (read-fix stream t)))
+  (when (>= length 7) (setf (extra-space tfm) (read-fix stream t))))
+
+
+
+;; ==========================================================================
 ;; Character Info
 ;; ==========================================================================
 
@@ -284,6 +300,8 @@ This program may involve KERNINGS and CHARACTERS."
   "Parse TFM FILE into a TFM instance. Return that instance."
   (with-open-file (stream file
 		   :direction :input :element-type '(unsigned-byte 8))
+
+    ;; 1. Read the preamble and perform some sanity checks.
     (let ((lf (read-u16 stream t))
 	  (lh (read-u16 stream t))
 	  (bc (read-u16 stream t))
@@ -298,19 +316,26 @@ This program may involve KERNINGS and CHARACTERS."
 	  (np (read-u16 stream t)))
       (unless (and (<= (1- bc) ec) (<= ec 255))
 	(error "Invalid smallest / largest character codes: ~A / ~A." bc ec))
-      (when (> bc 255)
-	(setq bc 1 ec 0))
-      (setf (min-code tfm) bc
-	    (max-code tfm) ec)
+      (when (> bc 255) (setq bc 1 ec 0))
+      (setf (min-code tfm) bc (max-code tfm) ec)
       (unless (= lf (+ 6 lh (+ ec (- bc) 1) nw nh nd ni nl nk ne np))
-	(error "Invalid lengths in file header."))
-      (unless (= (file-length stream) (* 4 lf))
-	(error "File length doesn't match header."))
-      (when (or (zerop nw) (zerop nh) (zerop nd) (zerop ni))
-	(error "Empty width, height, depth or italic correction table."))
+	(error "Declared section lengths mismatch."))
+      (let ((actual-file-length (file-length stream))
+	    (declared-file-length (* 4 lf)))
+	(unless (= actual-file-length declared-file-length)
+	  (error "Actual / declared file lengths mismatch: ~A / ~A."
+		 actual-file-length declared-file-length)))
+      (loop :for length :in (list nw nh nd ni)
+	    :for name :in (list "width" "height" "depth" "italic correction")
+	    :when (zerop length)
+	      :do (error "Invalid ~A table length: 0." name))
       (unless (>= lh 2)
-	(error "Invalid header length: too small."))
+	(error "Invalid header length (too small): ~A." lh))
+
+      ;; 2. Read the header section.
       (parse-header stream lh tfm)
+
+      ;; 3. Read the 8 character-related sections.
       (parse-characters stream tfm)
       (let ((widths (make-array 256 :fill-pointer 0))
 	    (heights (make-array 16 :fill-pointer 0))
@@ -355,14 +380,9 @@ This program may involve KERNINGS and CHARACTERS."
 			   kernings
 			   (characters tfm)))
 	      ))
-      (when (>= np 1) (setf (slant tfm) (read-fix stream)))
-      (when (>= np 2) (setf (interword-space tfm) (read-fix stream t)))
-      (when (>= np 3) (setf (interword-stretch tfm) (read-fix stream t)))
-      (when (>= np 4) (setf (interword-shrink tfm) (read-fix stream t)))
-      (when (>= np 5) (setf (ex tfm) (read-fix stream t)))
-      (when (>= np 6) (setf (em tfm) (read-fix stream t)))
-      (when (>= np 7) (setf (extra-space tfm) (read-fix stream t)))
-      ))
+
+      ;; 4. Read the parameters section.
+      (parse-parameters stream np tfm)))
   tfm)
 
 ;; tfm.lisp ends here
