@@ -155,7 +155,7 @@ If LIMIT, check that the number lies within [-16,16]."
    (height :initarg :height :accessor height)
    (depth :initarg :depth :accessor depth)
    (italic-correction :initarg :italic-correction :accessor italic-correction)
-   (ligature/kerning-index :initform nil :accessor ligature/kerning-index)
+   (ligature/kerning-program :initform nil :accessor ligature/kerning-program)
    (next-larger-character :initform nil :accessor next-larger-character)
    (extensible-recipe :initform nil :accessor extensible-recipe))
   (:documentation "The Character Metrics class."))
@@ -170,7 +170,7 @@ If LIMIT, check that the number lies within [-16,16]."
 	(tag (ldb (byte 2 8) u32))
 	(remainder (ldb (byte 8 0) u32)))
     (case tag
-      (1 (setf (ligature/kerning-index character) remainder))
+      (1 (setf (ligature/kerning-program character) remainder))
       (2 (setf (next-larger-character character) remainder))
       (3 (setf (extensible-recipe character) remainder)))
     character))
@@ -196,6 +196,83 @@ If LIMIT, check that the number lies within [-16,16]."
 	  (unless (zerop mid) (aref characters mid))
 	  (unless (zerop bot) (aref characters bot))
 	  (aref characters rep))))
+
+
+;; ---------------------------
+;; Ligature / Kerning Programs
+;; ---------------------------
+
+(defun skip-byte (instruction)
+  "Return ligature / kerning INSTRUCTION's skip byte."
+  (ldb (byte 8 24) instruction))
+
+(defun next-byte (instruction)
+  "Return ligature / kerning INSTRUCTION's next byte."
+  (ldb (byte 8 16) instruction))
+
+(defun op-byte (instruction)
+  "Return ligature / kerning INSTRUCTION's op byte."
+  (ldb (byte 8 8) instruction))
+
+(defun remainder-byte (instruction)
+  "Return ligature / kerning INSTRUCTION's remainder byte."
+  (ldb (byte 8 0) instruction))
+
+;; #### NOTE: the reason we return a list instead of multiple values is that
+;; the caller of this function is a LOOP, which only knows how to destructure
+;; lists.
+(defun decode-ligature/kerning-instruction
+    (instruction kernings characters &aux (skip-byte (skip-byte instruction)))
+  "Decode a ligature / kerning INSTRUCTION.
+The instruction may involve KERNINGS and CHARACTERS.
+Return a list of multiple values, explained below.
+The first value is the number of skips to reach the next step (0 if the
+program should terminate). The second value, when present, is the decoded
+instruction (none for halting)."
+  (if (> skip-byte 128)
+    (list 0)
+    (let* ((stop (= skip-byte 128))
+	   (skips (when (< skip-byte 128) skip-byte))
+	   (next-char (aref characters (next-byte instruction)))
+	   (op-byte (op-byte instruction))
+	   (remainder (remainder-byte instruction))
+	   (instruction
+	     (if (>= op-byte 128)
+	       (list next-char
+		     :kern
+		     (aref kernings (+ (* 256 (- op-byte 128)) remainder)))
+	       (list next-char
+		     :ligature (aref characters remainder)
+		     :delete-before (when (member op-byte '(0 1 5)) t)
+		     :delete-after (when (member op-byte '(0 2 6)) t)
+		     :pass-over (cond ((member op-byte '(5 6 7)) 1)
+				      ((= op-byte 11) 2)
+				      (t 0))))))
+      (list (if stop 0 skips) instruction))))
+
+(defun %make-ligature/kerning-program (index instructions kernings characters)
+  "Make a ligature / kerning program starting at INSTRUCTIONS[INDEX].
+This program may involve KERNINGS and CHARACTERS."
+  (loop :with continue := t
+	:while continue
+	:for (next instruction)
+	  := (decode-ligature/kerning-instruction
+	      (aref instructions index) kernings characters)
+	:if instruction :collect instruction :else :collect :halt
+	:if (zerop next)
+	  :do (setq continue nil)
+	:else
+	  :do (incf index (1+ next))))
+
+(defun make-ligature/kerning-program
+    (index instructions kernings characters
+     &aux (instruction (aref instructions index)))
+  "Make a ligature / kerning program after finding its real start."
+  (%make-ligature/kerning-program
+   (if (> (skip-byte instruction) 128)
+     (+ (* 256 (op-byte instruction)) (remainder-byte instruction))
+     index)
+   instructions kernings characters))
 
 
 
@@ -269,6 +346,13 @@ If LIMIT, check that the number lies within [-16,16]."
 			  (make-extensible-recipe
 			   (aref extensible-recipes
 				 (extensible-recipe character))
+			   (characters tfm)))
+	      :when (ligature/kerning-program character)
+		:do (setf (ligature/kerning-program character)
+			  (make-ligature/kerning-program
+			   (ligature/kerning-program character)
+			   ligatures/kernings
+			   kernings
 			   (characters tfm)))
 	      ))
       (when (>= np 1) (setf (slant tfm) (read-fix stream)))
