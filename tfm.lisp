@@ -98,6 +98,61 @@ If LIMIT, check that the number lies within [-16,16]."
 
 
 ;; ==========================================================================
+;; Non Trivial (Encoded) Character Information
+;; ==========================================================================
+
+;; #### NOTE: this section contains low level, intermediate data structures
+;; that closely match the contents of TFM files. Because of that, we choose to
+;; keep the TeX terminology.
+
+;; ---------------------
+;; Character information
+;; ---------------------
+
+(defstruct (char-info :conc-name)
+  "The Char Info structure.
+This structure is used to store decoded information from the char-info table
+in TFM files."
+  width-index height-index depth-index italic-index
+  lig/kern-index next-char-code exten-index)
+
+(defun decode-char-info (word)
+  "Decode char-info WORD and return a CHAR-INFO instance."
+  (let ((char-info (make-char-info
+		    :width-index (ldb (byte 8 24) word)
+		    :height-index (ldb (byte 4 20) word)
+		    :depth-index (ldb (byte 4 16) word)
+		    :italic-index (ldb (byte 6 10) word)))
+	(tag (ldb (byte 2 8) word))
+	(remainder (ldb (byte 8 0) word)))
+    (case tag
+      (1 (setf (lig/kern-index char-info) remainder))
+      (2 (setf (next-char-code char-info) remainder))
+      (3 (setf (exten-index char-info) remainder)))
+    char-info))
+
+
+;; ------------------
+;; Extensible Recipes
+;; ------------------
+
+(defstruct (exten :conc-name)
+  "The Exten structure.
+This structure is used to store decoded information from the exten table in
+TFM files."
+  top mid bot rep)
+
+(defun decode-exten (word)
+  "Decode exten WORD and return an EXTEN instance."
+  (make-exten
+   :top (ldb (byte 8 24) word)
+   :mid (ldb (byte 8 16) word)
+   :bot (ldb (byte 8  8) word)
+   :rep (ldb (byte 8  0) word)))
+
+
+
+;; ==========================================================================
 ;; TeX Font Metrics
 ;; ==========================================================================
 
@@ -118,7 +173,9 @@ If LIMIT, check that the number lies within [-16,16]."
    (extra-space :initform 0 :accessor extra-space)
    (min-code :accessor min-code)
    (max-code :accessor max-code)
-   (characters :initform (make-array 256 :fill-pointer 0) :reader characters))
+   (characters-by-code :initform (make-hash-table :test #'eq)
+		       :accessor characters-by-code)
+   (characters :accessor characters))
   (:documentation "The TeX Font Metrics class."))
 
 (defmethod print-object ((tfm tfm) stream)
@@ -147,55 +204,33 @@ If LIMIT, check that the number lies within [-16,16]."
 
 
 ;; ==========================================================================
-;; Parameters
-;; ==========================================================================
-
-(defun parse-parameters (stream length tfm)
-  "Parse a TFM parameters section in STREAM."
-  (when (>= length 1) (setf (slant tfm) (read-fix stream)))
-  (when (>= length 2) (setf (interword-space tfm) (read-fix stream t)))
-  (when (>= length 3) (setf (interword-stretch tfm) (read-fix stream t)))
-  (when (>= length 4) (setf (interword-shrink tfm) (read-fix stream t)))
-  (when (>= length 5) (setf (ex tfm) (read-fix stream t)))
-  (when (>= length 6) (setf (em tfm) (read-fix stream t)))
-  (when (>= length 7) (setf (extra-space tfm) (read-fix stream t))))
-
-
-
-;; ==========================================================================
 ;; Character Info
 ;; ==========================================================================
 
 (defclass character-metrics ()
-  ((width :initarg :width :accessor width)
-   (height :initarg :height :accessor height)
-   (depth :initarg :depth :accessor depth)
-   (italic-correction :initarg :italic-correction :accessor italic-correction)
+  ((code :initarg :code :reader code)
+   (width :initarg :width :reader width)
+   (height :initarg :height :reader height)
+   (depth :initarg :depth :reader depth)
+   (italic-correction :initarg :italic-correction :reader italic-correction)
    (ligature/kerning-program :initform nil :accessor ligature/kerning-program)
    (next-larger-character :initform nil :accessor next-larger-character)
    (extensible-recipe :initform nil :accessor extensible-recipe))
   (:documentation "The Character Metrics class."))
 
-(defun make-character-metrics (u32)
-  "Make a CHARACTER-METRICS instance out of U32 word."
-  (let ((character (make-instance 'character-metrics
-		     :width (ldb (byte 8 24) u32)
-		     :height (ldb (byte 4 20) u32)
-		     :depth (ldb (byte 4 16) u32)
-		     :italic-correction (ldb (byte 6 10) u32)))
-	(tag (ldb (byte 2 8) u32))
-	(remainder (ldb (byte 8 0) u32)))
-    (case tag
-      (1 (setf (ligature/kerning-program character) remainder))
-      (2 (setf (next-larger-character character) remainder))
-      (3 (setf (extensible-recipe character) remainder)))
-    character))
+(defmethod print-object ((character character-metrics) stream)
+  "Print CHARACTER unreadably with its code to STREAM."
+  (print-unreadable-object (character stream :type t)
+    (princ (code character) stream)))
 
-(defun parse-characters (stream tfm)
-  "Parse a TFM character info table in STREAM."
-  (loop :repeat (+ (max-code tfm) (- (min-code tfm)) 1)
-	:do (vector-push (make-character-metrics (read-u32 stream))
-			 (characters tfm))))
+(defun make-character-metrics (code width height depth italic-correction)
+  "Make a CHARACTER-METRICS instance."
+  (make-instance 'character-metrics
+    :code code
+    :width width
+    :height height
+    :depth depth
+    :italic-correction italic-correction))
 
 
 ;; ------------------
@@ -291,6 +326,87 @@ This program may involve KERNINGS and CHARACTERS."
    instructions kernings characters))
 
 
+(defun parse-character-information (stream nc nw nh nd ni nl nk ne tfm)
+  "Parse the 8 TFM character information tables in STREAM."
+  (let ((char-info (make-array nc :fill-pointer 0))
+	(width (make-array nw :fill-pointer 0))
+	(height (make-array nh :fill-pointer 0))
+	(depth (make-array nd :fill-pointer 0))
+	(italic (make-array ni :fill-pointer 0))
+	(lig/kern (make-array nl :fill-pointer 0))
+	(kern (make-array nk :fill-pointer 0))
+	(exten (make-array ne :fill-pointer 0)))
+    (loop :repeat nc
+	  :do (vector-push (decode-char-info (read-u32 stream)) char-info))
+    (loop :repeat nw :do (vector-push (read-fix stream t) width))
+    (loop :repeat nh :do (vector-push (read-fix stream t) height))
+    (loop :repeat nd :do (vector-push (read-fix stream t) depth))
+    (loop :repeat ni :do (vector-push (read-fix stream t) italic))
+    (loop :repeat nl :do (vector-push (read-u32 stream) lig/kern))
+    (loop :repeat nk :do (vector-push (read-fix stream t) kern))
+    (loop :repeat ne :do (vector-push (read-u32 stream) exten))
+
+    (loop :for array :in (list width height depth italic)
+	  :for name :in (list "width" "height" "depth" "italic correction")
+	  :unless (zerop (aref array 0))
+	    :do (error "Invalid first element of ~A table (should be 0): ~A."
+		       name (aref array 0)))
+
+    ;; 1. Create the character metrics.
+    (loop :for info :across char-info
+	  :for code :from (min-code tfm)
+	  :unless (zerop (width-index info))
+	    :do (setf (gethash code (characters-by-code tfm))
+		      (make-character-metrics
+		       code
+		       (aref width (width-index info))
+		       (aref height (height-index info))
+		       (aref depth (depth-index info))
+		       (aref italic (italic-index info)))))
+    (setf (characters tfm) (hash-table-count (characters-by-code tfm)))
+
+    #+()(loop :for character :across (characters tfm)
+	  :do (setf (width character) (aref widths (width character))
+		    (height character) (aref heights (height character))
+		    (depth character) (aref depths (depth character))
+		    (italic-correction character) (aref italic-corrections
+							(italic-correction
+							 character)))
+	  :when (next-larger-character character)
+	    :do (setf (next-larger-character character)
+		      (aref (characters tfm) (next-larger-character
+					      character)))
+	  :when (extensible-recipe character)
+	    :do (setf (extensible-recipe character)
+		      (make-extensible-recipe
+		       (aref extensible-recipes
+			     (extensible-recipe character))
+		       (characters tfm)))
+	  :when (ligature/kerning-program character)
+	    :do (setf (ligature/kerning-program character)
+		      (make-ligature/kerning-program
+		       (ligature/kerning-program character)
+		       ligatures/kernings
+		       kernings
+		       (characters tfm)))
+	      )))
+
+
+;; ==========================================================================
+;; Parameters
+;; ==========================================================================
+
+(defun parse-parameters (stream length tfm)
+  "Parse a TFM parameters section in STREAM."
+  (when (>= length 1) (setf (slant tfm) (read-fix stream)))
+  (when (>= length 2) (setf (interword-space tfm) (read-fix stream t)))
+  (when (>= length 3) (setf (interword-stretch tfm) (read-fix stream t)))
+  (when (>= length 4) (setf (interword-shrink tfm) (read-fix stream t)))
+  (when (>= length 5) (setf (ex tfm) (read-fix stream t)))
+  (when (>= length 6) (setf (em tfm) (read-fix stream t)))
+  (when (>= length 7) (setf (extra-space tfm) (read-fix stream t))))
+
+
 
 ;; ==========================================================================
 ;; Entry Point
@@ -300,7 +416,6 @@ This program may involve KERNINGS and CHARACTERS."
   "Parse TFM FILE into a TFM instance. Return that instance."
   (with-open-file (stream file
 		   :direction :input :element-type '(unsigned-byte 8))
-
     ;; 1. Read the preamble and perform some sanity checks.
     (let ((lf (read-u16 stream t))
 	  (lh (read-u16 stream t))
@@ -313,74 +428,34 @@ This program may involve KERNINGS and CHARACTERS."
 	  (nl (read-u16 stream t))
 	  (nk (read-u16 stream t))
 	  (ne (read-u16 stream t))
-	  (np (read-u16 stream t)))
+	  (np (read-u16 stream t))
+	  nc)
       (unless (and (<= (1- bc) ec) (<= ec 255))
 	(error "Invalid smallest / largest character codes: ~A / ~A." bc ec))
       (when (> bc 255) (setq bc 1 ec 0))
+      (setq nc (+ ec (- bc) 1))
       (setf (min-code tfm) bc (max-code tfm) ec)
-      (unless (= lf (+ 6 lh (+ ec (- bc) 1) nw nh nd ni nl nk ne np))
+      (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
 	(error "Declared section lengths mismatch."))
       (let ((actual-file-length (file-length stream))
 	    (declared-file-length (* 4 lf)))
 	(unless (= actual-file-length declared-file-length)
 	  (error "Actual / declared file lengths mismatch: ~A / ~A."
 		 actual-file-length declared-file-length)))
-      (loop :for length :in (list nw nh nd ni)
-	    :for name :in (list "width" "height" "depth" "italic correction")
-	    :when (zerop length)
-	      :do (error "Invalid ~A table length: 0." name))
+      (loop :for length :in (list nw nh nd ni ne)
+	    :for min :in '(1 1 1 1 0)
+	    :for max :in '(256 16 16 64 256)
+	    :for name :in '("width" "height" "depth" "italic correction"
+			    "exten")
+	    :unless (<= min length max)
+	      :do (error "Invalid ~A table length (out of range): ~A."
+			 name length))
       (unless (>= lh 2)
 	(error "Invalid header length (too small): ~A." lh))
-
       ;; 2. Read the header section.
       (parse-header stream lh tfm)
-
       ;; 3. Read the 8 character-related sections.
-      (parse-characters stream tfm)
-      (let ((widths (make-array 256 :fill-pointer 0))
-	    (heights (make-array 16 :fill-pointer 0))
-	    (depths (make-array 16 :fill-pointer 0))
-	    (italic-corrections (make-array 64 :fill-pointer 0))
-	    (ligatures/kernings (make-array nl :fill-pointer 0))
-	    (kernings (make-array nk :fill-pointer 0))
-	    (extensible-recipes (make-array ne :fill-pointer 0)))
-	(loop :repeat nw :do (vector-push (read-fix stream t) widths))
-	(loop :repeat nh :do (vector-push (read-fix stream t) heights))
-	(loop :repeat nd :do (vector-push (read-fix stream t) depths))
-	(loop :repeat ni :do (vector-push (read-fix stream t)
-					  italic-corrections))
-	(loop :repeat nl :do (vector-push (read-u32 stream)
-					  ligatures/kernings))
-	(loop :repeat nk :do (vector-push (read-fix stream t) kernings))
-	(loop :repeat ne :do (vector-push (read-u32 stream)
-					  extensible-recipes))
-
-	(loop :for character :across (characters tfm)
-	      :do (setf (width character) (aref widths (width character))
-			(height character) (aref heights (height character))
-			(depth character) (aref depths (depth character))
-			(italic-correction character) (aref italic-corrections
-							    (italic-correction
-							     character)))
-	      :when (next-larger-character character)
-		:do (setf (next-larger-character character)
-			  (aref (characters tfm) (next-larger-character
-						  character)))
-	      :when (extensible-recipe character)
-		:do (setf (extensible-recipe character)
-			  (make-extensible-recipe
-			   (aref extensible-recipes
-				 (extensible-recipe character))
-			   (characters tfm)))
-	      :when (ligature/kerning-program character)
-		:do (setf (ligature/kerning-program character)
-			  (make-ligature/kerning-program
-			   (ligature/kerning-program character)
-			   ligatures/kernings
-			   kernings
-			   (characters tfm)))
-	      ))
-
+      (parse-character-information stream nc nw nh nd ni nl nk ne tfm)
       ;; 4. Read the parameters section.
       (parse-parameters stream np tfm)))
   tfm)
