@@ -258,7 +258,6 @@ If ERRORP, signal an error if not found."
 	character-metrics))
 
 
-
 ;; ---------------------------
 ;; Ligature / Kerning Programs
 ;; ---------------------------
@@ -336,6 +335,7 @@ This program may involve KERNINGS and CHARACTERS."
    instructions kernings characters))
 
 
+
 ;; ==========================================================================
 ;; Parsing
 ;; ==========================================================================
@@ -363,84 +363,80 @@ This program may involve KERNINGS and CHARACTERS."
 
 (defun parse-character-information (stream nc nw nh nd ni nl nk ne tfm)
   "Parse the 8 TFM character information tables in STREAM."
-  (let ((char-info (make-array nc :fill-pointer 0))
-	(width (make-array nw :fill-pointer 0))
-	(height (make-array nh :fill-pointer 0))
-	(depth (make-array nd :fill-pointer 0))
-	(italic (make-array ni :fill-pointer 0))
-	(lig/kern (make-array nl :fill-pointer 0))
-	(kern (make-array nk :fill-pointer 0))
-	(exten (make-array ne :fill-pointer 0)))
+  (let ((char-infos (make-array nc :fill-pointer 0))
+	(widths (make-array nw :fill-pointer 0))
+	(heights (make-array nh :fill-pointer 0))
+	(depths (make-array nd :fill-pointer 0))
+	(italics (make-array ni :fill-pointer 0))
+	(lig/kerns (make-array nl :fill-pointer 0))
+	(kerns (make-array nk :fill-pointer 0))
+	(extens (make-array ne :fill-pointer 0)))
     (loop :repeat nc
-	  :do (vector-push (decode-char-info (read-u32 stream)) char-info))
-    (loop :repeat nw :do (vector-push (read-fix stream t) width))
-    (loop :repeat nh :do (vector-push (read-fix stream t) height))
-    (loop :repeat nd :do (vector-push (read-fix stream t) depth))
-    (loop :repeat ni :do (vector-push (read-fix stream t) italic))
-    (loop :repeat nl :do (vector-push (read-u32 stream) lig/kern))
-    (loop :repeat nk :do (vector-push (read-fix stream t) kern))
-    (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) exten))
+	  :do (vector-push (decode-char-info (read-u32 stream)) char-infos))
+    (loop :repeat nw :do (vector-push (read-fix stream t) widths))
+    (loop :repeat nh :do (vector-push (read-fix stream t) heights))
+    (loop :repeat nd :do (vector-push (read-fix stream t) depths))
+    (loop :repeat ni :do (vector-push (read-fix stream t) italics))
+    (loop :repeat nl :do (vector-push (read-u32 stream) lig/kerns))
+    (loop :repeat nk :do (vector-push (read-fix stream t) kerns))
+    (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) extens))
 
-    (loop :for array :in (list width height depth italic)
+    (loop :for array :in (list widths heights depths italics)
 	  :for name :in (list "width" "height" "depth" "italic correction")
 	  :unless (zerop (aref array 0))
 	    :do (error "Invalid first element of ~A table (should be 0): ~A."
 		       name (aref array 0)))
 
     ;; 1. Create the character metrics.
-    (loop :for info :across char-info
+    (loop :for char-info :across char-infos
 	  :for code :from (min-code tfm)
 	  :unless (zerop (width-index info))
 	    :do (setf (character-by-code tfm)
 		      (make-character-metrics
 		       code
-		       (aref width (width-index info))
-		       (aref height (height-index info))
-		       (aref depth (depth-index info))
-		       (aref italic (italic-index info)))))
+		       (aref widths (width-index char-info))
+		       (aref heights (height-index char-info))
+		       (aref depths (depth-index char-info))
+		       (aref italics (italic-index char-info)))))
     (setf (characters tfm) (hash-table-count (characters-by-code tfm)))
 
     ;; Now that we have all the characters registered, we can start processing
     ;; mutual references.
 
     ;; 2. Create extension recipes.
-    (loop :for info :across char-info
+    (loop :for char-info :across char-infos
 	  :for code :from (min-code tfm)
-	  :when (exten-index info)
-	    :do (let ((recipe (aref exten (exten-index info)))
-		      (extension (make-array 4 :initial-element nil)))
-		  (unless (zerop (top recipe))
-		    (setf (aref extension 0)
-			  (character-by-code (top recipe) tfm t)))
-		  (unless (zerop (mid recipe))
-		    (setf (aref extension 1)
-			  (character-by-code (mid recipe) tfm t)))
-		  (unless (zerop (bot recipe))
-		    (setf (aref extension 2)
-			  (character-by-code (bot recipe) tfm t)))
-		  (setf (aref extension 3)
-			(character-by-code (rep recipe) tfm t))
+	  :when (exten-index char-info)
+	    :do (let ((exten (aref extens (exten-index char-info)))
+		      (recipe (make-array 4 :initial-element nil)))
+		  (loop :for code :in (list (top exten) (mid exten) (bot exten))
+			:for index :from 0
+			:unless (zerop code)
+			  :do (setf (aref recipe index)
+				    (character-by-code code tfm t)))
+		  (setf (aref recipe 3)
+			(character-by-code (rep exten) tfm t))
 		  (setf (extension-recipe (character-by-code code tfm t))
-			extension)))
+			recipe)))
 
     #+()(loop :for character :across (characters tfm)
-	  :do (setf (width character) (aref widths (width character))
-		    (height character) (aref heights (height character))
-		    (depth character) (aref depths (depth character))
-		    (italic-correction character) (aref italic-corrections
-							(italic-correction
-							 character)))
-	  :when (next-larger-character character)
-	    :do (setf (next-larger-character character)
-		      (aref (characters tfm) (next-larger-character
-					      character)))
-	  :when (ligature/kerning-program character)
-	    :do (setf (ligature/kerning-program character)
-		      (make-ligature/kerning-program
-		       (ligature/kerning-program character)
-		       ligatures/kernings
-		       kernings
-		       (characters tfm)))
+	      :do (setf (width character) (aref widths (width character))
+			(height character) (aref heights (height character))
+			(depth character) (aref depths (depth character))
+			(italic-correction character) (aref italic-corrections
+							    (italic-correction
+							     character)))
+	      :when (next-larger-character character)
+		:do (setf (next-larger-character character)
+			  (aref (characters tfm) (next-larger-character
+						  character)))
+	      :when (ligature/kerning-program character)
+		:do (setf (ligature/kerning-program character)
+			  (make-ligature/kerning-program
+			   (ligature/kerning-program character)
+			   ligatures/kernings
+			   kernings
+			   (characters tfm)))
 	      )))
 
 
