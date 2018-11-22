@@ -31,8 +31,17 @@
   (:documentation "The TeX Font Metrics package.")
   (:use :cl)
   (:export
+    ;; Utilities:
     :nickname-package
-
+    ;; Character metrics:
+    :code :width :height :depth :itlaic-correction :next-larger-character
+    :extension-recipe :top-character :middle-character :bottom-character
+    :repeated-character
+    ;; TeX font metrics:
+    :name :checksum :design-size :slant
+    :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
+    :min-code :max-code
+    :character-by-code :characters :ligature :kerning :right-boundary-character
     ;; Entry point:
     :parse))
 
