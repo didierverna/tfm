@@ -353,21 +353,21 @@ If ERRORP, signal an error if not found."
     :delete-after delete-after
     :pass-over pass-over))
 
-(defun %make-ligature/kerning-program (code index lig/kerns kerns tfm)
-  "Make a ligature / kerning program for character CODE in TFM.
+(defun %make-ligature/kerning-program (character index lig/kerns kerns tfm)
+  "Make a ligature / kerning program for CHARACTER in TFM.
 The program starts at LIG/KERNS[INDEX] and uses KERNS array."
   (loop :with continue := t
 	:while continue
 	:for lig/kern := (aref lig/kerns index)
 	:when (<= (skip lig/kern) 128)
 	  :if (>= (op lig/kern) 128)
-	    :do (setf (kerning (character-by-code code tfm t)
+	    :do (setf (kerning character
 			       (character-by-code (next lig/kern) tfm t)
 			       tfm)
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
 	  :else
-	    :do (setf (ligature (character-by-code code tfm t)
+	    :do (setf (ligature character
 				(character-by-code (next lig/kern) tfm t)
 				tfm)
 		      (make-ligature
@@ -383,11 +383,11 @@ The program starts at LIG/KERNS[INDEX] and uses KERNS array."
 	  :do (incf index (1+ (skip lig/kern)))))
 
 (defun make-ligature/kerning-program
-    (code index lig/kerns kerns tfm &aux (lig/kern (aref lig/kerns index)))
+    (character index lig/kerns kerns tfm &aux (lig/kern (aref lig/kerns index)))
   "Find the real start of a ligature / kerning program and make it.
 See %make-ligature/kerning-program for more information."
   (%make-ligature/kerning-program
-   code
+   character
    (if (> (skip lig/kern) 128)
      (+ (* 256 (op lig/kern)) (remainder lig/kern))
      index)
@@ -462,7 +462,11 @@ See %make-ligature/kerning-program for more information."
 	  :for code :from (min-code tfm)
 	  :when (lig/kern-index char-info)
 	    :do (make-ligature/kerning-program
-		 code (lig/kern-index char-info) lig/kerns kerns tfm)
+		 (character-by-code code tfm t)
+		 (lig/kern-index char-info)
+		 lig/kerns
+		 kerns
+		 tfm)
 	  :when (next-char char-info)
 	    :do (setf (next-larger-character (character-by-code code tfm t))
 		      (character-by-code (next-char char-info) tfm t))
