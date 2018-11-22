@@ -98,7 +98,7 @@ If LIMIT, check that the number lies within [-16,16]."
 
 
 ;; ==========================================================================
-;; Non Trivial (Encoded) Character Information
+;; Non Trivial (Encoded) Information
 ;; ==========================================================================
 
 ;; #### NOTE: this section contains low level, intermediate data structures
@@ -114,7 +114,7 @@ If LIMIT, check that the number lies within [-16,16]."
 This structure is used to store decoded information from the char-info table
 in TFM files."
   width-index height-index depth-index italic-index
-  lig/kern-index next-char-code exten-index)
+  lig/kern-index next-char exten-index)
 
 (defun decode-char-info (word)
   "Decode char-info WORD and return a CHAR-INFO instance."
@@ -127,7 +127,7 @@ in TFM files."
 	(remainder (ldb (byte 8 0) word)))
     (case tag
       (1 (setf (lig/kern-index char-info) remainder))
-      (2 (setf (next-char-code char-info) remainder))
+      (2 (setf (next-char char-info) remainder))
       (3 (setf (exten-index char-info) remainder)))
     char-info))
 
@@ -151,6 +151,25 @@ TFM files."
    :rep (ldb (byte 8  0) word)))
 
 
+;; -------------------------------
+;; Ligature / Kerning Instructions
+;; -------------------------------
+
+(defstruct (lig/kern :conc-name)
+  "The Lig / Kern structure.
+This structure is used to store decoded information from the lig/kern table in
+TFM files."
+  skip next op remainder)
+
+(defun decode-lig/kern (word)
+  "Decode lig/kern WORD and return a LIG/KERN, LIG, or KERN instance."
+  (make-lig/kern
+   :skip (ldb (byte 8 24) word)
+   :next (ldb (byte 8 16) word)
+   :op (ldb (byte 8 8) word)
+   :remainder (ldb (byte 8 0) word)))
+
+
 
 ;; ==========================================================================
 ;; Character Metrics
@@ -166,8 +185,19 @@ TFM files."
    (height :initarg :height :reader height)
    (depth :initarg :depth :reader depth)
    (italic-correction :initarg :italic-correction :reader italic-correction)
-   (ligature/kerning-program :initform nil :accessor ligature/kerning-program)
+   ;; #### WARNING: for now, the handling of character lists is very basic: I
+   ;; only store the "next character" here, exactly as it is provided in the
+   ;; TFM file. There's not specific representation of character lists and no
+   ;; checking for cycles for instance. I'm not sure whether storing the next
+   ;; character here is the right way to do it (as opposed to creating
+   ;; specific entries in the TFM instance directly). I guess I'll have to
+   ;; wait until it's actually used to figure this out.
    (next-larger-character :initform nil :accessor next-larger-character)
+   ;; #### WARNING: for now, extension recipes are stored as an array of top,
+   ;; middle, bottom and repeated characters. I'm not sure whether storing
+   ;; extension recipes within characters is the right way to do it (as
+   ;; opposed to, for example, in the TFM instance directly). I guess I'll
+   ;; have to wait until it's actually used to figure this out...
    (extension-recipe :initform nil :accessor extension-recipe))
   (:documentation "The Character Metrics class."))
 
@@ -190,12 +220,8 @@ TFM files."
 ;; Pseudo-accessors
 ;; ----------------
 
-;; #### NOTE: for now, extension recipes are stored as an array of top,
-;; middle, bottom and repeated characters. I'm not sure whether storing
-;; extension recipes within characters is the right way to do it (as opposed
-;; to, for example, in the TFM instance directly). I guess I'll have to wait
-;; until it's actually used to figure this out... The pseudo-accessors below
-;; assume that an extension recipe exists in the target character.
+;; #### NOTE: The pseudo-accessors below assume that an extension recipe
+;; exists in the target character.
 
 (defun top-character (character)
   "Return the top character in CHARACTER's extension recipe, or NIL."
@@ -238,7 +264,9 @@ TFM files."
    (max-code :accessor max-code)
    (characters-by-code :initform (make-hash-table :test #'eq)
 		       :accessor characters-by-code)
-   (characters :accessor characters))
+   (characters :accessor characters)
+   (ligatures :initform (make-hash-table :test #'equal) :accessor ligatures)
+   (kernings :initform (make-hash-table :test #'equal) :accessor kernings))
   (:documentation "The TeX Font Metrics class."))
 
 (defmethod print-object ((tfm tfm) stream)
@@ -257,82 +285,21 @@ If ERRORP, signal an error if not found."
   (setf (gethash (code character-metrics) (characters-by-code tfm))
 	character-metrics))
 
+(defun ligature (character1 character2 tfm)
+  "Return (CHARACTER1 . CHARACTER2)'s ligature from TFM."
+  (gethash (cons character1 character2) (ligatures tfm)))
 
-;; ---------------------------
-;; Ligature / Kerning Programs
-;; ---------------------------
+(defun (setf ligature) (value character1 character2 tfm)
+  "Set (CHARACTER1 . CHARACTER2)'s ligature to VALUE in TFM."
+  (setf (gethash (cons character1 character2) (ligatures tfm)) value))
 
-(defun skip-byte (instruction)
-  "Return ligature / kerning INSTRUCTION's skip byte."
-  (ldb (byte 8 24) instruction))
+(defun kerning (character1 character2 tfm)
+  "Return (CHARACTER1 . CHARACTER2)'s kerning from TFM."
+  (gethash (cons character1 character2) (kernings tfm)))
 
-(defun next-byte (instruction)
-  "Return ligature / kerning INSTRUCTION's next byte."
-  (ldb (byte 8 16) instruction))
-
-(defun op-byte (instruction)
-  "Return ligature / kerning INSTRUCTION's op byte."
-  (ldb (byte 8 8) instruction))
-
-(defun remainder-byte (instruction)
-  "Return ligature / kerning INSTRUCTION's remainder byte."
-  (ldb (byte 8 0) instruction))
-
-;; #### NOTE: the reason we return a list instead of multiple values is that
-;; the caller of this function is a LOOP, which only knows how to destructure
-;; lists.
-(defun decode-ligature/kerning-instruction
-    (instruction kernings characters &aux (skip-byte (skip-byte instruction)))
-  "Decode a ligature / kerning INSTRUCTION.
-The instruction may involve KERNINGS and CHARACTERS.
-Return a list of multiple values, explained below.
-The first value is the number of skips to reach the next step (0 if the
-program should terminate). The second value, when present, is the decoded
-instruction (none for halting)."
-  (if (> skip-byte 128)
-    (list 0)
-    (let* ((stop (= skip-byte 128))
-	   (skips (when (< skip-byte 128) skip-byte))
-	   (next-char (aref characters (next-byte instruction)))
-	   (op-byte (op-byte instruction))
-	   (remainder (remainder-byte instruction))
-	   (instruction
-	     (if (>= op-byte 128)
-	       (list next-char
-		     :kern
-		     (aref kernings (+ (* 256 (- op-byte 128)) remainder)))
-	       (list next-char
-		     :ligature (aref characters remainder)
-		     :delete-before (when (member op-byte '(0 1 5)) t)
-		     :delete-after (when (member op-byte '(0 2 6)) t)
-		     :pass-over (cond ((member op-byte '(5 6 7)) 1)
-				      ((= op-byte 11) 2)
-				      (t 0))))))
-      (list (if stop 0 skips) instruction))))
-
-(defun %make-ligature/kerning-program (index instructions kernings characters)
-  "Make a ligature / kerning program starting at INSTRUCTIONS[INDEX].
-This program may involve KERNINGS and CHARACTERS."
-  (loop :with continue := t
-	:while continue
-	:for (next instruction)
-	  := (decode-ligature/kerning-instruction
-	      (aref instructions index) kernings characters)
-	:if instruction :collect instruction :else :collect :halt
-	:if (zerop next)
-	  :do (setq continue nil)
-	:else
-	  :do (incf index (1+ next))))
-
-(defun make-ligature/kerning-program
-    (index instructions kernings characters
-     &aux (instruction (aref instructions index)))
-  "Make a ligature / kerning program after finding its real start."
-  (%make-ligature/kerning-program
-   (if (> (skip-byte instruction) 128)
-     (+ (* 256 (op-byte instruction)) (remainder-byte instruction))
-     index)
-   instructions kernings characters))
+(defun (setf kerning) (value character1 character2 tfm)
+  "Set (CHARACTER1 . CHARACTER2)'s kerning to VALUE in TFM."
+  (setf (gethash (cons character1 character2) (kernings tfm)) value))
 
 
 
@@ -361,6 +328,81 @@ This program may involve KERNINGS and CHARACTERS."
 ;; Character Information
 ;; ---------------------
 
+;; #### FIXME: Knuth's description of the lig/kern programming language is
+;; somewhat confusing. I don't understand the purpose of "halt" (skip > 128)
+;; in particular. What's the difference with having no instruction associated
+;; with a character at all? Otherwise, it would be in contradiction with the
+;; description of regular instruction (perform and then stop).
+
+(defclass ligature ()
+  ((composite :initarg :composite :reader composite)
+   (delete-before :initarg :delete-before :reader delete-before)
+   (delete-after :initarg :delete-after :reader delete-after)
+   (pass-over :initarg :pass-over :reader pass-over))
+  (:documentation "The Ligature class."))
+
+(defun make-ligature (composite delete-before delete-after pass-over)
+  "Make a new LIGATURE instance."
+  (make-instance 'ligature
+    :composite composite
+    :delete-before delete-before
+    :delete-after delete-after
+    :pass-over pass-over))
+
+(defun %make-ligature/kerning-program (code index lig/kerns kerns tfm)
+  "Make a ligature / kerning program for character CODE in TFM.
+The program starts at LIG/KERNS[INDEX] and uses KERNS array."
+  (loop :with continue := t
+	:while continue
+	:for lig/kern := (aref lig/kerns index)
+	:when (<= (skip lig/kern) 128)
+	  :if (>= (op lig/kern) 128)
+	    :do (setf (kerning (character-by-code code tfm t)
+			       (character-by-code (next lig/kern) tfm t)
+			       tfm)
+		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
+				     (remainder lig/kern))))
+	  :else
+	    :do (setf (ligature (character-by-code code tfm t)
+				(character-by-code (next lig/kern) tfm t)
+				tfm)
+		      (make-ligature
+		       (character-by-code (remainder lig/kern) tfm t)
+		       (when (member (op lig/kern) '(0 1 5)) t)
+		       (when (member (op lig/kern) '(0 2 6)) t)
+		       (cond ((member (op lig/kern) '(5 6 7)) 1)
+			     ((= (op lig/kern) 11) 2)
+			     (t 0))))
+	:if (>= (skip lig/kern) 128)
+	  :do (setq continue nil)
+	:else
+	  :do (incf index (1+ (skip lig/kern)))))
+
+(defun make-ligature/kerning-program
+    (code index lig/kerns kerns tfm &aux (lig/kern (aref lig/kerns index)))
+  "Find the real start of a ligature / kerning program and make it.
+See %make-ligature/kerning-program for more information."
+  (%make-ligature/kerning-program
+   code
+   (if (> (skip lig/kern) 128)
+     (+ (* 256 (op lig/kern)) (remainder lig/kern))
+     index)
+   lig/kerns
+   kerns
+   tfm))
+
+
+(defun make-extension-recipe (exten tfm)
+  "Make an extension recipe based on EXTEN and TFM."
+  (let ((recipe (make-array 4 :initial-element nil)))
+    (loop :for code :in (list (top exten) (mid exten) (bot exten))
+	  :for index :from 0
+	  :unless (zerop code)
+	    :do (setf (aref recipe index) (character-by-code code tfm t)))
+    (setf (aref recipe 3) (character-by-code (rep exten) tfm t))
+    recipe))
+
+
 (defun parse-character-information (stream nc nw nh nd ni nl nk ne tfm)
   "Parse the 8 TFM character information tables in STREAM."
   (let ((char-infos (make-array nc :fill-pointer 0))
@@ -377,7 +419,8 @@ This program may involve KERNINGS and CHARACTERS."
     (loop :repeat nh :do (vector-push (read-fix stream t) heights))
     (loop :repeat nd :do (vector-push (read-fix stream t) depths))
     (loop :repeat ni :do (vector-push (read-fix stream t) italics))
-    (loop :repeat nl :do (vector-push (read-u32 stream) lig/kerns))
+    (loop :repeat nl
+	  :do (vector-push (decode-lig/kern (read-u32 stream)) lig/kerns))
     (loop :repeat nk :do (vector-push (read-fix stream t) kerns))
     (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) extens))
 
@@ -387,10 +430,10 @@ This program may involve KERNINGS and CHARACTERS."
 	    :do (error "Invalid first element of ~A table (should be 0): ~A."
 		       name (aref array 0)))
 
-    ;; 1. Create the character metrics.
+    ;; Create the character metrics.
     (loop :for char-info :across char-infos
 	  :for code :from (min-code tfm)
-	  :unless (zerop (width-index info))
+	  :unless (zerop (width-index char-info))
 	    :do (setf (character-by-code tfm)
 		      (make-character-metrics
 		       code
@@ -401,43 +444,21 @@ This program may involve KERNINGS and CHARACTERS."
     (setf (characters tfm) (hash-table-count (characters-by-code tfm)))
 
     ;; Now that we have all the characters registered, we can start processing
-    ;; mutual references.
-
-    ;; 2. Create extension recipes.
+    ;; mutual references: character lists, extension recipes, ligature, and
+    ;; kerning instructions.
     (loop :for char-info :across char-infos
 	  :for code :from (min-code tfm)
+	  :when (lig/kern-index char-info)
+	    :do (make-ligature/kerning-program
+		 code (lig/kern-index char-info) lig/kerns kerns tfm)
+	  :when (next-char char-info)
+	    :do (setf (next-larger-character (character-by-code code tfm t))
+		      (character-by-code (next-char char-info) tfm t))
 	  :when (exten-index char-info)
-	    :do (let ((exten (aref extens (exten-index char-info)))
-		      (recipe (make-array 4 :initial-element nil)))
-		  (loop :for code :in (list (top exten) (mid exten) (bot exten))
-			:for index :from 0
-			:unless (zerop code)
-			  :do (setf (aref recipe index)
-				    (character-by-code code tfm t)))
-		  (setf (aref recipe 3)
-			(character-by-code (rep exten) tfm t))
-		  (setf (extension-recipe (character-by-code code tfm t))
-			recipe)))
-
-    #+()(loop :for character :across (characters tfm)
-	      :do (setf (width character) (aref widths (width character))
-			(height character) (aref heights (height character))
-			(depth character) (aref depths (depth character))
-			(italic-correction character) (aref italic-corrections
-							    (italic-correction
-							     character)))
-	      :when (next-larger-character character)
-		:do (setf (next-larger-character character)
-			  (aref (characters tfm) (next-larger-character
-						  character)))
-	      :when (ligature/kerning-program character)
-		:do (setf (ligature/kerning-program character)
-			  (make-ligature/kerning-program
-			   (ligature/kerning-program character)
-			   ligatures/kernings
-			   kernings
-			   (characters tfm)))
-	      )))
+	    :do (setf (extension-recipe (character-by-code code tfm t))
+		      (make-extension-recipe
+		       (aref extens (exten-index char-info))
+		       tfm)))))
 
 
 ;; ----------
