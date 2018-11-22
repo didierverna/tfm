@@ -447,6 +447,9 @@ See %make-ligature/kerning-program for more information."
       ;; characters would have lig/kern instructions, not regular ones.
       (let ((lig/kern (aref lig/kerns (1- (length lig/kerns)))))
 	(when (= (skip lig/kern) 255)
+	  ;; #### NOTE: since we need to access the last instruction in the
+	  ;; lig/kern table, we may as well bypass
+	  ;; MAKE-LIGATURE/KERNING-PROGRAM.
 	  (%make-ligature/kerning-program
 	   :left-boundary-character
 	   (+ (* 256 (op lig/kern)) (remainder lig/kern))
