@@ -266,7 +266,11 @@ TFM files."
 		       :accessor characters-by-code)
    (characters :accessor characters)
    (ligatures :initform (make-hash-table :test #'equal) :accessor ligatures)
-   (kernings :initform (make-hash-table :test #'equal) :accessor kernings))
+   (kernings :initform (make-hash-table :test #'equal) :accessor kernings)
+   ;; #### NOTE: the right boundary character need not be defined by this
+   ;; font. Thus, the value of this slot may be either a character metrics
+   ;; object, or only a character code if not found.
+   (right-boundary-character :initform nil :accessor right-boundary-character))
   (:documentation "The TeX Font Metrics class."))
 
 (defmethod print-object ((tfm tfm) stream)
@@ -429,6 +433,14 @@ See %make-ligature/kerning-program for more information."
 	  :unless (zerop (aref array 0))
 	    :do (error "Invalid first element of ~A table (should be 0): ~A."
 		       name (aref array 0)))
+
+    ;; Check for left and right boundary characters.
+    (unless (zerop nl)
+      (when (= (skip (aref lig/kerns 0)) 255)
+	(setf (right-boundary-character tfm)
+	      (or (character-by-code (next (aref lig/kerns 0)) tfm)
+		  (next (aref lig/kerns 0)))))
+      )
 
     ;; Create the character metrics.
     (loop :for char-info :across char-infos
