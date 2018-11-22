@@ -436,11 +436,23 @@ See %make-ligature/kerning-program for more information."
 
     ;; Check for left and right boundary characters.
     (unless (zerop nl)
-      (when (= (skip (aref lig/kerns 0)) 255)
-	(setf (right-boundary-character tfm)
-	      (or (character-by-code (next (aref lig/kerns 0)) tfm)
-		  (next (aref lig/kerns 0)))))
-      )
+      (let ((lig/kern (aref lig/kerns 0)))
+	(when (= (skip lig/kern) 255)
+	  (setf (right-boundary-character tfm)
+		(or (character-by-code (next lig/kern) tfm)
+		    (next lig/kern)))))
+      ;; #### NOTE: there would be a problem for lig/kern arrays of size 1
+      ;; since the first element would also be the last one. I don't think
+      ;; this could happen however, as it would mean that only boundary
+      ;; characters would have lig/kern instructions, not regular ones.
+      (let ((lig/kern (aref lig/kerns (1- (length lig/kerns)))))
+	(when (= (skip lig/kern) 255)
+	  (%make-ligature/kerning-program
+	   :left-boundary-character
+	   (+ (* 256 (op lig/kern)) (remainder lig/kern))
+	   lig/kerns
+	   kerns
+	   tfm))))
 
     ;; Create the character metrics.
     (loop :for char-info :across char-infos
