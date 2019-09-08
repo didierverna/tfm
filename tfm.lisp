@@ -122,12 +122,14 @@ If LIMIT, check that the number lies within [-16,16]."
 (defstruct (char-info :conc-name)
   "The Char Info structure.
 This structure is used to store decoded information from the char-info table
-in TFM files."
+in TFM files (see TeX: the Program [543]). Only one of LIG/KERN-INDEX,
+NEXT-CHAR, and EXTEN-INDEX may be non-null at a time (see TeX: the Program
+[544])."
   width-index height-index depth-index italic-index
   lig/kern-index next-char exten-index)
 
 (defun decode-char-info (word)
-  "Decode char-info WORD and return a CHAR-INFO instance."
+  "Decode char-info WORD into a new CHAR-INFO instance, and return it."
   (let ((char-info (make-char-info
 		    :width-index (ldb (byte 8 24) word)
 		    :height-index (ldb (byte 4 20) word)
@@ -149,11 +151,11 @@ in TFM files."
 (defstruct (exten :conc-name)
   "The Exten structure.
 This structure is used to store decoded information from the exten table in
-TFM files."
+TFM files (see TeX: the Program [546])."
   top mid bot rep)
 
 (defun decode-exten (word)
-  "Decode exten WORD and return an EXTEN instance."
+  "Decode exten WORD into a new EXTEN instance, and return it."
   (make-exten
    :top (ldb (byte 8 24) word)
    :mid (ldb (byte 8 16) word)
@@ -166,13 +168,13 @@ TFM files."
 ;; -------------------------------
 
 (defstruct (lig/kern :conc-name)
-  "The Lig / Kern structure.
+  "The Lig/Kern structure.
 This structure is used to store decoded information from the lig/kern table in
-TFM files."
+TFM files (see TeX: the Program [545])."
   skip next op remainder)
 
 (defun decode-lig/kern (word)
-  "Decode lig/kern WORD and return a LIG/KERN, LIG, or KERN instance."
+  "Decode lig/kern WORD into a new LIG/KERN instance, and return it."
   (make-lig/kern
    :skip (ldb (byte 8 24) word)
    :next (ldb (byte 8 16) word)
@@ -190,26 +192,58 @@ TFM files."
 ;; -----
 
 (defclass character-metrics ()
-  ((code :initarg :code :reader code)
-   (width :initarg :width :reader width)
-   (height :initarg :height :reader height)
-   (depth :initarg :depth :reader depth)
-   (italic-correction :initarg :italic-correction :reader italic-correction)
+  ((code
+    :documentation "The character's numerical code."
+    :initarg :code
+    :reader code)
+   (width
+    :documentation "The character's width, in design size units."
+    :initarg :width
+    :reader width)
+   (height
+    :documentation "The character's height, in design size units."
+    :initarg :height
+    :reader height)
+   (depth
+    :documentation "The character's depth, in design size units."
+    :initarg :depth
+    :reader depth)
+   (italic-correction
+    :documentation "The character's italic correction, in design size units."
+    :initarg :italic-correction
+    :reader italic-correction)
    ;; #### WARNING: for now, the handling of character lists is very basic: I
    ;; only store the "next character" here, exactly as it is provided in the
-   ;; TFM file. There's not specific representation of character lists and no
+   ;; TFM file. There's no specific representation of character lists and no
    ;; checking for cycles for instance. I'm not sure whether storing the next
    ;; character here is the right way to do it (as opposed to creating
-   ;; specific entries in the TFM instance directly). I guess I'll have to
-   ;; wait until it's actually used to figure this out.
-   (next-larger-character :initform nil :accessor next-larger-character)
+   ;; character lists in the TFM instance directly). I guess I'll have to wait
+   ;; until it's actually used to figure this out.
+   (next-larger-character
+    :documentation "The character's next larger character.
+This slot is non-null only if the character is part of a chain of characters
+of ascending size, and not the last one (see TeX: the Program [544]). It is
+mutually exclusive with the EXTENSION-RECIPE slot, and also with the existence
+of a ligature or kerning program for this character."
+    :initform nil
+    :accessor next-larger-character)
    ;; #### WARNING: for now, extension recipes are stored as an array of top,
    ;; middle, bottom and repeated characters. I'm not sure whether storing
    ;; extension recipes within characters is the right way to do it (as
    ;; opposed to, for example, in the TFM instance directly). I guess I'll
-   ;; have to wait until it's actually used to figure this out...
-   (extension-recipe :initform nil :accessor extension-recipe))
-  (:documentation "The Character Metrics class."))
+   ;; have to wait until it's actually used to figure this out.
+   (extension-recipe
+    :documentation "The character's extension recipe.
+This slot is non-null only if this character is extensible (see TeX: the
+Program [544]). It is mutually exclusive with the NEXT-LARGER-CHARACTER slot,
+and also with the existence of a ligature or kerning program for this
+character."
+    :initform nil
+    :accessor extension-recipe))
+  (:documentation "The Character Metrics class.
+This class represents decoded character information from the TFM format.
+Within the context of this library, the term \"character\" denotes an instance
+of this class."))
 
 (defmethod print-object ((character character-metrics) stream)
   "Print CHARACTER unreadably with its code to STREAM."
@@ -217,7 +251,11 @@ TFM files."
     (princ (code character) stream)))
 
 (defun make-character-metrics (code width height depth italic-correction)
-  "Make a CHARACTER-METRICS instance."
+  "Make a new CHARACTER-METRICS instance, and return it.
+Initialize the character's CODE, WIDTH, HEIGHT, DEPTH, and ITALIC-CORRECTION
+appropriately. The two remaining slots (NEXT-LARGER-CHARACTER and
+EXTENSION-RECIPE) will be initialized later if needed, when all character
+metrics instances are created."
   (make-instance 'character-metrics
     :code code
     :width width
@@ -260,60 +298,108 @@ TFM files."
 ;; -----
 
 (defclass tfm ()
-  ((name :initarg :name :reader name)
-   (checksum :accessor checksum)
-   (design-size :accessor design-size)
-   (slant :initform 0 :accessor slant)
-   (interword-space :initform 0 :accessor interword-space)
-   (interword-stretch :initform 0 :accessor interword-stretch)
-   (interword-shrink :initform 0 :accessor interword-shrink)
-   (ex :initform 0 :accessor ex)
-   (em :initform 0 :accessor em)
-   (extra-space :initform 0 :accessor extra-space)
-   (min-code :accessor min-code)
-   (max-code :accessor max-code)
-   (characters-by-code :initform (make-hash-table :test #'eq)
-		       :accessor characters-by-code)
-   (characters :accessor characters)
-   (ligatures :initform (make-hash-table :test #'equal) :accessor ligatures)
-   (kernings :initform (make-hash-table :test #'equal) :accessor kernings)
-   ;; #### NOTE: the right boundary character need not be defined by this
-   ;; font. Thus, the value of this slot may be either a character metrics
-   ;; object, or only a character code if not found.
-   (right-boundary-character :initform nil :accessor right-boundary-character))
-  (:documentation "The TeX Font Metrics class."))
+  ((name
+    :documentation "The font's name. This is the TFM file's base name."
+    :initarg :name
+    :reader name)
+   (checksum :documentation "The TFM file's checksum." :accessor checksum)
+   (design-size
+    :documentation "The font's design size, in units of TeX points."
+    :accessor design-size)
+   (slant :documentation "The font's slant ratio." :initform 0 :accessor slant)
+   (interword-space
+    :documentation "The font's normal interword space, in design size units."
+    :initform 0
+    :accessor interword-space)
+   (interword-stretch
+    :documentation "The font's interword stretchability, in design size units."
+    :initform 0
+    :accessor interword-stretch)
+   (interword-shrink
+    :documentation "The font's interword shrinkability, in design size units."
+    :initform 0
+    :accessor interword-shrink)
+   (ex :documentation "The font's ex size." :initform 0 :accessor ex)
+   (em  :documentation "The font's em size." :initform 0 :accessor em)
+   (extra-space
+    :documentation "The font's extra space to put at the end of sentences."
+    :initform 0 :accessor extra-space)
+   (min-code
+    :documentation "The font's smallest character code."
+    :accessor min-code)
+   (max-code
+    :documentation "The font's largest character code."
+    :accessor max-code)
+   (characters-by-code
+    :documentation "The font's characters.
+This is a hash table associating character codes with characters."
+    :initform (make-hash-table :test #'eq)
+    :accessor characters-by-code)
+   (characters
+    :documentation "The font's number of characters."
+    :accessor characters)
+   (ligatures
+    :documentation "The font's ligatures.
+This is a hash table associating conses of characters with the corresponding
+ligature."
+    :initform (make-hash-table :test #'equal)
+    :accessor ligatures)
+   (kernings
+    :documentation "The font's kernings.
+This is a hash table associating conses of characters with the corresponding
+kerning, in design size units."
+    :initform (make-hash-table :test #'equal)
+    :accessor kernings)
+   (right-boundary-character
+    :documentation "The font's right boundary character.
+This is either a character from this font, or a character code outside of this
+font's code boundaries (see TeX: the Program [545])."
+    :initform nil
+    :accessor right-boundary-character))
+  (:documentation "The TeX Font Metrics class.
+This class represents decoded font information from the TFM format. Within the
+context of this library, the term \"tfm\" denotes an instance of this class."))
 
 (defmethod print-object ((tfm tfm) stream)
   "Print TFM unreadably with its font name to STREAM."
   (print-unreadable-object (tfm stream :type t)
     (princ (name tfm) stream)))
 
+(defun make-tfm (name)
+  "Make a new TFM instance, and return it.
+Only font NAME is initialized. The other slots will be computed later on."
+  (make-instance 'tfm :name name))
+
+
+;; ----------------
+;; Pseudo-accessors
+;; ----------------
+
 (defun character-by-code (code tfm &optional errorp)
-  "Return a character metrics object for CODE from TFM.
+  "Return TFM's character with CODE.
 If ERRORP, signal an error if not found."
   (or (gethash code (characters-by-code tfm))
-      (when errorp (error "Character code ~A not found." code))))
+      (when errorp (error "Character code ~A not found in ~S." code tfm))))
 
-(defun (setf character-by-code) (character-metrics tfm)
-  "Make CHARACTER-METRICS accessible by code in TFM."
-  (setf (gethash (code character-metrics) (characters-by-code tfm))
-	character-metrics))
+(defun (setf character-by-code) (character tfm)
+  "Register TFM's CHARACTER."
+  (setf (gethash (code character) (characters-by-code tfm)) character))
 
 (defun ligature (character1 character2 tfm)
-  "Return (CHARACTER1 . CHARACTER2)'s ligature from TFM."
+  "Return TFM's ligature for CHARACTER1 and CHARACTER2 if any."
   (gethash (cons character1 character2) (ligatures tfm)))
 
-(defun (setf ligature) (value character1 character2 tfm)
-  "Set (CHARACTER1 . CHARACTER2)'s ligature to VALUE in TFM."
-  (setf (gethash (cons character1 character2) (ligatures tfm)) value))
+(defun (setf ligature) (ligature character1 character2 tfm)
+  "Set TFM's LIGATURE for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (ligatures tfm)) ligature))
 
 (defun kerning (character1 character2 tfm)
-  "Return (CHARACTER1 . CHARACTER2)'s kerning from TFM."
+  "Return TFM's kerning for CHARACTER1 and CHARACTER2 if any."
   (gethash (cons character1 character2) (kernings tfm)))
 
-(defun (setf kerning) (value character1 character2 tfm)
-  "Set (CHARACTER1 . CHARACTER2)'s kerning to VALUE in TFM."
-  (setf (gethash (cons character1 character2) (kernings tfm)) value))
+(defun (setf kerning) (kerning character1 character2 tfm)
+  "Set TFM's KERNING for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (kernings tfm)) kerning))
 
 
 
@@ -326,9 +412,9 @@ If ERRORP, signal an error if not found."
 ;; ------
 
 (defun parse-header (stream length tfm)
-  "Parse a TFM header of LENGTH in STREAM."
-  ;; #### WARNING: comparative tests with tftopl show a different checksum,
-  ;; but the checksum I see doesn't fit 32 bits, so I don't understand what
+  "Parse a header of LENGTH from STREAM into TFM."
+  ;; #### FIXME: comparative tests with tftopl show a different checksum, but
+  ;; the checksum I see doesn't fit 32 bits, so I don't understand what
   ;; they're doing...
   (setf (checksum tfm) (read-u32 stream))
   (setf (design-size tfm) (read-fix stream))
@@ -349,14 +435,30 @@ If ERRORP, signal an error if not found."
 ;; description of regular instruction (perform and then stop).
 
 (defclass ligature ()
-  ((composite :initarg :composite :reader composite)
-   (delete-before :initarg :delete-before :reader delete-before)
-   (delete-after :initarg :delete-after :reader delete-after)
-   (pass-over :initarg :pass-over :reader pass-over))
-  (:documentation "The Ligature class."))
+  ((composite
+    :documentation "The character to insert."
+    :initarg :composite
+    :reader composite)
+   (delete-before
+    :documentation "Whether to delete the character before the ligature."
+    :initarg :delete-before
+    :reader delete-before)
+   (delete-after
+    :documentation "Whether to delete the character after the ligature."
+    :initarg :delete-after
+    :reader delete-after)
+   (pass-over
+    :documentation
+    "The number of characters to skip for reaching the next character."
+    :initarg :pass-over
+    :reader pass-over))
+  (:documentation "The Ligature class.
+This class represents a decoded ligature program from the TFM format. Within
+the context of this library, the term \"ligature\" denotes an instance of this
+class."))
 
 (defun make-ligature (composite delete-before delete-after pass-over)
-  "Make a new LIGATURE instance."
+  "Make a new LIGATURE instance, and return it."
   (make-instance 'ligature
     :composite composite
     :delete-before delete-before
@@ -364,8 +466,8 @@ If ERRORP, signal an error if not found."
     :pass-over pass-over))
 
 (defun %make-ligature/kerning-program (character index lig/kerns kerns tfm)
-  "Make a ligature / kerning program for CHARACTER in TFM.
-The program starts at LIG/KERNS[INDEX] and uses KERNS array."
+  "Make a ligature/kerning program for CHARACTER in TFM.
+The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
   (loop :with continue := t
 	:while continue
 	:for lig/kern := (aref lig/kerns index)
@@ -394,7 +496,7 @@ The program starts at LIG/KERNS[INDEX] and uses KERNS array."
 
 (defun make-ligature/kerning-program
     (character index lig/kerns kerns tfm &aux (lig/kern (aref lig/kerns index)))
-  "Find the real start of a ligature / kerning program and make it.
+  "Find the real start of a ligature/kerning program and make it.
 See %make-ligature/kerning-program for more information."
   (%make-ligature/kerning-program
    character
@@ -418,7 +520,7 @@ See %make-ligature/kerning-program for more information."
 
 
 (defun parse-character-information (stream nc nw nh nd ni nl nk ne tfm)
-  "Parse the 8 TFM character information tables in STREAM."
+  "Parse the 8 TFM character information tables from STREAM into TFM."
   (let ((char-infos (make-array nc :fill-pointer 0))
 	(widths (make-array nw :fill-pointer 0))
 	(heights (make-array nh :fill-pointer 0))
@@ -427,6 +529,7 @@ See %make-ligature/kerning-program for more information."
 	(lig/kerns (make-array nl :fill-pointer 0))
 	(kerns (make-array nk :fill-pointer 0))
 	(extens (make-array ne :fill-pointer 0)))
+    ;; 1. Read the tables.
     (loop :repeat nc
 	  :do (vector-push (decode-char-info (read-u32 stream)) char-infos))
     (loop :repeat nw :do (vector-push (read-fix stream t) widths))
@@ -444,7 +547,7 @@ See %make-ligature/kerning-program for more information."
 	    :do (error "Invalid first element of ~A table (should be 0): ~A."
 		       name (aref array 0)))
 
-    ;; Check for left and right boundary characters.
+    ;; 2. Check for left and right boundary characters.
     (unless (zerop nl)
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
@@ -467,7 +570,7 @@ See %make-ligature/kerning-program for more information."
 	   kerns
 	   tfm))))
 
-    ;; Create the character metrics.
+    ;; 3. Create the character metrics.
     (loop :for char-info :across char-infos
 	  :for code :from (min-code tfm)
 	  :unless (zerop (width-index char-info))
@@ -480,9 +583,9 @@ See %make-ligature/kerning-program for more information."
 		       (aref italics (italic-index char-info)))))
     (setf (characters tfm) (hash-table-count (characters-by-code tfm)))
 
-    ;; Now that we have all the characters registered, we can start processing
-    ;; mutual references: character lists, extension recipes, ligature, and
-    ;; kerning instructions.
+    ;; 4. Now that we have all the characters registered, we can start
+    ;; processing mutual references: character lists, extension recipes,
+    ;; ligature, and kerning instructions.
     (loop :for char-info :across char-infos
 	  :for code :from (min-code tfm)
 	  :when (lig/kern-index char-info)
@@ -507,7 +610,7 @@ See %make-ligature/kerning-program for more information."
 ;; ----------
 
 (defun parse-parameters (stream length tfm)
-  "Parse a TFM parameters section in STREAM."
+  "Parse a parameters section of LENGTH from STREAM into TFM."
   (when (>= length 1) (setf (slant tfm) (read-fix stream)))
   (when (>= length 2) (setf (interword-space tfm) (read-fix stream t)))
   (when (>= length 3) (setf (interword-stretch tfm) (read-fix stream t)))
@@ -522,10 +625,10 @@ See %make-ligature/kerning-program for more information."
 ;; Entry Point
 ;; ==========================================================================
 
-(defun parse (file &aux (tfm (make-instance 'tfm :name (pathname-name file))))
-  "Parse TFM FILE into a TFM instance. Return that instance."
-  (with-open-file (stream file
-		   :direction :input :element-type '(unsigned-byte 8))
+(defun parse (file &aux (tfm (make-tfm (pathname-name file))))
+  "Parse TFM FILE into a new TFM instance, and return it."
+  (with-open-file
+      (stream file :direction :input :element-type '(unsigned-byte 8))
     ;; 1. Read the preamble and perform some sanity checks.
     (let ((lf (read-u16 stream t))
 	  (lh (read-u16 stream t))
@@ -561,11 +664,11 @@ See %make-ligature/kerning-program for more information."
 	      :do (error "Invalid ~A table length (out of range): ~A."
 			 name length))
       (unless (>= lh 2) (error "Invalid header length (too small): ~A." lh))
-      ;; 2. Read the header section.
+      ;; 2. Parse the header section.
       (parse-header stream lh tfm)
-      ;; 3. Read the 8 character-related sections.
+      ;; 3. Parse the 8 character-related sections.
       (parse-character-information stream nc nw nh nd ni nl nk ne tfm)
-      ;; 4. Read the parameters section.
+      ;; 4. Parse the parameters section.
       (parse-parameters stream np tfm)))
   tfm)
 
