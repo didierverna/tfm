@@ -41,7 +41,7 @@
     :name :checksum :design-size :slant
     :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
     :min-code :max-code
-    :character-by-code :characters :ligature :kerning :right-boundary-character
+    :character-by-code :character-count :ligature :kerning :right-boundary-character
     ;; Entry point:
     :parse))
 
@@ -335,9 +335,9 @@ metrics instances are created."
 This is a hash table associating character codes with characters."
     :initform (make-hash-table :test #'eq)
     :accessor characters-by-code)
-   (characters
+   (character-count
     :documentation "The font's number of characters."
-    :accessor characters)
+    :accessor character-count)
    (ligatures
     :documentation "The font's ligatures.
 This is a hash table associating conses of characters with the corresponding
@@ -581,7 +581,8 @@ See %make-ligature/kerning-program for more information."
 		       (aref heights (height-index char-info))
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
-    (setf (characters tfm) (hash-table-count (characters-by-code tfm)))
+    ;; #### NOTE: this should in fact always be ec - bc + 1.
+    (setf (character-count tfm) (hash-table-count (characters-by-code tfm)))
 
     ;; 4. Now that we have all the characters registered, we can start
     ;; processing mutual references: character lists, extension recipes,
