@@ -1,6 +1,6 @@
 ;;; tfm.lisp --- TeX Font Metrics
 
-;; Copyright (C) 2018 Didier Verna
+;; Copyright (C) 2018, 2019 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
