@@ -1,6 +1,6 @@
 ;;; net.didierverna.tfm.asd --- ASDF system definition
 
-;; Copyright (C) 2018 Didier Verna
+;; Copyright (C) 2018, 2019 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -27,8 +27,8 @@
 (asdf:defsystem :net.didierverna.tfm
   :long-name "TeX Font Metrics"
   :description "A Common Lisp interface to the TeX Font Metrics format"
-  :long-description
-  "TFM is a Common Lisp interface to the TeX Font Metrics format."
+  :long-description "TFM (for TeX Font Metrics) is a Common Lisp library for
+parsing tfm files."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm"
