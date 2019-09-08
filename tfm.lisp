@@ -34,7 +34,7 @@
     ;; Utilities:
     :nickname-package
     ;; Character metrics:
-    :code :width :height :depth :itlaic-correction :next-larger-character
+    :code :width :height :depth :italic-correction :next-larger-character
     :extension-recipe :top-character :middle-character :bottom-character
     :repeated-character
     ;; TeX font metrics:
