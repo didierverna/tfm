@@ -48,6 +48,7 @@
 (in-package :net.didierverna.tfm)
 
 
+
 ;; ==========================================================================
 ;; Utilities
 ;; ==========================================================================
@@ -75,7 +76,7 @@ If LIMIT, check that the integer is less than 2^15."
     (setf (ldb (byte 8 8) u16) (read-byte stream)
 	  (ldb (byte 8 0) u16) (read-byte stream))
     (when (and limit (not (zerop (ldb (byte 1 15) u16))))
-      (error "Unsigned 16bits integer too large (>= 2^15): ~A." u16))
+      (error "Unsigned 16 bits integer too large (>= 2^15): ~A." u16))
     u16))
 
 (defun read-u32 (stream)
