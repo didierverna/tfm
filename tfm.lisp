@@ -549,6 +549,13 @@ See %make-ligature/kerning-program for more information."
 		       name (aref array 0)))
 
     ;; 2. Check for left and right boundary characters.
+    ;; #### WARNING: the left and right boundary characters thing is still
+    ;; unclear to me (e.g. why a right boundary but a left lig/kern program?).
+    ;; I still need to see this used to figure out which implementation is
+    ;; best. Right now, the right boundary character is stored in the TFM
+    ;; instance directly, whereas there is a special lig/kern program
+    ;; accessible from :LEFT-BOUNDARY-CHARACTER which is probably not very
+    ;; good.
     (unless (zerop nl)
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
