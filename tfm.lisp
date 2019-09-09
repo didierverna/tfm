@@ -330,11 +330,11 @@ metrics instances are created."
    (max-code
     :documentation "The font's largest character code."
     :accessor max-code)
-   (characters-by-code
+   (characters
     :documentation "The font's characters.
 This is a hash table associating character codes with characters."
     :initform (make-hash-table :test #'eq)
-    :accessor characters-by-code)
+    :accessor characters)
    (character-count
     :documentation "The font's number of characters."
     :accessor character-count)
@@ -378,12 +378,12 @@ Only font NAME is initialized. The other slots will be computed later on."
 (defun character-by-code (code tfm &optional errorp)
   "Return TFM's character with CODE.
 If ERRORP, signal an error if not found."
-  (or (gethash code (characters-by-code tfm))
+  (or (gethash code (characters tfm))
       (when errorp (error "Character code ~A not found in ~S." code tfm))))
 
 (defun (setf character-by-code) (character tfm)
-  "Register TFM's CHARACTER."
-  (setf (gethash (code character) (characters-by-code tfm)) character))
+  "Make TFM's CHARACTER accessible by its code."
+  (setf (gethash (code character) (characters tfm)) character))
 
 (defun ligature (character1 character2 tfm)
   "Return TFM's ligature for CHARACTER1 and CHARACTER2 if any."
@@ -582,7 +582,7 @@ See %make-ligature/kerning-program for more information."
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
     ;; #### NOTE: this should in fact always be ec - bc + 1.
-    (setf (character-count tfm) (hash-table-count (characters-by-code tfm)))
+    (setf (character-count tfm) (hash-table-count (characters tfm)))
 
     ;; 4. Now that we have all the characters registered, we can start
     ;; processing mutual references: character lists, extension recipes,
