@@ -41,7 +41,8 @@
     :name :checksum :design-size :slant
     :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
     :min-code :max-code
-    :character-by-code :character-count :ligature :kerning :right-boundary-character
+    :character-by-code :character-count
+    :ligature :kerning :right-boundary-character
     ;; Entry point:
     :parse))
 
