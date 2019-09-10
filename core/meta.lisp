@@ -41,18 +41,17 @@
     :version
     ;; From meta.lisp (this file):
     :nickname-package
-    ;; From src/tfm.lisp:
-    ;;; Character metrics:
-    :code :width :height :depth :italic-correction :next-larger-character
-    :extension-recipe :top-character :middle-character :bottom-character
-    :repeated-character
-    ;;; TeX font metrics:
+    ;; From src/character-metrics.lisp:
+    :code :width :height :depth :italic-correction
+    :next-larger-character :extension-recipe
+    :top-character :middle-character :bottom-character :repeated-character
+    ;; Font src/font-metrics.lisp:
     :name :checksum :design-size :slant
     :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
     :min-code :max-code
     :character-by-code :character-count
     :ligature :kerning :right-boundary-character
-    ;;; Entry point:
+    ;; From src/file.lisp:
     :parse))
 
 (in-package :net.didierverna.tfm)

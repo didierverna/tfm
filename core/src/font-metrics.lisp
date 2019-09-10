@@ -1,0 +1,187 @@
+;;; font-metrics.lisp --- Font Metrics Information
+
+;; Copyright (C) 2018, 2019 Didier Verna
+
+;; Author: Didier Verna <didier@didierverna.net>
+
+;; This file is part of TFM.
+
+;; Permission to use, copy, modify, and distribute this software for any
+;; purpose with or without fee is hereby granted, provided that the above
+;; copyright notice and this permission notice appear in all copies.
+
+;; THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+;; WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+;; MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+;; ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+;; WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+;;; Commentary:
+
+
+
+;;; Code:
+
+(in-package :net.didierverna.tfm)
+(in-readtable :net.didierverna.tfm)
+
+
+;; ==========================================================================
+;; Ligatures
+;; ==========================================================================
+
+;; #### FIXME: Knuth's description of the lig/kern programming language is
+;; somewhat confusing. I don't understand the purpose of "halt" (skip > 128)
+;; in particular. What's the difference with having no instruction associated
+;; with a character at all? Otherwise, it would be in contradiction with the
+;; description of regular instruction (perform and then stop).
+
+(defclass ligature ()
+  ((composite
+    :documentation "The character to insert."
+    :initarg :composite
+    :reader composite)
+   (delete-before
+    :documentation "Whether to delete the character before the ligature."
+    :initarg :delete-before
+    :reader delete-before)
+   (delete-after
+    :documentation "Whether to delete the character after the ligature."
+    :initarg :delete-after
+    :reader delete-after)
+   (pass-over
+    :documentation
+    "The number of characters to skip for reaching the next character."
+    :initarg :pass-over
+    :reader pass-over))
+  (:documentation "The Ligature class.
+This class represents a decoded ligature program from the TFM format. Within
+the context of this library, the term \"ligature\" denotes an instance of this
+class."))
+
+(defun make-ligature (composite delete-before delete-after pass-over)
+  "Make a new LIGATURE instance, and return it."
+  (make-instance 'ligature
+    :composite composite
+    :delete-before delete-before
+    :delete-after delete-after
+    :pass-over pass-over))
+
+
+
+;; ==========================================================================
+;; Font Metrics
+;; ==========================================================================
+
+;; -----
+;; Class
+;; -----
+
+(defclass tfm ()
+  ((name
+    :documentation "The font's name. This is the TFM file's base name."
+    :initarg :name
+    :reader name)
+   (checksum :documentation "The TFM file's checksum." :accessor checksum)
+   (design-size
+    :documentation "The font's design size, in units of TeX points."
+    :accessor design-size)
+   (slant :documentation "The font's slant ratio." :initform 0 :accessor slant)
+   (interword-space
+    :documentation "The font's normal interword space, in design size units."
+    :initform 0
+    :accessor interword-space)
+   (interword-stretch
+    :documentation "The font's interword stretchability, in design size units."
+    :initform 0
+    :accessor interword-stretch)
+   (interword-shrink
+    :documentation "The font's interword shrinkability, in design size units."
+    :initform 0
+    :accessor interword-shrink)
+   (ex :documentation "The font's ex size." :initform 0 :accessor ex)
+   (em  :documentation "The font's em size." :initform 0 :accessor em)
+   (extra-space
+    :documentation "The font's extra space to put at the end of sentences."
+    :initform 0 :accessor extra-space)
+   (min-code
+    :documentation "The font's smallest character code."
+    :accessor min-code)
+   (max-code
+    :documentation "The font's largest character code."
+    :accessor max-code)
+   (characters
+    :documentation "The font's characters.
+This is a hash table associating character codes with characters."
+    :initform (make-hash-table :test #'eq)
+    :accessor characters)
+   (character-count
+    :documentation "The font's number of characters."
+    :accessor character-count)
+   (ligatures
+    :documentation "The font's ligatures.
+This is a hash table associating conses of characters with the corresponding
+ligature."
+    :initform (make-hash-table :test #'equal)
+    :accessor ligatures)
+   (kernings
+    :documentation "The font's kernings.
+This is a hash table associating conses of characters with the corresponding
+kerning, in design size units."
+    :initform (make-hash-table :test #'equal)
+    :accessor kernings)
+   (right-boundary-character
+    :documentation "The font's right boundary character.
+This is either a character from this font, or a character code outside of this
+font's code boundaries (see TeX: the Program [545])."
+    :initform nil
+    :accessor right-boundary-character))
+  (:documentation "The TeX Font Metrics class.
+This class represents decoded font information from the TFM format. Within the
+context of this library, the term \"tfm\" denotes an instance of this class."))
+
+(defmethod print-object ((tfm tfm) stream)
+  "Print TFM unreadably with its font name to STREAM."
+  (print-unreadable-object (tfm stream :type t)
+    (princ (name tfm) stream)))
+
+(defun make-tfm (name)
+  "Make a new TFM instance, and return it.
+Only font NAME is initialized. The other slots will be computed later on."
+  (make-instance 'tfm :name name))
+
+
+;; ----------------
+;; Pseudo-accessors
+;; ----------------
+
+(defun character-by-code (code tfm &optional errorp)
+  "Return TFM's character with CODE.
+If ERRORP, signal an error if not found."
+  (or (gethash code (characters tfm))
+      (when errorp (error "Character code ~A not found in ~S." code tfm))))
+
+(defun (setf character-by-code) (character tfm)
+  "Make TFM's CHARACTER accessible by its code."
+  (setf (gethash (code character) (characters tfm)) character))
+
+(defun ligature (character1 character2 tfm)
+  "Return TFM's ligature for CHARACTER1 and CHARACTER2 if any."
+  (gethash (cons character1 character2) (ligatures tfm)))
+
+(defun (setf ligature) (ligature character1 character2 tfm)
+  "Set TFM's LIGATURE for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (ligatures tfm)) ligature))
+
+(defun kerning (character1 character2 tfm)
+  "Return TFM's kerning for CHARACTER1 and CHARACTER2 if any."
+  (gethash (cons character1 character2) (kernings tfm)))
+
+(defun (setf kerning) (kerning character1 character2 tfm)
+  "Set TFM's KERNING for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (kernings tfm)) kerning))
+
+;;; font-metrics.lisp ends here

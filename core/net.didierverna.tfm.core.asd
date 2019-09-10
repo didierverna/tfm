@@ -43,6 +43,10 @@ For a more complete description of TFM, see the net.didierverna.tfm system."
   :components ((:file "meta")
 	       (:module "src"
 		:serial t
-		:components ((:file "tfm")))))
+		:components ((:file "util")
+			     (:file "intermediate")
+			     (:file "character-metrics")
+			     (:file "font-metrics")
+			     (:file "file")))))
 
 ;;; net.didierverna.tfm.core.asd ends here
