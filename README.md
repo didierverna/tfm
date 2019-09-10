@@ -9,9 +9,9 @@ In your favorite Lisp REPL, type something like this:
 ```
 (asdf:load-system :net.didierverna.tfm)
 (net.didierverna.tfm:nickname-package)
-(defvar *cmr10* (tfm:parse #p"/path/to/cmr10.tfm"))
+(defvar *cmr10* (tfm:load-font #p"/path/to/cmr10.tfm"))
 ```
-You will end up with a `tfm` object, containing the decoded font information,
+You will end up with a `font` object, containing the decoded font information,
 and stored in an easily accessible way. Inspect the object in question to
 familiarize yourself with its contents.
 
