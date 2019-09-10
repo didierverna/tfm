@@ -1,12 +1,10 @@
 # TFM
-TFM (TeX Font Metrics) is a Common Lisp interface to the TeX Font Metrics
-format. It decodes the contents of `tfm` files, and returns an abstract data
-structure storing the corresponding font information in an easily accessible
-way.
-
+TFM (TeX Font Metrics) is the standard font description format used by TeX.
+This library parses and decodes TFM files into an abstract data structure,
+providing easy access to the corresponding font information in Common Lisp.
 
 ## Quick Start
-In your favorite Lisp REPL, type this:
+In your favorite Lisp REPL, type something like this:
 ```
 (asdf:load-system :net.didierverna.tfm)
 (net.didierverna.tfm:nickname-package)
