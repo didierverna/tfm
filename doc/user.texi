@@ -223,7 +223,7 @@ This is the @tfm{} User Manual for @tfm{} version @value{VERSION}.
 * Introduction::                TFM at a glance
 * Installation::                Library and documentation
 * Usage::                       All the details
-* Advanced Usage::              And then some
+* Other Considerations::
 * Conclusion::                  That's all folks
 * Technical Notes::             Configuration, platforms and portability
 * Indexes::                     Concepts, functions, variables and data types
@@ -343,7 +343,7 @@ Type @command{make uninstall} to uninstall the library.
 @c ====================================================================
 @c Usage
 @c ====================================================================
-@node Usage, Advanced Usage, Installation, Top
+@node Usage, Other Considerations, Installation, Top
 @chapter Usage
 
 @pkgindex{net.didierverna.tfm}
@@ -358,14 +358,13 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 
 
 @c ====================================================================
-@c Advanced Usage
+@c Other Considerations
 @c ====================================================================
-@node Advanced Usage, Conclusion, Usage, Top
-@chapter Advanced Usage
+@node Other Considerations, Conclusion, Usage, Top
+@chapter Other Considerations
 
-This section contains information about different features that are
-present in @tfm{} because of design decisions, but that I expect to be
-used only rarely, if at all.
+This section contains marginal or meta-information, orthogonal to the
+library's main purpose.
 
 @menu
 * Version Numbering::           In case you need to conditionalize
@@ -375,7 +374,7 @@ used only rarely, if at all.
 @c -----------------
 @c Version Numbering
 @c -----------------
-@node Version Numbering,  , Advanced Usage, Advanced Usage
+@node Version Numbering,  , Other Considerations, Other Considerations
 @section Version Numbering
 
 As @tfm{} evolves over time, you might one day feel the need for
@@ -449,7 +448,7 @@ output: 1.3 "Artificial Uncial".
 @c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion, Technical Notes, Advanced Usage, Top
+@node Conclusion, Technical Notes, Other Considerations, Top
 @chapter Conclusion
 
 So that's it I guess. You know all about @tfm{} now.
