@@ -268,16 +268,16 @@ used by @TeX{}. The @tfm{} library parses and decodes TFM files into an
 abstract data structure, providing easy access to the corresponding font
 information in Common Lisp.
 
-This is the @tfm{} user manual. @tfm{} also has a
+This is the @tfm{} User Manual. @tfm{} also has a
 @ifinfo
-@ref{Top, , reference manual, tfm-reference}.
+@ref{Top, , Reference Manual, tfm-reference}.
 @end ifinfo
 @ifhtml
-@ref{Top, , reference manual, reference}.
+@ref{Top, , Reference Manual, reference}.
 @end ifhtml
 @ifnotinfo
 @ifnothtml
-@ref{Top, , , reference, reference manual}.
+@ref{Top, , , reference, Reference Manual}.
 @end ifnothtml
 @end ifnotinfo
 
@@ -304,28 +304,37 @@ in the ASDF 3 source registry and type this at the REPL:
 
 In addition to the bare Lisp library, the @tfm{} distribution offers
 documentation in the form of 2 different manuals: the User Manual (you
-are reading it) and the @ref{Top, , , reference, Reference Manual}. If
-you want to benefit from all these wonders, some bits of manual
-installation are needed. After unpacking somewhere in the ASDF 3 source
-registry, please perform the following steps, in order.
-
+are reading it) and the
+@ifinfo
+@ref{Top, , Reference Manual, tfm-reference}.
+@end ifinfo
+@ifhtml
+@ref{Top, , Reference Manual, reference}.
+@end ifhtml
+@ifnotinfo
+@ifnothtml
+@ref{Top, , , reference, Reference Manual}.
+@end ifnothtml
+@end ifnotinfo
+If you want to compile the manuals by yourself, please follow the
+instructions below.
 @enumerate
 @item
 Edit @file{make/config.make} to your specific needs.
-
 @item
-Type @command{make} to compile the documentation (user manual and
-reference manual). By default, the documentation is built in info, PDF
-and HTML formats. If you want other formats (DVI and PostScript are
-available), type @command{make all-formats}. You can also type
-individually @command{make dvi} and/or @command{make ps} in order to get
-the corresponding format.
-
+Switch to the @code{doc/} subdirectory and type @command{make}. By
+default, the documentation is built in info, PDF and HTML formats. If
+you want other formats (DVI and PostScript are available), type
+@command{make all-formats}. You can also type individually @command{make
+dvi} and/or @command{make ps} in order to get the corresponding format.
 @item
 Type @command{make install} to install the documentation. If you have
 compiled the documentation in DVI and PostScript format, those will be
 installed as well.
 @end enumerate
+Note that if
+@uref{http://www.lrde.epita.fr/~didier/software/lisp/misc.php#declt,,Declt}
+is not installed on your system, the reference manual won't be generated.
 
 Type @command{make uninstall} to uninstall the library.
 
