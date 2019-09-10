@@ -114,6 +114,17 @@ Common Lisp
 @findex \func\@r{, key, }\key\
 @end macro
 
+@c Reader functions subindex
+@macro rfsubindex{func}
+@findex @r{Reader, }\func\
+@end macro
+
+@c Reader functions
+@macro rfindex{func}
+@findex \func\
+@rfsubindex{\func\}
+@end macro
+
 
 @c Variables index
 @c ---------------
@@ -144,6 +155,18 @@ Common Lisp
 @macro sysindex{name}
 @tpindex \name\
 @tpindex @r{System, }\name\
+@end macro
+
+@c Classes
+@macro clsindex{cls}
+@tpindex \cls\
+@tpindex @r{Class, }\cls\
+@end macro
+
+@c Class slots
+@macro clssindex{cls,slot}
+@tpindex \cls\@r{, slots, }\slot\
+@tpindex @r{Class, }\cls\@r{, slot, }\slot\
 @end macro
 
 
@@ -360,6 +383,34 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 
 @node TFM Files, Font Metrics, Usage, Usage
 @section TFM Files
+The main entry point to @tfm{} is @code{load-font}, the function which
+allows you to load a @code{tfm} file in memory.
+@defun load-font FILE
+Load @var{FILE} into a new font, and return it.
+@end defun
+
+@var{FILE} must be a pathname designator. Currently, @tfm{} doesn't
+support searching for TFM files in common or standard places (such as
+@TeX{}Live installations), so you need to know where those files are
+located, and provide a specific pathname.
+
+@cindex font
+@clsindex{font}@c
+If everything goes well, this function will return a new instance of a
+class called @code{font}. In the context of this library, and from now
+on, the term ``font'' denotes an instance of this class.
+
+@clssindex{font,name}@c
+@clssindex{font,checkum}@c
+@rfindex{name}@c
+@rfindex{checkum}@c
+The first two (not so) interesting slots in a font are its name, and the
+checksum of the original file. Both of these slots may be accessed with
+the eponym readers, @code{name} and @code{checksum}. The checksum is
+defined by the TFM format. The name, on the other hand, is computed by
+@tfm{} as the file's base name. For example, the 10pt Computer Modern
+font loaded from @file{/path/to/cmr10.tfm} will be named @code{"cmr10"}.
+
 
 @node Font Metrics, Character Metrics, TFM Files, Usage
 @section Font Metrics
