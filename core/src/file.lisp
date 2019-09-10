@@ -33,15 +33,15 @@
 ;; Header
 ;; ==========================================================================
 
-(defun parse-header (stream length tfm)
-  "Parse a header of LENGTH from STREAM into TFM."
+(defun parse-header (stream length font)
+  "Parse a header of LENGTH from STREAM into FONT."
   ;; #### FIXME: comparative tests with tftopl show a different checksum, but
   ;; the checksum I see doesn't fit 32 bits, so I don't understand what
   ;; they're doing...
-  (setf (checksum tfm) (read-u32 stream))
-  (setf (design-size tfm) (read-fix stream))
-  (if (< (design-size tfm) 1)
-    (error "Design size should be >= 1: ~A" (design-size tfm)))
+  (setf (checksum font) (read-u32 stream))
+  (setf (design-size font) (read-fix stream))
+  (if (< (design-size font) 1)
+    (error "Design size should be >= 1: ~A" (design-size font)))
   ;; #### NOTE: FILE-POSITION maybe?
   (loop :repeat (- length 2) :do (read-u32 stream)))
 
@@ -55,8 +55,8 @@
 ;; Ligature/Kerning Programs
 ;; -------------------------
 
-(defun %make-ligature/kerning-program (character index lig/kerns kerns tfm)
-  "Make a ligature/kerning program for CHARACTER in TFM.
+(defun %make-ligature/kerning-program (character index lig/kerns kerns font)
+  "Make a ligature/kerning program for CHARACTER in FONT.
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
   (loop :with continue := t
 	:while continue
@@ -64,16 +64,16 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	:when (<= (skip lig/kern) 128)
 	  :if (>= (op lig/kern) 128)
 	    :do (setf (kerning character
-			       (character-by-code (next lig/kern) tfm t)
-			       tfm)
+			       (character-by-code (next lig/kern) font t)
+			       font)
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
 	  :else
 	    :do (setf (ligature character
-				(character-by-code (next lig/kern) tfm t)
-				tfm)
+				(character-by-code (next lig/kern) font t)
+				font)
 		      (make-ligature
-		       (character-by-code (remainder lig/kern) tfm t)
+		       (character-by-code (remainder lig/kern) font t)
 		       (when (member (op lig/kern) '(0 1 5)) t)
 		       (when (member (op lig/kern) '(0 2 6)) t)
 		       (cond ((member (op lig/kern) '(5 6 7)) 1)
@@ -84,8 +84,8 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	:else
 	  :do (incf index (1+ (skip lig/kern)))))
 
-(defun make-ligature/kerning-program
-    (character index lig/kerns kerns tfm &aux (lig/kern (aref lig/kerns index)))
+(defun make-ligature/kerning-program (character index lig/kerns kerns font
+				      &aux (lig/kern (aref lig/kerns index)))
   "Find the real start of a ligature/kerning program and make it.
 See %make-ligature/kerning-program for more information."
   (%make-ligature/kerning-program
@@ -95,21 +95,21 @@ See %make-ligature/kerning-program for more information."
      index)
    lig/kerns
    kerns
-   tfm))
+   font))
 
 
 ;; -----------------
 ;; Extension Recipes
 ;; -----------------
 
-(defun make-extension-recipe (exten tfm)
-  "Make an extension recipe based on EXTEN and TFM."
+(defun make-extension-recipe (exten font)
+  "Make an extension recipe based on EXTEN and FONT."
   (let ((recipe (make-array 4 :initial-element nil)))
     (loop :for code :in (list (top exten) (mid exten) (bot exten))
 	  :for index :from 0
 	  :unless (zerop code)
-	    :do (setf (aref recipe index) (character-by-code code tfm t)))
-    (setf (aref recipe 3) (character-by-code (rep exten) tfm t))
+	    :do (setf (aref recipe index) (character-by-code code font t)))
+    (setf (aref recipe 3) (character-by-code (rep exten) font t))
     recipe))
 
 
@@ -117,8 +117,8 @@ See %make-ligature/kerning-program for more information."
 ;; Character Information
 ;; ---------------------
 
-(defun parse-character-information (stream nc nw nh nd ni nl nk ne tfm)
-  "Parse the 8 character information tables from STREAM into TFM."
+(defun parse-character-information (stream nc nw nh nd ni nl nk ne font)
+  "Parse the 8 character information tables from STREAM into FONT."
   (let ((char-infos (make-array nc :fill-pointer 0))
 	(widths (make-array nw :fill-pointer 0))
 	(heights (make-array nh :fill-pointer 0))
@@ -149,15 +149,15 @@ See %make-ligature/kerning-program for more information."
     ;; #### WARNING: the left and right boundary characters thing is still
     ;; unclear to me (e.g. why a right boundary but a left lig/kern program?).
     ;; I still need to see this used to figure out which implementation is
-    ;; best. Right now, the right boundary character is stored in the TFM
+    ;; best. Right now, the right boundary character is stored in the FONT
     ;; instance directly, whereas there is a special lig/kern program
     ;; accessible from :LEFT-BOUNDARY-CHARACTER which is probably not very
     ;; good.
     (unless (zerop nl)
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
-	  (setf (right-boundary-character tfm)
-		(or (character-by-code (next lig/kern) tfm)
+	  (setf (right-boundary-character font)
+		(or (character-by-code (next lig/kern) font)
 		    (next lig/kern)))))
       ;; #### NOTE: there would be a problem for lig/kern arrays of size 1
       ;; since the first element would also be the last one. I don't think
@@ -173,13 +173,13 @@ See %make-ligature/kerning-program for more information."
 	   (+ (* 256 (op lig/kern)) (remainder lig/kern))
 	   lig/kerns
 	   kerns
-	   tfm))))
+	   font))))
 
     ;; 3. Create the character metrics.
     (loop :for char-info :across char-infos
-	  :for code :from (min-code tfm)
+	  :for code :from (min-code font)
 	  :unless (zerop (width-index char-info))
-	    :do (setf (character-by-code tfm)
+	    :do (setf (character-by-code font)
 		      (make-character-metrics
 		       code
 		       (aref widths (width-index char-info))
@@ -187,28 +187,28 @@ See %make-ligature/kerning-program for more information."
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
     ;; #### NOTE: this should in fact always be ec - bc + 1.
-    (setf (character-count tfm) (hash-table-count (characters tfm)))
+    (setf (character-count font) (hash-table-count (characters font)))
 
     ;; 4. Now that we have all the characters registered, we can start
     ;; processing mutual references: character lists, extension recipes,
     ;; ligature, and kerning instructions.
     (loop :for char-info :across char-infos
-	  :for code :from (min-code tfm)
+	  :for code :from (min-code font)
 	  :when (lig/kern-index char-info)
 	    :do (make-ligature/kerning-program
-		 (character-by-code code tfm t)
+		 (character-by-code code font t)
 		 (lig/kern-index char-info)
 		 lig/kerns
 		 kerns
-		 tfm)
+		 font)
 	  :when (next-char char-info)
-	    :do (setf (next-larger-character (character-by-code code tfm t))
-		      (character-by-code (next-char char-info) tfm t))
+	    :do (setf (next-larger-character (character-by-code code font t))
+		      (character-by-code (next-char char-info) font t))
 	  :when (exten-index char-info)
-	    :do (setf (extension-recipe (character-by-code code tfm t))
+	    :do (setf (extension-recipe (character-by-code code font t))
 		      (make-extension-recipe
 		       (aref extens (exten-index char-info))
-		       tfm)))))
+		       font)))))
 
 
 
@@ -216,15 +216,15 @@ See %make-ligature/kerning-program for more information."
 ;; Parameters Section
 ;; ==========================================================================
 
-(defun parse-parameters (stream length tfm)
-  "Parse a parameters section of LENGTH from STREAM into TFM."
-  (when (>= length 1) (setf (slant tfm) (read-fix stream)))
-  (when (>= length 2) (setf (interword-space tfm) (read-fix stream t)))
-  (when (>= length 3) (setf (interword-stretch tfm) (read-fix stream t)))
-  (when (>= length 4) (setf (interword-shrink tfm) (read-fix stream t)))
-  (when (>= length 5) (setf (ex tfm) (read-fix stream t)))
-  (when (>= length 6) (setf (em tfm) (read-fix stream t)))
-  (when (>= length 7) (setf (extra-space tfm) (read-fix stream t))))
+(defun parse-parameters (stream length font)
+  "Parse a parameters section of LENGTH from STREAM into FONT."
+  (when (>= length 1) (setf (slant font) (read-fix stream)))
+  (when (>= length 2) (setf (interword-space font) (read-fix stream t)))
+  (when (>= length 3) (setf (interword-stretch font) (read-fix stream t)))
+  (when (>= length 4) (setf (interword-shrink font) (read-fix stream t)))
+  (when (>= length 5) (setf (ex font) (read-fix stream t)))
+  (when (>= length 6) (setf (em font) (read-fix stream t)))
+  (when (>= length 7) (setf (extra-space font) (read-fix stream t))))
 
 
 
@@ -232,8 +232,8 @@ See %make-ligature/kerning-program for more information."
 ;; Entry Point
 ;; ==========================================================================
 
-(defun parse (file &aux (tfm (make-tfm (pathname-name file))))
-  "Parse FILE into a new TFM instance, and return it."
+(defun parse (file &aux (font (make-font (pathname-name file))))
+  "Parse FILE into a new FONT instance, and return it."
   (with-open-file
       (stream file :direction :input :element-type '(unsigned-byte 8))
 
@@ -255,7 +255,7 @@ See %make-ligature/kerning-program for more information."
 	(error "Invalid smallest / largest character codes: ~A / ~A." bc ec))
       (when (> bc 255) (setq bc 1 ec 0))
       (setq nc (+ ec (- bc) 1))
-      (setf (min-code tfm) bc (max-code tfm) ec)
+      (setf (min-code font) bc (max-code font) ec)
       (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
 	(error "Declared section lengths mismatch."))
       (let ((actual-file-length (file-length stream))
@@ -274,13 +274,13 @@ See %make-ligature/kerning-program for more information."
       (unless (>= lh 2) (error "Invalid header length (too small): ~A." lh))
 
       ;; 2. Parse the header section.
-      (parse-header stream lh tfm)
+      (parse-header stream lh font)
 
       ;; 3. Parse the 8 character-related sections.
-      (parse-character-information stream nc nw nh nd ni nl nk ne tfm)
+      (parse-character-information stream nc nw nh nd ni nl nk ne font)
 
       ;; 4. Parse the parameters section.
-      (parse-parameters stream np tfm)))
-  tfm)
+      (parse-parameters stream np font)))
+  font)
 
 ;;; file.lisp ends here

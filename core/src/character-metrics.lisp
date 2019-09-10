@@ -59,8 +59,8 @@
    ;; TFM file. There's no specific representation of character lists and no
    ;; checking for cycles for instance. I'm not sure whether storing the next
    ;; character here is the right way to do it (as opposed to creating
-   ;; character lists in the TFM instance directly). I guess I'll have to wait
-   ;; until it's actually used to figure this out.
+   ;; character lists in the font instance directly). I guess I'll have to
+   ;; wait until it's actually used to figure this out.
    (next-larger-character
     :documentation "The character's next larger character.
 This slot is non-null only if the character is part of a chain of characters
@@ -72,7 +72,7 @@ of a ligature or kerning program for this character."
    ;; #### WARNING: for now, extension recipes are stored as an array of top,
    ;; middle, bottom and repeated characters. I'm not sure whether storing
    ;; extension recipes within characters is the right way to do it (as
-   ;; opposed to, for example, in the TFM instance directly). I guess I'll
+   ;; opposed to, for example, in the font instance directly). I guess I'll
    ;; have to wait until it's actually used to figure this out.
    (extension-recipe
     :documentation "The character's extension recipe.
@@ -83,9 +83,8 @@ character."
     :initform nil
     :accessor extension-recipe))
   (:documentation "The Character Metrics class.
-This class represents decoded character information from the TFM format.
-Within the context of this library, the term \"character\" denotes an instance
-of this class."))
+This class represents decoded character information. Within the context of
+this library, the term \"character\" denotes an instance of this class."))
 
 (defmethod print-object ((character character-metrics) stream)
   "Print CHARACTER unreadably with its code to STREAM."

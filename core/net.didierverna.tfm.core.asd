@@ -46,7 +46,7 @@ For a more complete description of TFM, see the net.didierverna.tfm system."
 		:components ((:file "util")
 			     (:file "intermediate")
 			     (:file "character-metrics")
-			     (:file "font-metrics")
+			     (:file "font")
 			     (:file "file")))))
 
 ;;; net.didierverna.tfm.core.asd ends here

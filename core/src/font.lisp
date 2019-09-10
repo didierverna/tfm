@@ -1,4 +1,4 @@
-;;; font-metrics.lisp --- Font Metrics Information
+;;; font.lisp --- Font Information
 
 ;; Copyright (C) 2018, 2019 Didier Verna
 
@@ -58,9 +58,8 @@
     :initarg :pass-over
     :reader pass-over))
   (:documentation "The Ligature class.
-This class represents a decoded ligature program from the TFM format. Within
-the context of this library, the term \"ligature\" denotes an instance of this
-class."))
+This class represents a decoded ligature program. Within the context of this
+library, the term \"ligature\" denotes an instance of this class."))
 
 (defun make-ligature (composite delete-before delete-after pass-over)
   "Make a new LIGATURE instance, and return it."
@@ -73,14 +72,14 @@ class."))
 
 
 ;; ==========================================================================
-;; Font Metrics
+;; Font
 ;; ==========================================================================
 
 ;; -----
 ;; Class
 ;; -----
 
-(defclass tfm ()
+(defclass font ()
   ((name
     :documentation "The font's name. This is the TFM file's base name."
     :initarg :name
@@ -140,48 +139,48 @@ font's code boundaries (see TeX: the Program [545])."
     :initform nil
     :accessor right-boundary-character))
   (:documentation "The TeX Font Metrics class.
-This class represents decoded font information from the TFM format. Within the
-context of this library, the term \"tfm\" denotes an instance of this class."))
+This class represents decoded font information. Within the context of this
+library, the term \"font\" denotes an instance of this class."))
 
-(defmethod print-object ((tfm tfm) stream)
-  "Print TFM unreadably with its font name to STREAM."
-  (print-unreadable-object (tfm stream :type t)
-    (princ (name tfm) stream)))
+(defmethod print-object ((font font) stream)
+  "Print FONT unreadably with its name to STREAM."
+  (print-unreadable-object (font stream :type t)
+    (princ (name font) stream)))
 
-(defun make-tfm (name)
-  "Make a new TFM instance, and return it.
+(defun make-font (name)
+  "Make a new FONT instance, and return it.
 Only font NAME is initialized. The other slots will be computed later on."
-  (make-instance 'tfm :name name))
+  (make-instance 'font :name name))
 
 
 ;; ----------------
 ;; Pseudo-accessors
 ;; ----------------
 
-(defun character-by-code (code tfm &optional errorp)
-  "Return TFM's character with CODE.
+(defun character-by-code (code font &optional errorp)
+  "Return FONT's character with CODE.
 If ERRORP, signal an error if not found."
-  (or (gethash code (characters tfm))
-      (when errorp (error "Character code ~A not found in ~S." code tfm))))
+  (or (gethash code (characters font))
+      (when errorp (error "Character code ~A not found in ~S." code font))))
 
-(defun (setf character-by-code) (character tfm)
-  "Make TFM's CHARACTER accessible by its code."
-  (setf (gethash (code character) (characters tfm)) character))
+(defun (setf character-by-code) (character font)
+  "Make FONT's CHARACTER accessible by its code."
+  (setf (gethash (code character) (characters font)) character))
 
-(defun ligature (character1 character2 tfm)
-  "Return TFM's ligature for CHARACTER1 and CHARACTER2 if any."
-  (gethash (cons character1 character2) (ligatures tfm)))
+(defun ligature (character1 character2 font)
+  "Return FONT's ligature for CHARACTER1 and CHARACTER2 if any."
+  (gethash (cons character1 character2) (ligatures font)))
 
-(defun (setf ligature) (ligature character1 character2 tfm)
-  "Set TFM's LIGATURE for CHARACTER1 and CHARACTER2."
-  (setf (gethash (cons character1 character2) (ligatures tfm)) ligature))
+(defun (setf ligature) (ligature character1 character2 font)
+  "Set FONT's LIGATURE for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (ligatures font)) ligature))
 
-(defun kerning (character1 character2 tfm)
-  "Return TFM's kerning for CHARACTER1 and CHARACTER2 if any."
-  (gethash (cons character1 character2) (kernings tfm)))
+(defun kerning (character1 character2 font)
+  "Return FONT's kerning for CHARACTER1 and CHARACTER2 if any."
+  (gethash (cons character1 character2) (kernings font)))
 
-(defun (setf kerning) (kerning character1 character2 tfm)
-  "Set TFM's KERNING for CHARACTER1 and CHARACTER2."
-  (setf (gethash (cons character1 character2) (kernings tfm)) kerning))
+(defun (setf kerning) (kerning character1 character2 font)
+  "Set FONT's KERNING for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (kernings font)) kerning))
 
-;;; font-metrics.lisp ends here
+;;; font.lisp ends here
