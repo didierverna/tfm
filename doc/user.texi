@@ -355,6 +355,25 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 @code{:net.didierverna.tfm} package.
 @end defun
 
+@menu
+* TFM Files::                   Loading a font
+* Font Metrics::                Font information
+* Character Metrics::           Character Information
+* Ligatures and Kernings::      Character pairs adjustments
+@end menu
+
+@node TFM Files, Font Metrics, Usage, Usage
+@section TFM Files
+
+@node Font Metrics, Character Metrics, TFM Files, Usage
+@section Font Metrics
+
+@node Character Metrics, Ligatures and Kernings, Font Metrics, Usage
+@section Character Metrics
+
+@node Ligatures and Kernings,  , Character Metrics, Usage
+@section Ligatures and Kernings
+
 
 
 @c ====================================================================
