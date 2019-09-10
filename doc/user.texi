@@ -240,7 +240,6 @@ This is the @tfm{} User Manual for @tfm{} version @value{VERSION}.
 @c ====================================================================
 @node Copying, Introduction, Top, Top
 @unnumbered Copying
-
 @quotation
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -262,7 +261,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 @c ====================================================================
 @node Introduction, Installation, Copying, Top
 @chapter Introduction
-
 TFM (for @TeX{} Font Metrics) is the standard font description format
 used by @TeX{}. The @tfm{} library parses and decodes TFM files into an
 abstract data structure, providing easy access to the corresponding font
@@ -288,7 +286,6 @@ This is the @tfm{} User Manual. @tfm{} also has a
 @c ====================================================================
 @node Installation, Usage, Introduction, Top
 @chapter Installation
-
 @xref{Supported Platforms}, for information on portability or
 requirements. See @tfm{}'s
 @uref{http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm,,homepage}
@@ -345,7 +342,6 @@ Type @command{make uninstall} to uninstall the library.
 @c ====================================================================
 @node Usage, Other Considerations, Installation, Top
 @chapter Usage
-
 @pkgindex{net.didierverna.tfm}
 @tfm{} itself resides in a package called @t{net.didierverna.tfm}. You
 can automatically nickname this package with the following function.
@@ -381,7 +377,6 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 @c ====================================================================
 @node Other Considerations, Conclusion, Usage, Top
 @chapter Other Considerations
-
 This section contains marginal or meta-information, orthogonal to the
 library's main purpose.
 
@@ -443,7 +438,6 @@ this process works, I have described it a
 @c -----------------
 @node Version Numbering,  , Configuration, Other Considerations
 @section Version Numbering
-
 As @tfm{} evolves over time, you might one day feel the need for
 conditionalizing your code on the version of the library.
 
@@ -517,7 +511,6 @@ output: 1.3 "Artificial Uncial".
 @c ====================================================================
 @node Conclusion, Supported Platforms, Other Considerations, Top
 @chapter Conclusion
-
 So that's it I guess. You know all about @tfm{} now. Thanks for reading.
 Apart from that, I don't really have a conclusion.
 
@@ -528,7 +521,6 @@ Apart from that, I don't really have a conclusion.
 @c ====================================================================
 @node Supported Platforms, Indexes, Conclusion, Top
 @appendix Supported Platforms
-
 @tfm{} is an ASDF 3 library. Apart from that, there is nothing special
 about portability.
 
