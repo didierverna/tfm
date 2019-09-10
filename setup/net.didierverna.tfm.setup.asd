@@ -1,4 +1,4 @@
-;;; net.didierverna.tfm.setup.asd --- ASDF system definition
+;;; net.didierverna.tfm.setup.asd --- ASDF system definition, setup library
 
 ;; Copyright (C) 2019 Didier Verna
 
@@ -21,18 +21,15 @@
 
 ;;; Commentary:
 
-;; Contents management by FCM version 0.1.
 
 
 ;;; Code:
 
 (asdf:defsystem :net.didierverna.tfm.setup
-  :long-name "TeX Font Metrics, setup library"
-  :description "TFM''s preload setup library"
-  :long-description "\
-TFM's setup library provides support for various preload configuration
-parameters. For a more complete description of TFM, see the
-net.didierverna.tfm system."
+  :long-name "TeX Font Metrics Setup"
+  :description "TFM's setup library"
+  :long-description "The TeX Font Metrics setup library.
+For a more complete description of TFM, see the net.didierverna.tfm system."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm"
