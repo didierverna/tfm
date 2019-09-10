@@ -25,50 +25,14 @@
 
 ;;; Code:
 
-(in-package :cl-user)
-
-(defpackage :net.didierverna.tfm
-  (:documentation "The TeX Font Metrics package.")
-  (:use :cl)
-  (:export
-    ;; Utilities:
-    :nickname-package
-    ;; Character metrics:
-    :code :width :height :depth :italic-correction :next-larger-character
-    :extension-recipe :top-character :middle-character :bottom-character
-    :repeated-character
-    ;; TeX font metrics:
-    :name :checksum :design-size :slant
-    :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
-    :min-code :max-code
-    :character-by-code :character-count
-    :ligature :kerning :right-boundary-character
-    ;; Entry point:
-    :parse))
-
 (in-package :net.didierverna.tfm)
+(in-readtable :net.didierverna.tfm)
 
 
 
 ;; ==========================================================================
 ;; Utilities
 ;; ==========================================================================
-
-;; --------
-;; External
-;; --------
-
-(defun nickname-package (&optional (nickname :tfm))
-  "Add NICKNAME (:TFM by default) to the :NET.DIDIERVERNA.TFM package."
-  (rename-package :net.didierverna.tfm
-		  (package-name :net.didierverna.tfm)
-		  (adjoin nickname (package-nicknames :net.didierverna.tfm)
-			  :test #'string-equal)))
-
-
-;; --------
-;; Internal
-;; --------
 
 (defun read-u16 (stream &optional limit)
   "Read an unsigned 16 bits Big Endian integer from STREAM.

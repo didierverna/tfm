@@ -1,4 +1,4 @@
-;;; net.didierverna.tfm.asd --- ASDF system definition
+;;; version.cl --- TFM version extractor script
 
 ;; Copyright (C) 2019 Didier Verna
 
@@ -21,24 +21,21 @@
 
 ;;; Commentary:
 
-;; Contents management by FCM version 0.1.
 
 
 ;;; Code:
 
+(in-package :cl-user)
+
+(require "asdf")
+
 (asdf:load-system :net.didierverna.tfm.setup)
 
-(asdf:defsystem :net.didierverna.tfm
-  :long-name "TeX Font Metrics"
-  :description "A Common Lisp interface to the TeX Font Metrics format"
-  :long-description "\
-TFM (for TeX Font Metrics) is a Common Lisp library for parsing tfm files."
-  :author "Didier Verna"
-  :mailto "didier@didierverna.net"
-  :homepage "http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm"
-  :source-control "https://github.com/didierverna/tfm"
-  :license "BSD"
-  :version #.(net.didierverna.tfm.setup:version :short)
-  :depends-on (:net.didierverna.tfm.setup :net.didierverna.tfm.core))
+(format t "LONG_VERSION  := ~A~%~
+	   SHORT_VERSION := ~A~%"
+  (net.didierverna.tfm.setup:version :long)
+  (net.didierverna.tfm.setup:version :short))
 
-;;; net.didierverna.tfm.asd ends here
+(uiop:quit)
+
+;;; version.cl ends here

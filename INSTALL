@@ -1,0 +1,75 @@
+
+2 Installation
+**************
+
+*Note Supported Platforms::, for information on portability or
+requirements.  See TFM’s homepage for tarballs, Git repository and
+online documentation.  TFM is also available via Quicklisp.
+
+   In order to install and load the bare Lisp library, unpack it
+somewhere in the ASDF 3 source registry and type this at the REPL:
+(asdf:load-system :net.didierverna.tfm)
+
+   In addition to the bare Lisp library, the TFM distribution offers
+documentation in the form of 2 different manuals: the User Manual (you
+are reading it) and the *note (reference)Top::.  If you want to benefit
+from all these wonders, some bits of manual installation are needed.
+After unpacking somewhere in the ASDF 3 source registry, please perform
+the following steps, in order.
+
+  1. Edit ‘make/config.make’ to your specific needs.
+
+  2. Type ‘make’ to compile the documentation (user manual and reference
+     manual).  By default, the documentation is built in info, PDF and
+     HTML formats.  If you want other formats (DVI and PostScript are
+     available), type ‘make all-formats’.  You can also type
+     individually ‘make dvi’ and/or ‘make ps’ in order to get the
+     corresponding format.
+
+  3. Type ‘make install’ to install the documentation.  If you have
+     compiled the documentation in DVI and PostScript format, those will
+     be installed as well.
+
+   Type ‘make uninstall’ to uninstall the library.
+
+
+A.1 Configuration
+=================
+
+Some aspects of TFM’s behavior can be configured _before_ the library
+system is actually loaded.  TFM stores its user-level configuration
+(along with some other setup parameters) in another ASDF system called
+‘net.didierverna.tfm.setup’ (and the eponym package).  In order to
+configure the library (I repeat, prior to loading it), you will
+typically do something like this:
+(require "asdf")
+(asdf:load-system :net.didierverna.tfm.setup)
+(net.didierverna.tfm.setup:configure <option> <value>)
+
+ -- Function: configure KEY VALUE
+     Set KEY to VALUE in the current TFM configuration.
+
+   Out of curiosity, you can also inquire the current configuration for
+specific options with the following function.
+ -- Function: configuration KEY
+     Return KEY’s value in the current TFM configuration.
+
+   Currently, the following options are provided.
+:swank-eval-in-emacs
+     This option is only useful if you use Slime, and mostly if you plan
+     on hacking TFM itself.  The library provides indentation
+     information for some of its functions directly embedded in the
+     code.  This information can be automatically transmitted to Emacs
+     when the ASDF system is loaded if you set this option to ‘t’.
+     However, note that for this to work, the Slime variable
+     ‘slime-enable-evaluate-in-emacs’ must also be set to ‘t’ in your
+     Emacs session.  If you’re interested to know how this process
+     works, I have described it in the following blog entry:
+     <http://www.didierverna.net/blog/index.php?post/2011/07/20/One-more-indentation-hack>.
+
+
+A.2 Supported Platforms
+=======================
+
+TFM is an ASDF 3 library.
+

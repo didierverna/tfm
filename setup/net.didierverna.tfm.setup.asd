@@ -1,4 +1,4 @@
-;;; net.didierverna.tfm.asd --- ASDF system definition
+;;; net.didierverna.tfm.setup.asd --- ASDF system definition
 
 ;; Copyright (C) 2019 Didier Verna
 
@@ -26,19 +26,18 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.tfm.setup)
-
-(asdf:defsystem :net.didierverna.tfm
-  :long-name "TeX Font Metrics"
-  :description "A Common Lisp interface to the TeX Font Metrics format"
+(asdf:defsystem :net.didierverna.tfm.setup
+  :long-name "TeX Font Metrics, setup library"
+  :description "TFM''s preload setup library"
   :long-description "\
-TFM (for TeX Font Metrics) is a Common Lisp library for parsing tfm files."
+TFM's setup library provides support for various preload configuration
+parameters. For a more complete description of TFM, see the
+net.didierverna.tfm system."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm"
   :source-control "https://github.com/didierverna/tfm"
   :license "BSD"
-  :version #.(net.didierverna.tfm.setup:version :short)
-  :depends-on (:net.didierverna.tfm.setup :net.didierverna.tfm.core))
+  :components ((:file "setup")))
 
-;;; net.didierverna.tfm.asd ends here
+;;; net.didierverna.tfm.setup.asd ends here

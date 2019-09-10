@@ -1,4 +1,4 @@
-;;; net.didierverna.tfm.asd --- ASDF system definition
+;;; declt.cl --- Declt availability checking script
 
 ;; Copyright (C) 2019 Didier Verna
 
@@ -26,19 +26,21 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.tfm.setup)
+(require "asdf")
 
-(asdf:defsystem :net.didierverna.tfm
-  :long-name "TeX Font Metrics"
-  :description "A Common Lisp interface to the TeX Font Metrics format"
-  :long-description "\
-TFM (for TeX Font Metrics) is a Common Lisp library for parsing tfm files."
-  :author "Didier Verna"
-  :mailto "didier@didierverna.net"
-  :homepage "http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm"
-  :source-control "https://github.com/didierverna/tfm"
-  :license "BSD"
-  :version #.(net.didierverna.tfm.setup:version :short)
-  :depends-on (:net.didierverna.tfm.setup :net.didierverna.tfm.core))
+(with-open-file (stream "declt.make" :direction :output :if-exists :supersede)
+  (princ "TEXI_REF :=" stream)
+  (handler-case
+      (progn (asdf:load-system :net.didierverna.declt)
+	     (princ " reference.texi" stream))
+  (asdf:missing-component ()
+    (format *error-output* "~
+*********************************************************************
+* WARNING: ASDF component NET.DIDIERVERNA.DECLT not found.          *
+* The TFM reference manual will not be generated.                   *
+*********************************************************************~%")))
+  (terpri stream))
 
-;;; net.didierverna.tfm.asd ends here
+(uiop:quit)
+
+;;; declt.cl ends here

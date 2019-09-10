@@ -1,0 +1,575 @@
+\input texinfo
+
+@c user.texi --- User manual
+
+@c Copyright (C) 2019 Didier Verna
+
+@c Author: Didier Verna <didier@didierverna.net>
+
+@c This file is part of TFM.
+
+@c Permission to use, copy, modify, and distribute this software for any
+@c purpose with or without fee is hereby granted, provided that the above
+@c copyright notice and this permission notice appear in all copies.
+
+@c THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+@c WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+@c MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+@c ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+@c WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+@c ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+@c OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+@c Commentary:
+
+
+
+@c ====================================================================
+@c Header
+@c ====================================================================
+@c %**start of header
+@setfilename tfm-user.info
+@settitle The TFM User Manual
+@afourpaper
+@documentencoding UTF-8
+@c %**end of header
+
+
+
+@c ====================================================================
+@c Settings
+@c ====================================================================
+@set VERSION 1.0 beta 1 "Artificial Uncial"
+@set COPYRIGHT_DATE 2018, 2019
+@setchapternewpage odd
+@documentdescription
+The TFM User Manual for version @value{VERSION}.
+@end documentdescription
+
+
+
+@c ====================================================================
+@c New Commands
+@c ====================================================================
+
+@macro tfm
+@sc{Tfm}
+@end macro
+
+@macro cl
+Common Lisp
+@end macro
+
+@macro etc
+@i{etc.}
+@end macro
+
+@macro eg
+@i{e.g.}
+@end macro
+
+@macro ie
+@i{i.e.}
+@end macro
+
+@macro perse
+@i{per-se}
+@end macro
+
+@macro nil
+@code{nil}
+@end macro
+
+
+@c --------------------------------
+@c Manuals cross-referencing macros
+@c --------------------------------
+
+@c ---------------
+@c Indexing macros
+@c ---------------
+
+@c Concept index
+@c -------------
+
+@c Configuration options
+@macro coindex{name}
+@vindex net.didierverna.declt.configuration
+@cindex Configuration Option, @t{:\name\}
+@cindex @t{:\name\}
+@end macro
+
+
+@c Functions index
+@c ---------------
+
+@c Function options
+@macro foindex{func,opt}
+@findex \func\@r{, option, }\opt\
+@end macro
+
+@c Function keys
+@macro fkindex{func,key}
+@findex \func\@r{, key, }\key\
+@end macro
+
+
+@c Variables index
+@c ---------------
+
+@c Constant variables
+@macro cvindex{var}
+@vindex \var\
+@vindex @r{Constant, }\var\
+@end macro
+
+@c Parameter variables
+@macro pvindex{var}
+@vindex \var\
+@vindex @r{Parameter, }\var\
+@end macro
+
+
+@c Data Types index
+@c ----------------
+
+@c Packages
+@macro pkgindex{name}
+@tpindex \name\
+@tpindex @r{Package, }\name\
+@end macro
+
+@c Systems
+@macro sysindex{name}
+@tpindex \name\
+@tpindex @r{System, }\name\
+@end macro
+
+
+
+@c ====================================================================
+@c Info Category and Directory
+@c ====================================================================
+@dircategory Common Lisp
+@direntry
+* TFM User: (tfm-user).             The TFM User Manual.
+@end direntry
+
+
+
+@c ====================================================================
+@c Copying
+@c ====================================================================
+@copying
+@quotation
+Copyright @copyright{} @value{COPYRIGHT_DATE} Didier Verna
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries a copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+section entitled ``Copying'' is included exactly as in the original.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be translated as well.
+@end quotation
+@end copying
+
+
+
+@c ====================================================================
+@c Title Page
+@c ====================================================================
+@titlepage
+@title The TFM User Manual
+@subtitle @TeX{} Font Metrics, Version @value{VERSION}
+@author Didier Verna <@email{didier@@didierverna.net}>
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+
+@c ====================================================================
+@c Table of Contents
+@c ====================================================================
+@contents
+
+
+
+@c ====================================================================
+@c Master Menu
+@c ====================================================================
+@ifnottex
+@node Top, Copying, (dir), (dir)
+@top The TFM User Manual
+
+This is the @tfm{} User Manual for @tfm{} version @value{VERSION}.
+
+@menu
+* Copying::                     The BSD license
+* Introduction::                TFM at a glance
+* Installation::                Library and documentation
+* Usage::                       All the details
+* Advanced Usage::              And then some
+* Conclusion::                  That's all folks
+* Technical Notes::             Configuration, platforms and portability
+* Indexes::                     Concepts, functions, variables and data types
+* Acknowledgments::             Hall of Pride
+@end menu
+
+@insertcopying
+@end ifnottex
+
+
+
+@c ====================================================================
+@c Copying
+@c ====================================================================
+@node Copying, Introduction, Top, Top
+@unnumbered Copying
+
+@quotation
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+@end quotation
+
+
+
+@c ====================================================================
+@c Introduction
+@c ====================================================================
+@node Introduction, Installation, Copying, Top
+@chapter Introduction
+
+That's it.
+
+
+
+
+@c ====================================================================
+@c Installation
+@c ====================================================================
+@node Installation, Usage, Introduction, Top
+@chapter Installation
+
+@xref{Supported Platforms}, for information on portability or
+requirements. See @tfm{}'s
+@uref{http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm,,homepage}
+for tarballs, Git repository and online documentation. @tfm{} is also
+available via @uref{http://www.quicklisp.org,,Quicklisp}.
+
+In order to install and load the bare Lisp library, unpack it somewhere
+in the ASDF 3 source registry and type this at the REPL:
+@sysindex{net.didierverna.tfm}
+@verbatim
+(asdf:load-system :net.didierverna.tfm)
+@end verbatim
+
+In addition to the bare Lisp library, the @tfm{} distribution offers
+documentation in the form of 2 different manuals: the User Manual (you
+are reading it) and the @ref{Top, , , reference, Reference Manual}. If
+you want to benefit from all these wonders, some bits of manual
+installation are needed. After unpacking somewhere in the ASDF 3 source
+registry, please perform the following steps, in order.
+
+@enumerate
+@item
+Edit @file{make/config.make} to your specific needs.
+
+@item
+Type @command{make} to compile the documentation (user manual and
+reference manual). By default, the documentation is built in info, PDF
+and HTML formats. If you want other formats (DVI and PostScript are
+available), type @command{make all-formats}. You can also type
+individually @command{make dvi} and/or @command{make ps} in order to get
+the corresponding format.
+
+@item
+Type @command{make install} to install the documentation. If you have
+compiled the documentation in DVI and PostScript format, those will be
+installed as well.
+@end enumerate
+
+Type @command{make uninstall} to uninstall the library.
+
+
+
+@c ====================================================================
+@c Usage
+@c ====================================================================
+@node Usage, Advanced Usage, Installation, Top
+@chapter Usage
+
+@pkgindex{net.didierverna.tfm}
+@tfm{} itself resides in a package called @t{net.didierverna.tfm}. You
+can automatically nickname this package with the following function.
+@cindex Package, nicknames
+@defun nickname-package [NICKNAME]
+Add @var{NICKNAME} (@code{:tfm} by default) to the
+@code{:net.didierverna.tfm} package.
+@end defun
+
+
+
+@c ====================================================================
+@c Advanced Usage
+@c ====================================================================
+@node Advanced Usage, Conclusion, Usage, Top
+@chapter Advanced Usage
+
+This section contains information about different features that are
+present in @tfm{} because of design decisions, but that I expect to be
+used only rarely, if at all.
+
+@menu
+* Version Numbering::           In case you need to conditionalize
+@end menu
+
+
+@c -----------------
+@c Version Numbering
+@c -----------------
+@node Version Numbering,  , Advanced Usage, Advanced Usage
+@section Version Numbering
+
+As @tfm{} evolves over time, you might one day feel the need for
+conditionalizing your code on the version of the library.
+
+The first thing you can do to access the current version number of
+@tfm{} is use the @code{version} function.
+
+@defun version &optional (TYPE :number)
+Return the current version number of @tfm{}. @var{TYPE} can be one of
+@code{:number}, @code{:short} or @code{:long}. For @code{:number}, the
+returned value is a fixnum. Otherwise, it is a string.
+@end defun
+
+A @tfm{} version is characterized by 4 elements as described below.
+@itemize
+@item
+@pvindex{*release-major-level*}
+A major version number stored in the parameter
+@code{*release-major-level*}.
+@item
+@pvindex{*release-minor-level*}
+A minor version number, stored in the parameter
+@code{*release-minor-level*}.
+@item
+@pvindex{*release-status*}
+A release status stored in the parameter @code{*release-status*}. The
+status of a release can be @code{:alpha}, @code{:beta}, @code{:rc}
+(standing for ``release candidate'') or @code{:patchlevel}. These are in
+effect 4 levels of expected stability.
+@item
+@pvindex{*release-status-level*}
+A status-specific version number stored in the parameter
+@code{*release-status-level*}. Status levels start at 1 (alpha 1, beta 1
+and release candidate 1) except for stable versions, in which case patch
+levels start at 0 (@eg{} 2.4.0).
+@end itemize
+
+@pvindex{*release-name*}
+In addition to that, each version of @tfm{} (in the sense
+@emph{major.minor}, regardless of the status) has a name, stored in the
+parameter @code{*release-name*}. The general naming theme for @tfm{}
+is ``Uncial Fonts'', from the
+@uref{https://www.tug.org/FontCatalogue/uncialfonts.html,,@LaTeX{} Font
+Catalogue}.
+
+Here is how the @code{version} function computes its value.
+@itemize
+@item
+A version @code{:number} is computed as @emph{major * 10000 + minor *
+100 + patchlevel}, effectively leaving two digits for each level. Note
+that alpha, beta and release candidate status are ignored in version
+numbers (this is as if the corresponding status level was considered to
+be always 0). Only stable releases have their level taken into account.
+@item
+A @code{:short} version will appear like this for unstable releases:
+1.3a4, 2.5b8 or 4.2rc1. Remember that alpha, beta or release candidate
+levels start at 1. Patchlevels for stable releases start at 0 but 0 is
+ignored in the output. So for instance, version 4.3.2 will appear as-is,
+while version 1.3.0 will appear as just 1.3.
+@item
+A @code{:long} version is expanded from the short one, and includes the
+release name. For instance, 1.3 alpha 4 "Artifical Uncial", 2.5 beta 8
+"Rotunda", 4.2 release candidate 1 "Romantic Rustic" or 4.3.2 "Square
+Capitals". As for the short version, a patchlevel of 0 is ignored in the
+output: 1.3 "Artificial Uncial".
+@end itemize
+
+
+
+@c ====================================================================
+@c Conclusion
+@c ====================================================================
+@node Conclusion, Technical Notes, Advanced Usage, Top
+@chapter Conclusion
+
+So that's it I guess. You know all about @tfm{} now.
+
+
+
+@c ====================================================================
+@c Technical Notes
+@c ====================================================================
+@node Technical Notes, Indexes, Conclusion, Top
+@appendix Technical Notes
+
+This chapter contains important information about the library's
+configuration and portability concerns.
+
+@menu
+* Configuration::               Pre-loading parameters
+* Supported Platforms::         Systems, compilers and dependencies
+@end menu
+
+
+@c -------------
+@c Configuration
+@c -------------
+@node Configuration, Supported Platforms, Technical Notes, Technical Notes
+@section Configuration
+@cindex Configuration
+@sysindex{net.didierverna.tfm.setup}@c
+@pkgindex{net.didierverna.tfm.setup}@c
+Some aspects of @tfm{}'s behavior can be configured @emph{before} the
+library system is actually loaded. @tfm{} stores its user-level
+configuration (along with some other setup parameters) in another ASDF
+system called @samp{net.didierverna.tfm.setup} (and the eponym
+package). In order to configure the library (I repeat, prior to loading
+it), you will typically do something like this:
+@verbatim
+(require "asdf")
+(asdf:load-system :net.didierverna.tfm.setup)
+(net.didierverna.tfm.setup:configure <option> <value>)
+@end verbatim
+
+@defun configure KEY VALUE
+Set @var{KEY} to @var{VALUE} in the current @tfm{} configuration.
+@end defun
+
+Out of curiosity, you can also inquire the current configuration for
+specific options with the following function.
+@defun configuration KEY
+Return @var{KEY}'s value in the current @tfm{} configuration.
+@end defun
+
+Currently, the following options are provided.
+@table @t
+@item :swank-eval-in-emacs
+@coindex{swank-eval-in-emacs}
+@vindex slime-enable-evaluate-in-emacs
+This option is only useful if you use Slime, and mostly if you plan on
+hacking @tfm{} itself. The library provides indentation information for
+some of its functions directly embedded in the code. This information
+can be automatically transmitted to Emacs when the ASDF system is loaded
+if you set this option to @code{t}. However, note that for this to work,
+the Slime variable @code{slime-enable-evaluate-in-emacs} must also be
+set to @code{t} in your Emacs session. If you're interested to know how
+this process works, I have described it in the following blog entry:
+@uref{http://www.didierverna.net/blog/index.php?post/2011/07/20/One-more-indentation-hack}.
+@end table
+
+
+@c ----------------------
+@c Supported Platforms
+@c ----------------------
+@node Supported Platforms,  , Configuration, Technical Notes
+@section Supported Platforms
+
+@tfm{} is an ASDF 3 library.
+
+
+
+@c ====================================================================
+@c Indexes
+@c ====================================================================
+@node Indexes, Acknowledgments, Technical Notes, Top
+@appendix Indexes
+
+@menu
+* Concept Index::               Well, the concept index
+* Function Index::              Well, the function index
+* Variable Index::              Well, the variable index
+* Data Type Index::             Well, the data type index
+@end menu
+
+
+@c --------------
+@c Concept Index
+@c --------------
+@node Concept Index, Function Index, Indexes, Indexes
+@section Concepts
+@printindex cp
+@page
+
+
+@c --------------
+@c Function Index
+@c --------------
+@node Function Index, Variable Index, Concept Index, Indexes
+@section Functions
+@printindex fn
+@page
+
+
+@c --------------
+@c Variable Index
+@c --------------
+@node Variable Index, Data Type Index, Function Index, Indexes
+@section Variables
+@printindex vr
+@page
+
+
+@c ---------------
+@c Data Type Index
+@c ---------------
+@node Data Type Index,  , Variable Index, Indexes
+@section Data Types
+@printindex tp
+
+
+
+@c ====================================================================
+@c Acknowledgments
+@c ====================================================================
+@node Acknowledgments,  , Indexes, Top
+@appendix Acknowledgments
+The following people have contributed bug reports or fixes, suggestions,
+compiler support or any other kind of help. You have my gratitude!
+
+@multitable @columnfractions .99
+@end multitable
+
+
+@bye
+
+@c Local Variables:
+@c TeX-master: t
+@c End:
+
+@c user.texi ends here
