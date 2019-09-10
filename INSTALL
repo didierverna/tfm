@@ -30,7 +30,7 @@ manual won’t be generated.
    Type ‘make uninstall’ to uninstall the library.
 
 
-A.1 Configuration
+4.1 Configuration
 =================
 
 Some aspects of TFM’s behavior can be configured _before_ the library
@@ -61,12 +61,12 @@ specific options with the following function.
      However, note that for this to work, the Slime variable
      ‘slime-enable-evaluate-in-emacs’ must also be set to ‘t’ in your
      Emacs session.  If you’re interested to know how this process
-     works, I have described it in the following blog entry:
-     <http://www.didierverna.net/blog/index.php?post/2011/07/20/One-more-indentation-hack>.
+     works, I have described it a Blog entry.
 
 
-A.2 Supported Platforms
-=======================
+Appendix A Supported Platforms
+******************************
 
-TFM is an ASDF 3 library.
+TFM is an ASDF 3 library.  Apart from that, there is nothing special
+about portability.
 
