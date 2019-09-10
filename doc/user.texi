@@ -586,6 +586,7 @@ this process works, I have described it in the following blog entry:
 The following people have contributed bug reports or fixes, suggestions,
 compiler support or any other kind of help. You have my gratitude!
 
+@emph{No one yet}.
 @multitable @columnfractions .99
 @end multitable
 
