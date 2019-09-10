@@ -31,9 +31,10 @@
   :long-name "TeX Font Metrics"
   :description "A Common Lisp interface to the TeX Font Metrics format"
   :long-description "\
-TFM (TeX Font Metrics) is the standard font description format used by TeX.
-This library parses and decodes TFM files into an abstract data structure,
-providing easy access to the corresponding font information in Common Lisp."
+TFM (for TeX Font Metrics) is the standard font description format used by
+TeX. The TFM library parses and decodes TFM files into an abstract data
+structure, providing easy access to the corresponding font information in
+Common Lisp."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm"
