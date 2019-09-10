@@ -52,7 +52,7 @@
     :character-by-code :character-count
     :ligature :kerning :right-boundary-character
     ;; From src/file.lisp:
-    :parse))
+    :load-font))
 
 (in-package :net.didierverna.tfm)
 

@@ -232,8 +232,8 @@ See %make-ligature/kerning-program for more information."
 ;; Entry Point
 ;; ==========================================================================
 
-(defun parse (file &aux (font (make-font (pathname-name file))))
-  "Parse FILE into a new FONT instance, and return it."
+(defun load-font (file &aux (font (make-font (pathname-name file))))
+  "Load FILE into a new font, and return it."
   (with-open-file
       (stream file :direction :input :element-type '(unsigned-byte 8))
 
