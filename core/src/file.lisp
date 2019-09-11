@@ -39,8 +39,18 @@
   (setf (design-size font) (read-fix stream))
   (if (< (design-size font) 1)
     (error "Design size should be >= 1: ~A" (design-size font)))
+  (let* ((ccs-length (read-byte stream))
+	 (ccs (make-string ccs-length)))
+    (loop :for i :from 0 :upto (1- ccs-length)
+	  ;; #### NOTE: this assumes that Lisp's internal character encoding
+	  ;; agrees at least with ASCII.
+	  :do (setf (aref ccs i) (code-char (read-byte stream))))
+    (setf (encoding font) ccs)
+    (loop :repeat (- 40 1 ccs-length)
+	  :do (unless (zerop (read-byte stream))
+		(error "Non-zero character coding scheme string remainder"))))
   ;; #### NOTE: FILE-POSITION maybe?
-  (loop :repeat (- length 2) :do (read-u32 stream)))
+  (loop :repeat (- length 12) :do (read-u32 stream)))
 
 
 

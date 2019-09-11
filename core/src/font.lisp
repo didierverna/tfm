@@ -85,6 +85,9 @@ library, the term \"ligature\" denotes an instance of this class."))
     :initarg :name
     :reader name)
    (checksum :documentation "The TFM file's checksum." :accessor checksum)
+   (encoding
+    :documentation "The font's character coding scheme."
+    :accessor encoding)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :accessor design-size)
