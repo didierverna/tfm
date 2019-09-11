@@ -120,12 +120,16 @@ This is a hash table associating character codes with characters."
    (character-count
     :documentation "The font's number of characters."
     :accessor character-count)
+   ;; #### WARNING: would it make sense to also have a hash by pairs of
+   ;; character /codes/?
    (ligatures
     :documentation "The font's ligatures.
 This is a hash table associating conses of characters with the corresponding
 ligature."
     :initform (make-hash-table :test #'equal)
     :accessor ligatures)
+   ;; #### WARNING: would it make sense to also have a hash by pairs of
+   ;; character /codes/?
    (kernings
     :documentation "The font's kernings.
 This is a hash table associating conses of characters with the corresponding
