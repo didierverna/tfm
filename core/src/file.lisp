@@ -34,7 +34,7 @@
 ;; ==========================================================================
 
 (defun parse-header (stream length font)
-  "Parse a header of LENGTH from STREAM into FONT."
+  "Parse a header of LENGTH words from STREAM into FONT."
   (setf (checksum font) (read-u32 stream))
   (setf (design-size font) (read-fix stream))
   (if (< (design-size font) 1)
@@ -214,7 +214,7 @@ See %make-ligature/kerning-program for more information."
 ;; ==========================================================================
 
 (defun parse-parameters (stream length font)
-  "Parse a parameters section of LENGTH from STREAM into FONT."
+  "Parse a parameters section of LENGTH words from STREAM into FONT."
   (when (>= length 1) (setf (slant font) (read-fix stream)))
   (when (>= length 2) (setf (interword-space font) (read-fix stream t)))
   (when (>= length 3) (setf (interword-stretch font) (read-fix stream t)))
