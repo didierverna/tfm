@@ -68,4 +68,25 @@ If LIMIT, check that the number lies within ]-16,16[."
       (error "Fix word outside ]-16,16[ range: ~A." value))
     value))
 
+
+
+;; ==========================================================================
+;; Strings
+;; ==========================================================================
+
+(defun read-padded-string
+    (stream padding
+     &aux (length (read-byte stream)) (string (make-string length)))
+  "Read a string out of PADDING bytes from STREAM.
+The first byte in STREAM indicates the actual length of the string.
+The remaining bytes should all be 0."
+  (loop :for i :from 0 :upto (1- length)
+	;; #### NOTE: this assumes that Lisp's internal character encoding
+	;; agrees at least with ASCII.
+	:do (setf (aref string i) (code-char (read-byte stream))))
+  (loop :repeat (- padding 1 length)
+	:do (unless (zerop (read-byte stream))
+	      (error "Non-zero character in padded string remainder")))
+  string)
+
 ;;; util.lisp ends here

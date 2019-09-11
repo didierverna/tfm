@@ -88,6 +88,7 @@ library, the term \"ligature\" denotes an instance of this class."))
    (encoding
     :documentation "The font's character coding scheme."
     :accessor encoding)
+   (family :documentation "The font's family." :accessor family)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :accessor design-size)
