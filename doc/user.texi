@@ -419,6 +419,10 @@ below. Each property is stored in a slot which may be accessed with the
 corresponding reader.
 @itemize @bullet
 @item
+@cindex @TeX{} point unit
+@cindex Unit, @TeX{} point
+@cindex Design size unit
+@cindex Unit, design size
 @clssindex{font,design-size}@c
 @rfindex{design-size}@c
 @code{design-size} is the font's design size, in @TeX{} point units.
