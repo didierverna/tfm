@@ -414,6 +414,45 @@ font loaded from @file{/path/to/cmr10.tfm} will be named @code{"cmr10"}.
 
 @node Font Metrics, Character Metrics, TFM Files, Usage
 @section Font Metrics
+Once loaded, a font contains a number of general properties described
+below. Each property is stored in a slot which may be accessed with the
+corresponding reader.
+@itemize @bullet
+@item
+@clssindex{font,design-size}@c
+@rfindex{design-size}@c
+@code{design-size} is the font's design size, in @TeX{} point units.
+For example, the design size of @t{cmr10} (the Computer Modern 10pt
+font) is 10. Apart from the @emph{slant} (see below), all other
+dimensions are given in design size units (not @TeX{} point units!).
+@item
+@clssindex{font,slant}@c
+@rfindex{slant}@c
+The @code{slant} of the font is a scalar ratio.
+@item
+@clssindex{font,interword-space}@c
+@rfindex{interword-space}@c
+@clssindex{font,interword-stretch}@c
+@rfindex{interword-stretch}@c
+@clssindex{font,interword-shrink}@c
+@rfindex{interword-shrink}@c
+The font's normal interword ``glue'' is provided by three separate
+values: @code{interword-space}, @code{interword-stretch}, and
+@code{interword-shrink}.
+@item
+@clssindex{font,ex}@c
+@rfindex{ex}@c
+@clssindex{font,em}@c
+@rfindex{em}@c
+@TeX{}'s usual font-dependent units are provided as @code{em} and
+@code{ex}.
+@item
+@clssindex{font,extra-space}@c
+@rfindex{extra-space}@c
+Finally, the font's additional space to put at the end of sentences is
+available as @code{extra-space}.
+@end itemize
+
 
 @node Character Metrics, Ligatures and Kernings, Font Metrics, Usage
 @section Character Metrics
