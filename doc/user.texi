@@ -165,7 +165,7 @@ Common Lisp
 
 @c Class slots
 @macro clssindex{cls,slot}
-@tpindex \cls\@r{, slots, }\slot\
+@tpindex \cls\@r{, slot, }\slot\
 @tpindex @r{Class, }\cls\@r{, slot, }\slot\
 @end macro
 
