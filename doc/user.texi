@@ -394,7 +394,7 @@ support searching for TFM files in common or standard places (such as
 @TeX{}Live installations), so you need to know where those files are
 located, and provide a specific pathname.
 
-@cindex font
+@cindex Font
 @clsindex{font}@c
 If everything goes well, this function will return a new instance of a
 class called @code{font}. In the context of this library, and from now
@@ -456,7 +456,7 @@ available as @code{extra-space}.
 
 @node Character Metrics, Ligatures and Kernings, Font Metrics, Usage
 @section Character Metrics
-@cindex character code
+@cindex Character code
 @clssindex{font,min-code}@c
 @rfindex{min-code}@c
 @clssindex{font,max-code}@c
@@ -477,7 +477,7 @@ Return @var{FONT}'s character with @var{CODE}.
 If @var{ERRORP}, signal an error if not found.
 @end defun
 
-@cindex character
+@cindex Character
 @clsindex{character-metrics}@c
 The function above actually returns an instance of a class called
 @code{character-metrics}, which contains character-specific information.
