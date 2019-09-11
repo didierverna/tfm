@@ -528,7 +528,8 @@ The character's box is described by its @code{width}, @code{height}, and
 @clssindex{character-metrics,italic-correction}@c
 @rfindex{italic-correction}@c
 Finally, a character may also have an @code{italic-correction} (still in
-design size units).
+design size units), used in @TeX{} for regular characters followed by
+the command @code{\/}, and also in math mode for superscript placement.
 @end itemize
 
 
