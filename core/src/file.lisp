@@ -35,9 +35,6 @@
 
 (defun parse-header (stream length font)
   "Parse a header of LENGTH from STREAM into FONT."
-  ;; #### FIXME: comparative tests with tftopl show a different checksum, but
-  ;; the checksum I see doesn't fit 32 bits, so I don't understand what
-  ;; they're doing...
   (setf (checksum font) (read-u32 stream))
   (setf (design-size font) (read-fix stream))
   (if (< (design-size font) 1)
