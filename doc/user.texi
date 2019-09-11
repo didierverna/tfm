@@ -376,12 +376,13 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 
 @menu
 * TFM Files::                   Loading a font
-* Font Metrics::                Font information
-* Character Metrics::           Character Information
-* Ligatures and Kernings::      Character pairs adjustments
+* Font Identity::               Name, encoding, etc.
+* Font Metrics::                Size, shape, etc.
+* Character Metrics::           Code, box dimensions, etc.
+* Ligatures and Kernings::      For pairs of characters
 @end menu
 
-@node TFM Files, Font Metrics, Usage, Usage
+@node TFM Files, Font Identity, Usage, Usage
 @section TFM Files
 The main entry point to @tfm{} is @code{load-font}, the function which
 allows you to load a @code{tfm} file in memory.
@@ -400,23 +401,40 @@ If everything goes well, this function will return a new instance of a
 class called @code{font}. In the context of this library, and from now
 on, the term ``font'' denotes an instance of this class.
 
+A font contains a lot of information (identity, description, characters,
+@etc{}). This information is stored in various slots which are
+accessible with the eponym reader functions. The following sections
+describe that information and how to access it.
+
+@node Font Identity, Font Metrics, TFM Files, Usage
+@section Font Indentity
+A font is identified by a number of general attributes described below.
+@itemize @bullet
+@item
 @clssindex{font,name}@c
-@clssindex{font,checkum}@c
 @rfindex{name}@c
+A font has a @code{name}, which is computed by @tfm{} as the file's base
+name. For example, the 10pt Computer Modern font loaded from
+@file{/path/to/cmr10.tfm} will be named @code{"cmr10"}.
+@item
+@clssindex{font,checkum}@c
 @rfindex{checkum}@c
-The first two (not so) interesting slots in a font are its name, and the
-checksum of the original file. Both of these slots may be accessed with
-the eponym readers, @code{name} and @code{checksum}. The checksum is
-defined by the TFM format. The name, on the other hand, is computed by
-@tfm{} as the file's base name. For example, the 10pt Computer Modern
-font loaded from @file{/path/to/cmr10.tfm} will be named @code{"cmr10"}.
+A font has a @code{checksum}, which is provided by Metafont and stored
+in the TFM file.
+@item
+@clssindex{font,encoding}@c
+@rfindex{encoding}@c
+A font has a specific @code{encoding} describing the relation between
+characters and their numerical code. The encoding is an informal string.
+For some examples, see the paper
+@uref{http://www.tug.org/TUGboat/Articles/tb02-1/tb02fuchstfm.pdf,,@TeX{}
+Font Metric Files} from David Fuchs (TUGboat, Volume 2, N.1, pages
+12--16).
+@end itemize
 
-
-@node Font Metrics, Character Metrics, TFM Files, Usage
+@node Font Metrics, Character Metrics, Font Identity, Usage
 @section Font Metrics
-Once loaded, a font contains a number of general properties described
-below. Each property is stored in a slot which may be accessed with the
-corresponding reader.
+A font also contains a number of global properties described below.
 @itemize @bullet
 @item
 @cindex @TeX{} point unit
