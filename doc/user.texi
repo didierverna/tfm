@@ -456,6 +456,59 @@ available as @code{extra-space}.
 
 @node Character Metrics, Ligatures and Kernings, Font Metrics, Usage
 @section Character Metrics
+@cindex character code
+@clssindex{font,min-code}@c
+@rfindex{min-code}@c
+@clssindex{font,max-code}@c
+@rfindex{max-code}@c
+@clssindex{font,character-count}@c
+@rfindex{character-count}@c
+A TFM font contains at most 256 characters, represented by consecutive
+numerical @emph{codes}. The font instance has two readable slots named
+@code{min-code} and @code{max-code} representing the character code
+range. Additionally, the number of characters in the font is available
+as @code{character-count} (but this should be equal to @emph{max-code -
+min-code + 1}).
+
+The font's characters are internally stored in a hash table, which can
+be accessed with the following function.
+@defun character-by-code CODE FONT &optional ERRORP
+Return @var{FONT}'s character with @var{CODE}.
+If @var{ERRORP}, signal an error if not found.
+@end defun
+
+@cindex character
+@clsindex{character-metrics}@c
+The function above actually returns an instance of a class called
+@code{character-metrics}, which contains character-specific information.
+In the context of this library, and from now on, the term ``character''
+denotes an instance of this class.
+
+A character contains a number of specific properties, unsurprisingly
+stored in readable slots.
+@itemize @bullet
+@item
+@clssindex{character-metrics,code}@c
+@rfindex{code}@c
+@findex character-by-code
+A character has a numerical @code{code}, which makes it accessible from
+the font instance (see the function @code{character-by-code}).
+@item
+@clssindex{character-metrics,width}@c
+@rfindex{width}@c
+@clssindex{character-metrics,height}@c
+@rfindex{height}@c
+@clssindex{character-metrics,depth}@c
+@rfindex{depth}@c
+The character's box is described by its @code{width}, @code{height}, and
+@code{depth} (again, in design size units).
+@item
+@clssindex{character-metrics,italic-correction}@c
+@rfindex{italic-correction}@c
+Finally, a character may also have an @code{italic-correction}.
+@end itemize
+
+
 
 @node Ligatures and Kernings,  , Character Metrics, Usage
 @section Ligatures and Kernings
