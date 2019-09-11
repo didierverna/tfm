@@ -505,7 +505,8 @@ The character's box is described by its @code{width}, @code{height}, and
 @item
 @clssindex{character-metrics,italic-correction}@c
 @rfindex{italic-correction}@c
-Finally, a character may also have an @code{italic-correction}.
+Finally, a character may also have an @code{italic-correction} (still in
+design size units).
 @end itemize
 
 
