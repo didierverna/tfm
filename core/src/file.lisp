@@ -49,7 +49,7 @@
     (loop :repeat (- 40 1 ccs-length)
 	  :do (unless (zerop (read-byte stream))
 		(error "Non-zero character coding scheme string remainder"))))
-  ;; #### NOTE: FILE-POSITION maybe?
+  ;; #### FIXME: actually parse the rest of the header.
   (loop :repeat (- length 12) :do (read-u32 stream)))
 
 
@@ -229,6 +229,11 @@ See %make-ligature/kerning-program for more information."
   (when (>= length 4) (setf (interword-shrink font) (read-fix stream t)))
   (when (>= length 5) (setf (ex font) (read-fix stream t)))
   (when (>= length 6) (setf (em font) (read-fix stream t)))
+  ;; #### FIXME: in mathsy fonts, there is no extra-space, but 16 additional
+  ;; parameters instead. In mathex fonts, the extra-space is here, and there
+  ;; is 6 additional parameters. We need to figure this out by looking at the
+  ;; font encoding. It is likely that the best solution would be to have
+  ;; a font class hierarchy instead of a single one.
   (when (>= length 7) (setf (extra-space font) (read-fix stream t))))
 
 
