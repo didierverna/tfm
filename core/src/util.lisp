@@ -54,7 +54,7 @@ If LIMIT, check that the integer is less than 2^15."
 
 (defun read-fix (stream &optional limit)
   "Read a fix word from STREAM.
-If LIMIT, check that the number lies within [-16,16]."
+If LIMIT, check that the number lies within ]-16,16[."
   (let* ((bytes (read-u32 stream))
 	 (neg (= (ldb (byte 1 31) bytes) 1))
 	 value)
@@ -64,9 +64,8 @@ If LIMIT, check that the number lies within [-16,16]."
 		   (* (ldb (byte 8  8) bytes) (expt 2 -12))
 		   (* (ldb (byte 8  0) bytes) (expt 2 -20))))
     (when neg (setq value (- value)))
-    ;; #### FIXME: <= or < ?
-    (when (and limit (not (<= -16 value 16)))
-      (error "Fix word outside [-16,16] range: ~A." value))
+    (when (and limit (not (< -16 value 16)))
+      (error "Fix word outside ]-16,16[ range: ~A." value))
     value))
 
 ;;; util.lisp ends here
