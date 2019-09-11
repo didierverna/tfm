@@ -16,10 +16,10 @@ and stored in an easily accessible way. Inspect the object in question to
 familiarize yourself with its contents.
 
 ## More information
-TFM comes with both a [user manual]
-(https://www.lrde.epita.fr/~didier/software/lisp/tfm/user/)
-and a [reference manual]
-(https://www.lrde.epita.fr/~didier/software/lisp/tfm/reference/).
-Please see the projet's [homepage]
-(https://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm)
+TFM comes with both a
+[user manual](https://www.lrde.epita.fr/~didier/software/lisp/tfm/user/)
+and a
+[reference manual](https://www.lrde.epita.fr/~didier/software/lisp/tfm/reference/).
+Please see the projet's
+[homepage](https://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm)
 for more information.
