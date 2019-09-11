@@ -124,9 +124,9 @@ See %make-ligature/kerning-program for more information."
 ;; Character Information
 ;; ---------------------
 
-(defun parse-character-information (stream nc nw nh nd ni nl nk ne font)
+(defun parse-character-information (stream nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from STREAM into FONT."
-  (let ((char-infos (make-array nc :fill-pointer 0))
+  (let ((char-infos (make-array (character-count font) :fill-pointer 0))
 	(widths (make-array nw :fill-pointer 0))
 	(heights (make-array nh :fill-pointer 0))
 	(depths (make-array nd :fill-pointer 0))
@@ -135,7 +135,7 @@ See %make-ligature/kerning-program for more information."
 	(kerns (make-array nk :fill-pointer 0))
 	(extens (make-array ne :fill-pointer 0)))
     ;; 1. Read the tables.
-    (loop :repeat nc
+    (loop :repeat (character-count font)
 	  :do (vector-push (decode-char-info (read-u32 stream)) char-infos))
     (loop :repeat nw :do (vector-push (read-fix stream t) widths))
     (loop :repeat nh :do (vector-push (read-fix stream t) heights))
@@ -193,8 +193,6 @@ See %make-ligature/kerning-program for more information."
 		       (aref heights (height-index char-info))
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
-    ;; #### NOTE: this should in fact always be ec - bc + 1.
-    (setf (character-count font) (hash-table-count (characters font)))
 
     ;; 4. Now that we have all the characters registered, we can start
     ;; processing mutual references: character lists, extension recipes,
@@ -262,7 +260,7 @@ See %make-ligature/kerning-program for more information."
 	(error "Invalid smallest / largest character codes: ~A / ~A." bc ec))
       (when (> bc 255) (setq bc 1 ec 0))
       (setq nc (+ ec (- bc) 1))
-      (setf (min-code font) bc (max-code font) ec)
+      (setf (min-code font) bc (max-code font) ec (character-count font) nc)
       (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
 	(error "Declared section lengths mismatch."))
       (let ((actual-file-length (file-length stream))
@@ -284,7 +282,7 @@ See %make-ligature/kerning-program for more information."
       (parse-header stream lh font)
 
       ;; 3. Parse the 8 character-related sections.
-      (parse-character-information stream nc nw nh nd ni nl nk ne font)
+      (parse-character-information stream nw nh nd ni nl nk ne font)
 
       ;; 4. Parse the parameters section.
       (parse-parameters stream np font)))
