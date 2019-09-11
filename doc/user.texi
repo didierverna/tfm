@@ -489,7 +489,7 @@ A TFM font contains at most 256 characters, represented by consecutive
 numerical @emph{codes}. The font instance has two readable slots named
 @code{min-code} and @code{max-code} representing the character code
 range. Additionally, the number of characters in the font is available
-as @code{character-count} (but this should be equal to @emph{max-code -
+as @code{character-count} (this is in fact equal to @emph{max-code -
 min-code + 1}).
 
 The font's characters are internally stored in a hash table, which can
