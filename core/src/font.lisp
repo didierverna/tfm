@@ -86,13 +86,25 @@ library, the term \"ligature\" denotes an instance of this class."))
     :reader name)
    (checksum :documentation "The TFM file's checksum." :accessor checksum)
    (encoding
-    :documentation "The font's character coding scheme."
+    :documentation "The font's character coding scheme, if available."
+    :initform nil
     :accessor encoding)
-   (family :documentation "The font's family." :accessor family)
+   (family
+    :documentation "The font's family, if available."
+    :initform nil
+    :accessor family)
    (7bits-safe
-    :documentation "Whether the font is 7 bits safe."
+    :documentation "Whether the font is 7 bits safe, if available.
+Note that meaningful values are 0 or 1. A value of NIL means that the
+information in unavailable."
+    :initform nil
     :accessor 7bits-safe)
-   (face :documentation "The font's face number." :accessor face)
+   (face
+    :documentation "The font's face number.
+Note that meaningful values are numbers. A value of NIL means that the
+information in unavailable." 
+    :initform nil
+    :accessor face)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :accessor design-size)
