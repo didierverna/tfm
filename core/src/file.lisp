@@ -35,14 +35,26 @@
 
 (defun parse-header (stream length font)
   "Parse a header of LENGTH words from STREAM into FONT."
+  (unless (>= length 2) (error "Header length too small."))
   (setf (checksum font) (read-u32 stream))
   (setf (design-size font) (read-fix stream))
   (if (< (design-size font) 1)
     (error "Design size should be >= 1: ~A" (design-size font)))
-  (setf (encoding font) (read-padded-string stream 40))
-  (setf (family font) (read-padded-string stream 20))
-  ;; #### FIXME: actually parse the rest of the header.
-  (loop :repeat (- length 17) :do (read-u32 stream)))
+  (decf length 2)
+  ;; #### WARNING: we assume Palo Alto headers below. Can there be anything
+  ;; else?
+  (when (>= length 10)
+    (setf (encoding font) (read-padded-string stream 40))
+    (decf length 10))
+  (when (>= length 5)
+    (setf (family font) (read-padded-string stream 20))
+    (decf length 5))
+  (when (>= length 1)
+    (let ((word (read-u32 stream)))
+      (setf (7bits-safe font) (ldb (byte 1 31) word))
+      (setf (face font) (ldb (byte 8 0) word)))
+    (decf length))
+  (loop :repeat length :do (read-u32 stream)))
 
 
 

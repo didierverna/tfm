@@ -89,6 +89,10 @@ library, the term \"ligature\" denotes an instance of this class."))
     :documentation "The font's character coding scheme."
     :accessor encoding)
    (family :documentation "The font's family." :accessor family)
+   (7bits-safe
+    :documentation "Whether the font is 7 bits safe."
+    :accessor 7bits-safe)
+   (face :documentation "The font's face number." :accessor face)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :accessor design-size)
