@@ -291,18 +291,18 @@ It signals that the first VALUE in a table is not 0."))
 ;; Entry Point
 ;; ==========================================================================
 
-(define-condition file-lengths (tfm-format-error)
+(define-condition file-size (tfm-format-error)
   ((declared :initarg :declared :accessor declared)
    (actual :initarg :actual :accessor actual))
-  (:report (lambda (file-lengths stream)
+  (:report (lambda (file-size stream)
 	     (format stream "~
 Invalid file length (should be ~A): ~A.
 Stream: ~A."
-	       (actual file-lengths)
-	       (declared file-lengths)
-	       (tfm-stream file-lengths))))
-  (:documentation "The File Lengths error.
-It signals that the DECLARED file length is different from the ACTUAL one."))
+	       (actual file-size)
+	       (declared file-size)
+	       (tfm-stream file-size))))
+  (:documentation "The File Size error.
+It signals that the DECLARED file size is different from the ACTUAL one."))
 
 (define-condition header-length (tfm-format-error)
   ((value :initarg :value :accessor value))
@@ -397,12 +397,12 @@ greater than LARGEST."))
 	  (ne (read-u16 stream t))
 	  (np (read-u16 stream t))
 	  nc)
-      (let ((actual-file-length (file-length stream))
-	    (declared-file-length (* 4 lf)))
-	(unless (= actual-file-length declared-file-length)
-	  (error 'file-lengths
-		 :actual actual-file-length
-		 :declared declared-file-length
+      (let ((actual-size (file-length stream))
+	    (declared-size (* 4 lf)))
+	(unless (= actual-size declared-size)
+	  (error 'file-size
+		 :actual actual-size
+		 :declared declared-size
 		 :stream stream)))
       (unless (>= lh 2) (error 'header-length :value lh :stream stream))
       (unless (and (<= (1- bc) ec) (<= ec 255))
