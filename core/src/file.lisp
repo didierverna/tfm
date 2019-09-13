@@ -138,6 +138,7 @@ See %make-ligature/kerning-program for more information."
 	(lig/kerns (make-array nl :fill-pointer 0))
 	(kerns (make-array nk :fill-pointer 0))
 	(extens (make-array ne :fill-pointer 0)))
+
     ;; 1. Read the tables.
     (loop :repeat (character-count font)
 	  :do (vector-push (decode-char-info (read-u32 stream)) char-infos))
@@ -156,7 +157,22 @@ See %make-ligature/kerning-program for more information."
 	    :do (error "Invalid first element of ~A table (should be 0): ~A."
 		       name (aref array 0)))
 
-    ;; 2. Check for left and right boundary characters.
+    ;; 2. Create the character metrics.
+    (loop :for char-info :across char-infos
+	  :for code :from (min-code font)
+	  :unless (zerop (width-index char-info))
+	    :do (setf (character-by-code font)
+		      (make-character-metrics
+		       code
+		       (aref widths (width-index char-info))
+		       (aref heights (height-index char-info))
+		       (aref depths (depth-index char-info))
+		       (aref italics (italic-index char-info)))))
+
+    ;; Now that we have all the characters registered, we can start processing
+    ;; mutual references.
+
+    ;; 3. Check for left and right boundary characters.
     ;; #### WARNING: the left and right boundary characters thing is still
     ;; unclear to me (e.g. why a right boundary but a left lig/kern program?).
     ;; I still need to see this used to figure out which implementation is
@@ -186,21 +202,8 @@ See %make-ligature/kerning-program for more information."
 	   kerns
 	   font))))
 
-    ;; 3. Create the character metrics.
-    (loop :for char-info :across char-infos
-	  :for code :from (min-code font)
-	  :unless (zerop (width-index char-info))
-	    :do (setf (character-by-code font)
-		      (make-character-metrics
-		       code
-		       (aref widths (width-index char-info))
-		       (aref heights (height-index char-info))
-		       (aref depths (depth-index char-info))
-		       (aref italics (italic-index char-info)))))
-
-    ;; 4. Now that we have all the characters registered, we can start
-    ;; processing mutual references: character lists, extension recipes,
-    ;; ligature, and kerning instructions.
+    ;; 4. Process ligature / kerning programs, character lists, and extension
+    ;; recipes, character by character.
     (loop :for char-info :across char-infos
 	  :for code :from (min-code font)
 	  :when (lig/kern-index char-info)
