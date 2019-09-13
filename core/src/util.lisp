@@ -30,8 +30,39 @@
 
 
 ;; ==========================================================================
+;; Error Ontology
+;; ==========================================================================
+
+(define-condition tfm ()
+  ()
+  (:documentation "The TFM root condition."))
+
+(define-condition tfm-error (tfm error)
+  ()
+  (:documentation "The TFM errors root condition."))
+
+(define-condition tfm-format-error (tfm-error)
+  ((stream :initarg :stream :accessor tfm-stream))
+  (:documentation "The TFM format errors root condition.
+This is the root condition for errors related to non-compliant STREAMs."))
+
+
+
+;; ==========================================================================
 ;; Numerical Values
 ;; ==========================================================================
+
+(define-condition u16 (tfm-format-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (u16 stream)
+	     (format stream "~
+Unsigned 16 bits integer is >= 2^15: ~A.
+Stream: ~A."
+	       (value u16)
+	       (tfm-stream u16))))
+  (:documentation "The U16 error.
+It signals that an unsigned 16 bits integer VALUE is greater than 2^15."))
+
 
 (defun read-u16 (stream &optional limit)
   "Read an unsigned 16 bits Big Endian integer from STREAM.
@@ -40,8 +71,9 @@ If LIMIT, check that the integer is less than 2^15."
     (setf (ldb (byte 8 8) u16) (read-byte stream)
 	  (ldb (byte 8 0) u16) (read-byte stream))
     (when (and limit (not (zerop (ldb (byte 1 15) u16))))
-      (error "Unsigned 16 bits integer too large (>= 2^15): ~A." u16))
+      (error 'u16 :value u16 :stream stream))
     u16))
+
 
 (defun read-u32 (stream)
   "Read an unsigned 32 bits Big Endian integer from STREAM."
@@ -52,21 +84,33 @@ If LIMIT, check that the integer is less than 2^15."
 	  (ldb (byte 8  0) u32) (read-byte stream))
     u32))
 
+
+(define-condition fix (tfm-format-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (fix stream)
+	     (format stream "~
+Fix word is outside ]-16,+16[: ~A.
+Stream: ~A."
+	       (value fix)
+	       (tfm-stream fix))))
+  (:documentation "The Fix error.
+It signals that a fix word VALUE is outside ]-16,+16[."))
+
 (defun read-fix (stream &optional limit)
   "Read a fix word from STREAM.
-If LIMIT, check that the number lies within ]-16,16[."
+If LIMIT, check that the number lies within ]-16,+16[."
   (let* ((bytes (read-u32 stream))
 	 (neg (= (ldb (byte 1 31) bytes) 1))
-	 value)
+	 fix)
     (when neg (setq bytes (lognot (1- bytes))))
-    (setq value (+ (* (ldb (byte 8 24) bytes) (expt 2 4))
-		   (* (ldb (byte 8 16) bytes) (expt 2 -4))
-		   (* (ldb (byte 8  8) bytes) (expt 2 -12))
-		   (* (ldb (byte 8  0) bytes) (expt 2 -20))))
-    (when neg (setq value (- value)))
-    (when (and limit (not (< -16 value 16)))
-      (error "Fix word outside ]-16,16[ range: ~A." value))
-    value))
+    (setq fix (+ (* (ldb (byte 8 24) bytes) (expt 2 4))
+		 (* (ldb (byte 8 16) bytes) (expt 2 -4))
+		 (* (ldb (byte 8  8) bytes) (expt 2 -12))
+		 (* (ldb (byte 8  0) bytes) (expt 2 -20))))
+    (when neg (setq fix (- fix)))
+    (when (and limit (not (< -16 fix 16)))
+      (error 'fix :value fix :stream stream))
+    fix))
 
 
 
@@ -79,14 +123,16 @@ If LIMIT, check that the number lies within ]-16,16[."
      &aux (length (read-byte stream)) (string (make-string length)))
   "Read a string out of PADDING bytes from STREAM.
 The first byte in STREAM indicates the actual length of the string.
-The remaining bytes should all be 0."
+The remaining bytes are ignored."
   (loop :for i :from 0 :upto (1- length)
 	;; #### NOTE: this assumes that Lisp's internal character encoding
 	;; agrees at least with ASCII.
 	:do (setf (aref string i) (code-char (read-byte stream))))
-  (loop :repeat (- padding 1 length)
-	:do (unless (zerop (read-byte stream))
-	      (error "Non-zero character in padded string remainder")))
+  ;; #### NOTE: David Fuchs'paper in TUGboat Vol.2 n.1 says that the remaining
+  ;; bytes should be 0, but this doesn't appear to be true, at least not
+  ;; anymore. For example, the pagd8y.tfm file has a "Y&Y Inc" string hidden
+  ;; in the character coding scheme string's remainder...
+  (loop :repeat (- padding 1 length) :do (read-byte stream))
   string)
 
 ;;; util.lisp ends here

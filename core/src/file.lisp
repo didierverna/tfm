@@ -35,16 +35,27 @@
 ;; Header
 ;; ==========================================================================
 
+(define-condition design-size (tfm-format-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (design-size stream)
+	     (format stream "~
+Design size too small (< 1pt): ~Apt~:P.
+Stream: ~A."
+	       (value design-size)
+	       (tfm-stream design-size))))
+  (:documentation "The Design Size error.
+It signals that a design size VALUE is too small (< 1pt)."))
+
 (defun parse-header (stream length font)
   "Parse a header of LENGTH words from STREAM into FONT."
-  (unless (>= length 2) (error "Header length too small."))
   (setf (checksum font) (read-u32 stream))
   (setf (design-size font) (read-fix stream))
-  (if (< (design-size font) 1)
-    (error "Design size should be >= 1: ~A" (design-size font)))
+  (unless (>= (design-size font) 1)
+    (error 'design-size :value (design-size font) :stream stream))
   (decf length 2)
-  ;; #### WARNING: we assume Palo Alto headers below. Can there be anything
-  ;; else?
+  ;; #### WARNING: we silently assume Xerox PARC headers below. Not sure if
+  ;; anything else could be in use, but it's impossible to tell from the files
+  ;; themselves.
   (when (>= length 10)
     (setf (encoding font) (read-padded-string stream 40))
     (decf length 10))
@@ -142,6 +153,23 @@ See %make-ligature/kerning-program for more information."
 ;; Character Information
 ;; ---------------------
 
+(define-condition tfm-table-error (tfm-format-error)
+  ((name :initarg :name :accessor name))
+  (:documentation "The TFM table errors root condition.
+This is the root condition for errors related to a NAMEd TFM table."))
+
+(define-condition table-start (tfm-table-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (table stream)
+	     (format stream "~
+Invalid first value in ~A table (should be 0): ~A.
+Stream: ~A."
+	       (name table)
+	       (value table)
+	       (tfm-stream table))))
+  (:documentation "The Table Start error.
+It signals that the first VALUE in a table is not 0."))
+
 (defun parse-character-information (stream nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from STREAM into FONT."
   (let ((char-infos (make-array (character-count font) :fill-pointer 0))
@@ -168,8 +196,8 @@ See %make-ligature/kerning-program for more information."
     (loop :for array :in (list widths heights depths italics)
 	  :for name :in (list "width" "height" "depth" "italic correction")
 	  :unless (zerop (aref array 0))
-	    :do (error "Invalid first element of ~A table (should be 0): ~A."
-		       name (aref array 0)))
+	    :do (error 'table-start
+		       :value (aref array 0) :name name :stream stream))
 
     ;; 2. Create the character metrics.
     (loop :for char-info :across char-infos
@@ -263,6 +291,93 @@ See %make-ligature/kerning-program for more information."
 ;; Entry Point
 ;; ==========================================================================
 
+(define-condition file-lengths (tfm-format-error)
+  ((declared :initarg :declared :accessor declared)
+   (actual :initarg :actual :accessor actual))
+  (:report (lambda (file-lengths stream)
+	     (format stream "~
+Invalid file length (should be ~A): ~A.
+Stream: ~A."
+	       (actual file-lengths)
+	       (declared file-lengths)
+	       (tfm-stream file-lengths))))
+  (:documentation "The File Lengths error.
+It signals that the DECLARED file length is different from the ACTUAL one."))
+
+(define-condition header-length (tfm-format-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (header-length stream)
+	     (format stream "~
+Header length too small (< 2 words): ~A word~:P.
+Stream: ~A."
+	       (value header-length)
+	       (tfm-stream header-length))))
+  (:documentation "The Header Length error.
+It signals that a header length VALUE is too small (< 2 words)."))
+
+(define-condition character-range (tfm-format-error)
+  ((bc :initarg :bc :accessor bc)
+   (ec :initarg :ec :accessor ec))
+  (:report (lambda (character-range stream)
+	     (format stream "~
+Invalid character range (should satisfy bc-1 <= ec && ec <= 255): ~A / ~A.
+Stream: ~A."
+	       (bc character-range)
+	       (ec character-range)
+	       (tfm-stream character-range))))
+  (:documentation "The Character Range error.
+It signals that BC-1 > EC, or that EC > 255."))
+
+(define-condition section-lengths (tfm-format-error)
+  ((lf :initarg :lf :accessor lf)
+   (lh :initarg :lh :accessor lh)
+   (nc :initarg :nc :accessor nc)
+   (nw :initarg :nw :accessor nw)
+   (nh :initarg :nh :accessor nh)
+   (nd :initarg :nd :accessor nd)
+   (ni :initarg :ni :accessor ni)
+   (nl :initarg :nl :accessor nl)
+   (nk :initarg :nk :accessor nk)
+   (ne :initarg :ne :accessor ne)
+   (np :initarg :np :accessor np))
+  (:report (lambda (section-lengths stream)
+	     (format stream "~
+Invalid section lengths ~
+(lf != 6 + lh + nc + nw + nh + nd + ni + nl + nk + ne + np).
+~A != 6 + ~A + ~A + ~A + ~A + ~A + ~A + ~A + ~A + ~A + ~A.
+Stream: ~A."
+	       (lf section-lengths)
+	       (lh section-lengths)
+	       (nc section-lengths)
+	       (nw section-lengths)
+	       (nh section-lengths)
+	       (nd section-lengths)
+	       (ni section-lengths)
+	       (nl section-lengths)
+	       (nk section-lengths)
+	       (ne section-lengths)
+	       (np section-lengths)
+	       (tfm-stream section-lengths))))
+  (:documentation "The Section Lengths error.
+It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
+
+(define-condition table-length (tfm-table-error)
+  ((smallest :initarg :smallest :accessor smallest)
+   (largest :initarg :largest :accessor largest)
+   (value :initarg :value :accessor value))
+  (:report (lambda (table-length stream)
+	     (format stream "~
+Invalid ~A table length (should be in [~A,~A]): ~A.
+Stream: ~A."
+	       (name table-length)
+	       (smallest table-length)
+	       (largest table-length)
+	       (value table-length)
+	       (tfm-stream table-length))))
+  (:documentation "The Table Length error.
+It signals that the NAMEd table's length VALUE is less than SMALLEST, or
+greater than LARGEST."))
+
 (defun load-font (file &aux (font (make-font (pathname-name file))))
   "Load FILE into a new font, and return it."
   (with-open-file
@@ -282,27 +397,33 @@ See %make-ligature/kerning-program for more information."
 	  (ne (read-u16 stream t))
 	  (np (read-u16 stream t))
 	  nc)
+      (let ((actual-file-length (file-length stream))
+	    (declared-file-length (* 4 lf)))
+	(unless (= actual-file-length declared-file-length)
+	  (error 'file-lengths
+		 :actual actual-file-length
+		 :declared declared-file-length
+		 :stream stream)))
+      (unless (>= lh 2) (error 'header-length :value lh :stream stream))
       (unless (and (<= (1- bc) ec) (<= ec 255))
-	(error "Invalid smallest / largest character codes: ~A / ~A." bc ec))
+	(error 'character-range :bc bc :ec ec :stream stream))
       (when (> bc 255) (setq bc 1 ec 0))
       (setq nc (+ ec (- bc) 1))
       (setf (min-code font) bc (max-code font) ec (character-count font) nc)
       (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
-	(error "Declared section lengths mismatch."))
-      (let ((actual-file-length (file-length stream))
-	    (declared-file-length (* 4 lf)))
-	(unless (= actual-file-length declared-file-length)
-	  (error "Actual / declared file lengths mismatch: ~A / ~A."
-		 actual-file-length declared-file-length)))
+	(error 'section-lengths
+	       :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
+	       :ne ne :np np
+	       :stream stream))
       (loop :for length :in (list nw nh nd ni ne)
 	    :for min :in '(1 1 1 1 0)
 	    :for max :in '(256 16 16 64 256)
 	    :for name :in '("width" "height" "depth" "italic correction"
 			    "exten")
 	    :unless (<= min length max)
-	      :do (error "Invalid ~A table length (out of range): ~A."
-			 name length))
-      (unless (>= lh 2) (error "Invalid header length (too small): ~A." lh))
+	      :do (error 'table-length
+			 :smallest min :largest max :value length :name name
+			 :stream stream))
 
       ;; 2. Parse the header section.
       (parse-header stream lh font)
