@@ -128,10 +128,22 @@ The remaining bytes are ignored."
 	;; #### NOTE: this assumes that Lisp's internal character encoding
 	;; agrees at least with ASCII.
 	:do (setf (aref string i) (code-char (read-byte stream))))
+
   ;; #### NOTE: David Fuchs'paper in TUGboat Vol.2 n.1 says that the remaining
-  ;; bytes should be 0, but this doesn't appear to be true, at least not
-  ;; anymore. For example, the pagd8y.tfm file has a "Y&Y Inc" string hidden
-  ;; in the character coding scheme string's remainder...
+  ;; bytes should be 0, but this doesn't appear to be always the case. For
+  ;; example, the pagd8y.tfm file has a "Y&Y Inc" string hidden in the
+  ;; character coding scheme string's remainder.
+
+  ;; Here's a comment from Doug McKenna about this: So the answer as to
+  ;; whether the remaining space is required to be nulls should be in the
+  ;; source code of pltotf. And indeed, that's what it does, although the
+  ;; notes in the source code say the nullification of the remaining garbage
+  ;; bytes wasn't added until two years later, in April 1983 (Version 1.3).
+  ;; Search the WEB source code for "tidy up the remaining bytes", which is
+  ;; commenting on the routine creating a BCPL string.
+
+  ;; So it may very well be the case that older tfm files do have garbage
+  ;; after the actual string.
   (loop :repeat (- padding 1 length) :do (read-byte stream))
   string)
 
