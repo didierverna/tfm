@@ -21,6 +21,8 @@
 
 ;;; Commentary:
 
+;; #### FIXME: check all calls to character-by-code ... T to see whether it's
+;; #### actually required that the character exist in the font.
 
 
 ;;; Code:
@@ -80,16 +82,28 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
 	  :else
-	    :do (setf (ligature character
-				(character-by-code (next lig/kern) font t)
-				font)
-		      (make-ligature
-		       (character-by-code (remainder lig/kern) font t)
-		       (when (member (op lig/kern) '(0 1 5)) t)
-		       (when (member (op lig/kern) '(0 2 6)) t)
-		       (cond ((member (op lig/kern) '(5 6 7)) 1)
-			     ((= (op lig/kern) 11) 2)
-			     (t 0))))
+	    :do (let ((rbc (right-boundary-character font))
+		      (code (next lig/kern)))
+		  (setf (ligature character
+				  ;; #### NOTE: ligatures with the right
+				  ;; boundary character need to handle the
+				  ;; case where that character is not actually
+				  ;; present in the font.
+				  (if (or
+				       (and (typep rbc 'character-metrics)
+					    (= code (code rbc)))
+				       (and (numberp rbc)
+					    (= code rbc)))
+				    rbc
+				    (character-by-code code font t))
+				  font)
+			(make-ligature
+			 (character-by-code (remainder lig/kern) font t)
+			 (when (member (op lig/kern) '(0 1 5)) t)
+			 (when (member (op lig/kern) '(0 2 6)) t)
+			 (cond ((member (op lig/kern) '(5 6 7)) 1)
+			       ((= (op lig/kern) 11) 2)
+			       (t 0)))))
 	:if (>= (skip lig/kern) 128)
 	  :do (setq continue nil)
 	:else
