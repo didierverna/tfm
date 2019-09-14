@@ -291,18 +291,39 @@ It signals that the first VALUE in a table is not 0."))
 ;; Entry Point
 ;; ==========================================================================
 
-(define-condition file-size (tfm-format-error)
-  ((declared :initarg :declared :accessor declared)
-   (actual :initarg :actual :accessor actual))
-  (:report (lambda (file-size stream)
+(define-condition file-size-mixin ()
+  ((declared-size :initarg :declared-size :accessor declared-size)
+   (actual-size :initarg :actual-size :accessor actual-size))
+  (:documentation "The File Size mixin.
+It is used in both errors and warnings to report different DECLARED- and
+ACTUAL-SIZEs."))
+
+(define-condition short-file (file-size-mixin tfm-format-error)
+  ()
+  (:report (lambda (short-file stream)
 	     (format stream "~
-Invalid file length (should be ~A): ~A.
+File shorter than expected: wanted ~A, got ~A words.
 Stream: ~A."
-	       (actual file-size)
-	       (declared file-size)
-	       (tfm-stream file-size))))
-  (:documentation "The File Size error.
-It signals that the DECLARED file size is different from the ACTUAL one."))
+	       (declared-size short-file)
+	       (actual-size short-file)
+	       (tfm-stream short-file))))
+  (:documentation "The Short File error.
+It signals that the file size is shorter than expected."))
+
+;; #### NOTE: this one is a warning instead of an error because TeX silently
+;; ignores junk at the end of TFM files (see TeX: the Program [575]). We hence
+;; do the same, but still signal a warning.
+(define-condition long-file (file-size-mixin tfm-format-warning)
+  ()
+  (:report (lambda (long-file stream)
+	     (format stream "~
+file longer than expected (excess will be ignored): wanted ~A, got ~A words.
+Stream: ~A."
+	       (declared-size long-file)
+	       (actual-size long-file)
+	       (tfm-stream long-file))))
+  (:documentation "The Long File warning.
+It signals that the file size is longer than expected."))
 
 (define-condition header-length (tfm-format-error)
   ((value :initarg :value :accessor value))
@@ -378,7 +399,6 @@ Stream: ~A."
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
 
-
 (define-condition tfm-extension (tfm-format-warning)
   ((extension :initarg :extension :accessor extension))
   (:report (lambda (tfm-extension stream)
@@ -390,7 +410,6 @@ Stream: ~A."
   (:documentation "The TFM Extension warning.
 It signals that STREAM is probably in EXTENSION format (JFM or OFM)
 rather than plain TFM."))
-
 
 (defun load-tfm-font (stream name lf &aux (font (make-font name)))
   "Parse TFM STREAM of declared length LF into a new NAMEd font, and return it."
@@ -410,11 +429,16 @@ rather than plain TFM."))
 	nc)
     (let ((actual-size (file-length stream))
 	  (declared-size (* 4 lf)))
-      (unless (= actual-size declared-size)
-	(error 'file-size
-	       :actual actual-size
-	       :declared declared-size
-	       :stream stream)))
+      (cond ((< actual-size declared-size)
+	     (error 'short-file
+		    :actual-size actual-size
+		    :declared-size declared-size
+		    :stream stream))
+	    ((> actual-size declared-size)
+	     (warn 'long-file
+		   :actual-size actual-size
+		   :declared-size declared-size
+		   :stream stream))))
     (unless (>= lh 2) (error 'header-length :value lh :stream stream))
     (unless (and (<= (1- bc) ec) (<= ec 255))
       (error 'character-range :bc bc :ec ec :stream stream))
