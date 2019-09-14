@@ -46,6 +46,15 @@
   (:documentation "The TFM format errors root condition.
 This is the root condition for errors related to non-compliant STREAMs."))
 
+(define-condition tfm-warning (tfm warning)
+  ()
+  (:documentation "The TFM warnings root condition."))
+
+(define-condition tfm-format-warning (tfm-warning)
+  ((stream :initarg :stream :accessor tfm-stream))
+  (:documentation "The TFM format warnings root condition.
+This is the root condition for warnings related to non-compliant STREAMs."))
+
 
 
 ;; ==========================================================================

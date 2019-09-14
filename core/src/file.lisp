@@ -378,61 +378,86 @@ Stream: ~A."
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
 
-(defun load-font (file &aux (font (make-font (pathname-name file))))
-  "Load FILE into a new font, and return it."
+
+(define-condition tfm-extension (tfm-format-warning)
+  ((extension :initarg :extension :accessor extension))
+  (:report (lambda (tfm-extension stream)
+	     (format stream "~
+probable ~A format. Not supported yet.
+Stream: ~A."
+	       (extension tfm-extension)
+	       (tfm-stream tfm-extension))))
+  (:documentation "The TFM Extension warning.
+It signals that STREAM is probably in EXTENSION format (JFM or OFM)
+rather than plain TFM."))
+
+
+(defun load-tfm-font (stream name lf &aux (font (make-font name)))
+  "Parse TFM STREAM of declared length LF into a new NAMEd font, and return it."
+
+  ;; 1. Read the rest of the preamble and perform some sanity checks.
+  (let ((lh (read-u16 stream t))
+	(bc (read-u16 stream t))
+	(ec (read-u16 stream t))
+	(nw (read-u16 stream t))
+	(nh (read-u16 stream t))
+	(nd (read-u16 stream t))
+	(ni (read-u16 stream t))
+	(nl (read-u16 stream t))
+	(nk (read-u16 stream t))
+	(ne (read-u16 stream t))
+	(np (read-u16 stream t))
+	nc)
+    (let ((actual-size (file-length stream))
+	  (declared-size (* 4 lf)))
+      (unless (= actual-size declared-size)
+	(error 'file-size
+	       :actual actual-size
+	       :declared declared-size
+	       :stream stream)))
+    (unless (>= lh 2) (error 'header-length :value lh :stream stream))
+    (unless (and (<= (1- bc) ec) (<= ec 255))
+      (error 'character-range :bc bc :ec ec :stream stream))
+    (when (> bc 255) (setq bc 1 ec 0))
+    (setq nc (+ ec (- bc) 1))
+    (setf (min-code font) bc (max-code font) ec (character-count font) nc)
+    (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
+      (error 'section-lengths
+	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
+	     :ne ne :np np
+	     :stream stream))
+    (loop :for length :in (list nw nh nd ni ne)
+	  :for min :in '(1 1 1 1 0)
+	  :for max :in '(256 16 16 64 256)
+	  :for name :in '("width" "height" "depth" "italic correction"
+			  "exten")
+	  :unless (<= min length max)
+	    :do (error 'table-length
+		       :smallest min :largest max :value length :name name
+		       :stream stream))
+
+    ;; 2. Parse the header section.
+    (parse-header stream lh font)
+
+    ;; 3. Parse the 8 character-related sections.
+    (parse-character-information stream nw nh nd ni nl nk ne font)
+
+    ;; 4. Parse the parameters section.
+    (parse-parameters stream np font))
+  font)
+
+(defun load-font (file)
+  "Load FILE into a new font, and return it.
+Only TFM files are currently supported. This function returns NIL if FILE
+contains OFM or JFM data."
   (with-open-file
       (stream file :direction :input :element-type '(unsigned-byte 8))
-
-    ;; 1. Read the preamble and perform some sanity checks.
-    (let ((lf (read-u16 stream t))
-	  (lh (read-u16 stream t))
-	  (bc (read-u16 stream t))
-	  (ec (read-u16 stream t))
-	  (nw (read-u16 stream t))
-	  (nh (read-u16 stream t))
-	  (nd (read-u16 stream t))
-	  (ni (read-u16 stream t))
-	  (nl (read-u16 stream t))
-	  (nk (read-u16 stream t))
-	  (ne (read-u16 stream t))
-	  (np (read-u16 stream t))
-	  nc)
-      (let ((actual-size (file-length stream))
-	    (declared-size (* 4 lf)))
-	(unless (= actual-size declared-size)
-	  (error 'file-size
-		 :actual actual-size
-		 :declared declared-size
-		 :stream stream)))
-      (unless (>= lh 2) (error 'header-length :value lh :stream stream))
-      (unless (and (<= (1- bc) ec) (<= ec 255))
-	(error 'character-range :bc bc :ec ec :stream stream))
-      (when (> bc 255) (setq bc 1 ec 0))
-      (setq nc (+ ec (- bc) 1))
-      (setf (min-code font) bc (max-code font) ec (character-count font) nc)
-      (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
-	(error 'section-lengths
-	       :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
-	       :ne ne :np np
-	       :stream stream))
-      (loop :for length :in (list nw nh nd ni ne)
-	    :for min :in '(1 1 1 1 0)
-	    :for max :in '(256 16 16 64 256)
-	    :for name :in '("width" "height" "depth" "italic correction"
-			    "exten")
-	    :unless (<= min length max)
-	      :do (error 'table-length
-			 :smallest min :largest max :value length :name name
-			 :stream stream))
-
-      ;; 2. Parse the header section.
-      (parse-header stream lh font)
-
-      ;; 3. Parse the 8 character-related sections.
-      (parse-character-information stream nw nh nd ni nl nk ne font)
-
-      ;; 4. Parse the parameters section.
-      (parse-parameters stream np font)))
-  font)
+    (let ((lf (read-u16 stream t)))
+      (cond ((zerop lf)
+	     (warn 'tfm-extension :extension "OFM" :stream stream))
+	    ((or (= lf 9) (= lf 11))
+	     (warn 'tfm-extension :extension "JFM" :stream stream))
+	    (t
+	     (load-tfm-font stream (pathname-name file) lf))))))
 
 ;;; file.lisp ends here
