@@ -122,29 +122,29 @@ If LIMIT, check that the integer is less than 2^15."
     u32))
 
 
-(define-condition fix (tfm-compliance-error)
+(define-condition fix-word (tfm-compliance-error)
   ((value :initarg :value :accessor value))
-  (:report (lambda (fix stream)
-	     (stream-report stream fix
-	       "fix word ~A is outside ]-16,+16[." (value fix))))
-  (:documentation "The Fix error.
+  (:report (lambda (fix-word stream)
+	     (stream-report stream fix-word
+	       "fix word ~A is outside ]-16,+16[." (value fix-word))))
+  (:documentation "The Fix Word error.
 It signals that a fix word VALUE is outside ]-16,+16[."))
 
-(defun read-fix (stream &optional limit)
+(defun read-fix-word (stream &optional limit)
   "Read a fix word from STREAM.
 If LIMIT, check that the number lies within ]-16,+16[."
   (let* ((bytes (read-u32 stream))
 	 (neg (= (ldb (byte 1 31) bytes) 1))
-	 fix)
+	 fix-word)
     (when neg (setq bytes (lognot (1- bytes))))
-    (setq fix (+ (* (ldb (byte 8 24) bytes) (expt 2 4))
-		 (* (ldb (byte 8 16) bytes) (expt 2 -4))
-		 (* (ldb (byte 8  8) bytes) (expt 2 -12))
-		 (* (ldb (byte 8  0) bytes) (expt 2 -20))))
-    (when neg (setq fix (- fix)))
-    (when (and limit (not (< -16 fix 16)))
-      (error 'fix :value fix :stream stream))
-    fix))
+    (setq fix-word (+ (* (ldb (byte 8 24) bytes) (expt 2 4))
+		      (* (ldb (byte 8 16) bytes) (expt 2 -4))
+		      (* (ldb (byte 8  8) bytes) (expt 2 -12))
+		      (* (ldb (byte 8  0) bytes) (expt 2 -20))))
+    (when neg (setq fix-word (- fix-word)))
+    (when (and limit (not (< -16 fix-word 16)))
+      (error 'fix-word :value fix-word :stream stream))
+    fix-word))
 
 
 

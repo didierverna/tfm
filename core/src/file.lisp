@@ -47,7 +47,7 @@ It signals that a design size VALUE is too small (< 1pt)."))
 (defun parse-header (stream length font)
   "Parse a header of LENGTH words from STREAM into FONT."
   (setf (checksum font) (read-u32 stream))
-  (setf (design-size font) (read-fix stream))
+  (setf (design-size font) (read-fix-word stream))
   (unless (>= (design-size font) 1)
     (error 'design-size :value (design-size font) :stream stream))
   (decf length 2)
@@ -180,13 +180,13 @@ It signals that the first VALUE in a table is not 0."))
     ;; 1. Read the tables.
     (loop :repeat (character-count font)
 	  :do (vector-push (decode-char-info (read-u32 stream)) char-infos))
-    (loop :repeat nw :do (vector-push (read-fix stream t) widths))
-    (loop :repeat nh :do (vector-push (read-fix stream t) heights))
-    (loop :repeat nd :do (vector-push (read-fix stream t) depths))
-    (loop :repeat ni :do (vector-push (read-fix stream t) italics))
+    (loop :repeat nw :do (vector-push (read-fix-word stream t) widths))
+    (loop :repeat nh :do (vector-push (read-fix-word stream t) heights))
+    (loop :repeat nd :do (vector-push (read-fix-word stream t) depths))
+    (loop :repeat ni :do (vector-push (read-fix-word stream t) italics))
     (loop :repeat nl
 	  :do (vector-push (decode-lig/kern (read-u32 stream)) lig/kerns))
-    (loop :repeat nk :do (vector-push (read-fix stream t) kerns))
+    (loop :repeat nk :do (vector-push (read-fix-word stream t) kerns))
     (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) extens))
 
     (loop :for array :in (list widths heights depths italics)
@@ -268,18 +268,18 @@ It signals that the first VALUE in a table is not 0."))
 
 (defun parse-parameters (stream length font)
   "Parse a parameters section of LENGTH words from STREAM into FONT."
-  (when (>= length 1) (setf (slant font) (read-fix stream)))
-  (when (>= length 2) (setf (interword-space font) (read-fix stream t)))
-  (when (>= length 3) (setf (interword-stretch font) (read-fix stream t)))
-  (when (>= length 4) (setf (interword-shrink font) (read-fix stream t)))
-  (when (>= length 5) (setf (ex font) (read-fix stream t)))
-  (when (>= length 6) (setf (em font) (read-fix stream t)))
+  (when (>= length 1) (setf (slant font) (read-fix-word stream)))
+  (when (>= length 2) (setf (interword-space font) (read-fix-word stream t)))
+  (when (>= length 3) (setf (interword-stretch font) (read-fix-word stream t)))
+  (when (>= length 4) (setf (interword-shrink font) (read-fix-word stream t)))
+  (when (>= length 5) (setf (ex font) (read-fix-word stream t)))
+  (when (>= length 6) (setf (em font) (read-fix-word stream t)))
   ;; #### FIXME: in mathsy fonts, there is no extra-space, but 16 additional
   ;; parameters instead. In mathex fonts, the extra-space is here, and there
   ;; is 6 additional parameters. We need to figure this out by looking at the
   ;; font encoding. It is likely that the best solution would be to have
   ;; a font class hierarchy instead of a single one.
-  (when (>= length 7) (setf (extra-space font) (read-fix stream t))))
+  (when (>= length 7) (setf (extra-space font) (read-fix-word stream t))))
 
 
 
