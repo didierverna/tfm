@@ -38,8 +38,8 @@
 (define-condition design-size (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (design-size stream)
-	     (report design-size stream)
-	     (format stream "~Apt~:P design size is too small (< 1pt)."
+	     (stream-report stream design-size
+	       "~Apt~:P design size is too small (< 1pt)."
 	       (value design-size))))
   (:documentation "The Design Size error.
 It signals that a design size VALUE is too small (< 1pt)."))
@@ -159,9 +159,8 @@ This is the root condition for errors related to a NAMEd TFM table."))
 (define-condition table-start (tfm-table-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (table stream)
-	     (report table stream)
-	     (format stream "~
-invalid first value in ~A table (should be 0): ~A."
+	     (stream-report stream table
+	       "invalid first value in ~A table (should be 0): ~A."
 	       (name table)
 	       (value table))))
   (:documentation "The Table Start error.
@@ -298,8 +297,8 @@ ACTUAL-SIZEs."))
 (define-condition short-file (file-size-mixin tfm-compliance-error)
   ()
   (:report (lambda (short-file stream)
-	     (report short-file stream)
-	     (format stream "actual size ~A is lesser than declared one ~A."
+	     (stream-report stream short-file
+	       "actual size ~A is lesser than declared one ~A."
 	       (actual-size short-file)
 	       (declared-size short-file))))
   (:documentation "The Short File error.
@@ -311,8 +310,8 @@ It signals that the file size is shorter than expected."))
 (define-condition long-file (file-size-mixin tfm-compliance-warning)
   ()
   (:report (lambda (long-file stream)
-	     (report long-file stream)
-	     (format stream "declared size ~A is lesser than actual one ~A."
+	     (stream-report stream long-file
+	       "declared size ~A is lesser than actual one ~A."
 	       (declared-size long-file)
 	       (actual-size long-file))))
   (:documentation "The Long File warning.
@@ -321,9 +320,8 @@ It signals that the file size is longer than expected."))
 (define-condition header-length (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (header-length stream)
-	     (report header-length stream)
-	     (format stream "~
-~A word~:P header length is too small (< 2 words)."
+	     (stream-report stream header-length
+	       "~A word~:P header length is too small (< 2 words)."
 	       (value header-length))))
   (:documentation "The Header Length error.
 It signals that a header length VALUE is too small (< 2 words)."))
@@ -332,8 +330,8 @@ It signals that a header length VALUE is too small (< 2 words)."))
   ((bc :initarg :bc :accessor bc)
    (ec :initarg :ec :accessor ec))
   (:report (lambda (character-range stream)
-	     (report character-range stream)
-	     (format stream "~
+	     (stream-report stream character-range
+	       "~
 character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
 	       (bc character-range)
 	       (ec character-range))))

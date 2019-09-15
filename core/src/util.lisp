@@ -45,6 +45,7 @@
   ()
   (:documentation "The TFM errors root condition."))
 
+
 (define-condition stream-mixin ()
   ((stream :initarg :stream :accessor tfm-stream))
   (:documentation "The Stream Mixin condition.
@@ -61,6 +62,14 @@ It writes \"While reading ..., \" on STREAM, arranging to print the stream's
 file name instead of the stream itself, for conditions associated with file
 streams."
   (format stream "While reading ~A, " (or pathname tfm-stream)))
+
+#i(stream-report 2)
+(defun stream-report (stream condition format-string &rest format-arguments)
+  "Report a stream CONDITION with FORMAT-STRING and FORMAT-ARGUMENTS on STREAM.
+Before calling FORMAT, call REPORT with CONDITION and STREAM."
+  (report condition stream)
+  (apply #'format stream format-string format-arguments))
+
 
 (define-condition tfm-compliance-warning (stream-mixin tfm-warning)
   ()
@@ -85,8 +94,8 @@ is loaded."))
 (define-condition u16 (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (u16 stream)
-	     (report u16 stream)
-	     (format stream "unsigned 16 bits integer ~A is greater than 2^15."
+	     (stream-report stream u16
+	       "unsigned 16 bits integer ~A is greater than 2^15."
 	       (value u16))))
   (:documentation "The U16 error.
 It signals that an unsigned 16 bits integer VALUE is greater than 2^15."))
@@ -116,8 +125,8 @@ If LIMIT, check that the integer is less than 2^15."
 (define-condition fix (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (fix stream)
-	     (report fix stream)
-	     (format stream "fix word ~A is outside ]-16,+16[." (value fix))))
+	     (stream-report stream fix
+	       "fix word ~A is outside ]-16,+16[." (value fix))))
   (:documentation "The Fix error.
 It signals that a fix word VALUE is outside ]-16,+16[."))
 
