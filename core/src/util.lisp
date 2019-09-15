@@ -108,7 +108,8 @@ If LIMIT, check that the integer is less than 2^15."
     (setf (ldb (byte 8 8) u16) (read-byte stream)
 	  (ldb (byte 8 0) u16) (read-byte stream))
     (when (and limit (not (zerop (ldb (byte 1 15) u16))))
-      (error 'u16 :value u16 :stream stream))
+      (restart-case (error 'u16 :value u16 :stream stream)
+	(use-zero () :report "Use zero instead." (setq u16 0))))
     u16))
 
 
@@ -143,7 +144,8 @@ If LIMIT, check that the number lies within ]-16,+16[."
 		      (* (ldb (byte 8  0) bytes) (expt 2 -20))))
     (when neg (setq fix-word (- fix-word)))
     (when (and limit (not (< -16 fix-word 16)))
-      (error 'fix-word :value fix-word :stream stream))
+      (restart-case (error 'fix-word :value fix-word :stream stream)
+	(use-zero () :report "Use zero instead." (setq fix-word 0))))
     fix-word))
 
 

@@ -49,7 +49,8 @@ It signals that a design size VALUE is too small (< 1pt)."))
   (setf (checksum font) (read-u32 stream))
   (setf (design-size font) (read-fix-word stream))
   (unless (>= (design-size font) 1)
-    (error 'design-size :value (design-size font) :stream stream))
+    (restart-case (error 'design-size :value (design-size font) :stream stream)
+      (use-one () :report "Set to 1pt." (setf (design-size font) 1))))
   (decf length 2)
   ;; #### WARNING: we silently assume Xerox PARC headers below. Not sure if
   ;; anything else could be in use, but it's impossible to tell from the files
@@ -192,8 +193,10 @@ It signals that the first VALUE in a table is not 0."))
     (loop :for array :in (list widths heights depths italics)
 	  :for name :in (list "width" "height" "depth" "italic correction")
 	  :unless (zerop (aref array 0))
-	    :do (error 'table-start
-		       :value (aref array 0) :name name :stream stream))
+	    :do (restart-case
+		    (error 'table-start
+			   :value (aref array 0) :name name :stream stream)
+		  (use-zero () :report "Set to 0." (setf (aref array 0) 0))))
 
     ;; 2. Create the character metrics.
     (loop :for char-info :across char-infos
