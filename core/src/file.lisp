@@ -35,14 +35,12 @@
 ;; Header
 ;; ==========================================================================
 
-(define-condition design-size (tfm-format-error)
+(define-condition design-size (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (design-size stream)
-	     (format stream "~
-Design size too small (< 1pt): ~Apt~:P.
-Stream: ~A."
-	       (value design-size)
-	       (tfm-stream design-size))))
+	     (report design-size stream)
+	     (format stream "~Apt~:P design size is too small (< 1pt)."
+	       (value design-size))))
   (:documentation "The Design Size error.
 It signals that a design size VALUE is too small (< 1pt)."))
 
@@ -153,7 +151,7 @@ See %make-ligature/kerning-program for more information."
 ;; Character Information
 ;; ---------------------
 
-(define-condition tfm-table-error (tfm-format-error)
+(define-condition tfm-table-error (tfm-compliance-error)
   ((name :initarg :name :accessor name))
   (:documentation "The TFM table errors root condition.
 This is the root condition for errors related to a NAMEd TFM table."))
@@ -161,12 +159,11 @@ This is the root condition for errors related to a NAMEd TFM table."))
 (define-condition table-start (tfm-table-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (table stream)
+	     (report table stream)
 	     (format stream "~
-Invalid first value in ~A table (should be 0): ~A.
-Stream: ~A."
+invalid first value in ~A table (should be 0): ~A."
 	       (name table)
-	       (value table)
-	       (tfm-stream table))))
+	       (value table))))
   (:documentation "The Table Start error.
 It signals that the first VALUE in a table is not 0."))
 
@@ -294,62 +291,56 @@ It signals that the first VALUE in a table is not 0."))
 (define-condition file-size-mixin ()
   ((declared-size :initarg :declared-size :accessor declared-size)
    (actual-size :initarg :actual-size :accessor actual-size))
-  (:documentation "The File Size mixin.
+  (:documentation "The File Size Mixin condition.
 It is used in both errors and warnings to report different DECLARED- and
 ACTUAL-SIZEs."))
 
-(define-condition short-file (file-size-mixin tfm-format-error)
+(define-condition short-file (file-size-mixin tfm-compliance-error)
   ()
   (:report (lambda (short-file stream)
-	     (format stream "~
-File shorter than expected: wanted ~A, got ~A words.
-Stream: ~A."
-	       (declared-size short-file)
+	     (report short-file stream)
+	     (format stream "actual size ~A is lesser than declared one ~A."
 	       (actual-size short-file)
-	       (tfm-stream short-file))))
+	       (declared-size short-file))))
   (:documentation "The Short File error.
 It signals that the file size is shorter than expected."))
 
 ;; #### NOTE: this one is a warning instead of an error because TeX silently
 ;; ignores junk at the end of TFM files (see TeX: the Program [575]). We hence
 ;; do the same, but still signal a warning.
-(define-condition long-file (file-size-mixin tfm-format-warning)
+(define-condition long-file (file-size-mixin tfm-compliance-warning)
   ()
   (:report (lambda (long-file stream)
-	     (format stream "~
-file longer than expected (excess will be ignored): wanted ~A, got ~A words.
-Stream: ~A."
+	     (report long-file stream)
+	     (format stream "declared size ~A is lesser than actual one ~A."
 	       (declared-size long-file)
-	       (actual-size long-file)
-	       (tfm-stream long-file))))
+	       (actual-size long-file))))
   (:documentation "The Long File warning.
 It signals that the file size is longer than expected."))
 
-(define-condition header-length (tfm-format-error)
+(define-condition header-length (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (header-length stream)
+	     (report header-length stream)
 	     (format stream "~
-Header length too small (< 2 words): ~A word~:P.
-Stream: ~A."
-	       (value header-length)
-	       (tfm-stream header-length))))
+~A word~:P header length is too small (< 2 words)."
+	       (value header-length))))
   (:documentation "The Header Length error.
 It signals that a header length VALUE is too small (< 2 words)."))
 
-(define-condition character-range (tfm-format-error)
+(define-condition character-range (tfm-compliance-error)
   ((bc :initarg :bc :accessor bc)
    (ec :initarg :ec :accessor ec))
   (:report (lambda (character-range stream)
+	     (report character-range stream)
 	     (format stream "~
-Invalid character range (should satisfy bc-1 <= ec && ec <= 255): ~A / ~A.
-Stream: ~A."
+character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
 	       (bc character-range)
-	       (ec character-range)
-	       (tfm-stream character-range))))
+	       (ec character-range))))
   (:documentation "The Character Range error.
 It signals that BC-1 > EC, or that EC > 255."))
 
-(define-condition section-lengths (tfm-format-error)
+(define-condition section-lengths (tfm-compliance-error)
   ((lf :initarg :lf :accessor lf)
    (lh :initarg :lh :accessor lh)
    (nc :initarg :nc :accessor nc)
@@ -362,11 +353,11 @@ It signals that BC-1 > EC, or that EC > 255."))
    (ne :initarg :ne :accessor ne)
    (np :initarg :np :accessor np))
   (:report (lambda (section-lengths stream)
+	     (report section-lengths stream)
 	     (format stream "~
-Invalid section lengths ~
-(lf != 6 + lh + nc + nw + nh + nd + ni + nl + nk + ne + np).
-~A != 6 + ~A + ~A + ~A + ~A + ~A + ~A + ~A + ~A + ~A + ~A.
-Stream: ~A."
+section lengths don't satisfy ~
+~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
++ ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)."
 	       (lf section-lengths)
 	       (lh section-lengths)
 	       (nc section-lengths)
@@ -377,8 +368,7 @@ Stream: ~A."
 	       (nl section-lengths)
 	       (nk section-lengths)
 	       (ne section-lengths)
-	       (np section-lengths)
-	       (tfm-stream section-lengths))))
+	       (np section-lengths))))
   (:documentation "The Section Lengths error.
 It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 
@@ -387,26 +377,23 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
    (largest :initarg :largest :accessor largest)
    (value :initarg :value :accessor value))
   (:report (lambda (table-length stream)
+	     (report table-length stream)
 	     (format stream "~
-Invalid ~A table length (should be in [~A,~A]): ~A.
-Stream: ~A."
+invalid ~A table length (should be in [~A,~A]): ~A."
 	       (name table-length)
 	       (smallest table-length)
 	       (largest table-length)
-	       (value table-length)
-	       (tfm-stream table-length))))
+	       (value table-length))))
   (:documentation "The Table Length error.
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
 
-(define-condition tfm-extension (tfm-format-warning)
+(define-condition tfm-extension (tfm-compliance-warning)
   ((extension :initarg :extension :accessor extension))
   (:report (lambda (tfm-extension stream)
-	     (format stream "~
-probable ~A format. Not supported yet.
-Stream: ~A."
-	       (extension tfm-extension)
-	       (tfm-stream tfm-extension))))
+	     (report tfm-extension stream)
+	     (format stream "probable ~A format. Not supported yet."
+	       (extension tfm-extension))))
   (:documentation "The TFM Extension warning.
 It signals that STREAM is probably in EXTENSION format (JFM or OFM)
 rather than plain TFM."))

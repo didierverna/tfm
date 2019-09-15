@@ -37,23 +37,44 @@
   ()
   (:documentation "The TFM root condition."))
 
-(define-condition tfm-error (tfm error)
-  ()
-  (:documentation "The TFM errors root condition."))
-
-(define-condition tfm-format-error (tfm-error)
-  ((stream :initarg :stream :accessor tfm-stream))
-  (:documentation "The TFM format errors root condition.
-This is the root condition for errors related to non-compliant STREAMs."))
-
 (define-condition tfm-warning (tfm warning)
   ()
   (:documentation "The TFM warnings root condition."))
 
-(define-condition tfm-format-warning (tfm-warning)
+(define-condition tfm-error (tfm error)
+  ()
+  (:documentation "The TFM errors root condition."))
+
+(define-condition stream-mixin ()
   ((stream :initarg :stream :accessor tfm-stream))
-  (:documentation "The TFM format warnings root condition.
-This is the root condition for warnings related to non-compliant STREAMs."))
+  (:documentation "The Stream Mixin condition.
+It is used in all condition signalled while reading a STREAM."))
+
+(defun report
+    (stream-mixin stream
+     &aux (tfm-stream (tfm-stream stream-mixin))
+	  (pathname (when (typep tfm-stream 'file-stream)
+		      (pathname tfm-stream))))
+  "Report STREAM-MIXIN on STREAM.
+This function is used to print the start of STREAM-MIXIN condition reports.
+It writes \"While reading ..., \" on STREAM, arranging to print the stream's
+file name instead of the stream itself, for conditions associated with file
+streams."
+  (format stream "While reading ~A, " (or pathname tfm-stream)))
+
+(define-condition tfm-compliance-warning (stream-mixin tfm-warning)
+  ()
+  (:documentation "The TFM  compliance warnings root condition.
+This is the root condition for warnings related to TFM compliance.
+It uses STREAM-MIXIN because all compliance checks are performed when a font
+is loaded."))
+
+(define-condition tfm-compliance-error (stream-mixin tfm-error)
+  ()
+  (:documentation "The TFM compliance errors root condition.
+This is the root condition for errors related to TFM compliance.
+It uses STREAM-MIXIN because all compliance checks are performed when a font
+is loaded."))
 
 
 
@@ -61,14 +82,12 @@ This is the root condition for warnings related to non-compliant STREAMs."))
 ;; Numerical Values
 ;; ==========================================================================
 
-(define-condition u16 (tfm-format-error)
+(define-condition u16 (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (u16 stream)
-	     (format stream "~
-Unsigned 16 bits integer is >= 2^15: ~A.
-Stream: ~A."
-	       (value u16)
-	       (tfm-stream u16))))
+	     (report u16 stream)
+	     (format stream "unsigned 16 bits integer ~A is greater than 2^15."
+	       (value u16))))
   (:documentation "The U16 error.
 It signals that an unsigned 16 bits integer VALUE is greater than 2^15."))
 
@@ -94,14 +113,11 @@ If LIMIT, check that the integer is less than 2^15."
     u32))
 
 
-(define-condition fix (tfm-format-error)
+(define-condition fix (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (fix stream)
-	     (format stream "~
-Fix word is outside ]-16,+16[: ~A.
-Stream: ~A."
-	       (value fix)
-	       (tfm-stream fix))))
+	     (report fix stream)
+	     (format stream "fix word ~A is outside ]-16,+16[." (value fix))))
   (:documentation "The Fix error.
 It signals that a fix word VALUE is outside ]-16,+16[."))
 
