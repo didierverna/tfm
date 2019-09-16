@@ -390,8 +390,15 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
 
-(defun load-tfm-font (stream name lf &aux (font (make-font name)))
-  "Parse TFM STREAM of declared length LF into a new NAMEd font, and return it."
+(defun load-tfm-font (stream lf
+		      &key (file (when (typep stream 'file-stream)
+				   (pathname stream)))
+			   (name (when file
+				   (pathname-name file)))
+		      &aux (font (make-font name :file file)))
+  "Parse TFM STREAM of declared length LF into a new font, and return it.
+FILE defaults to the STREAM's associated file if any, and NAME defaults to
+the FILE's base name, if any."
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   (let ((lh (read-u16 stream t))
@@ -478,6 +485,6 @@ NIL if FILE contains OFM or JFM data."
 	    ((or (= lf 9) (= lf 11))
 	     (warn 'extended-tfm :file file :extension "JFM"))
 	    (t
-	     (load-tfm-font stream (pathname-name file) lf))))))
+	     (load-tfm-font stream lf))))))
 
 ;;; file.lisp ends here

@@ -81,10 +81,15 @@ library, the term \"ligature\" denotes an instance of this class."))
 
 (defclass font ()
   ((name
-    :documentation "The font's name. This is the TFM file's base name."
+    :documentation "The font's name."
     :initarg :name
     :reader name)
-   (checksum :documentation "The TFM file's checksum." :accessor checksum)
+   (file
+    :documentation "The file from which the font was loaded, or NIL."
+    :initform nil
+    :initarg :file
+    :accessor file)
+   (checksum :documentation "The font's checksum." :accessor checksum)
    (encoding
     :documentation "The font's character coding scheme, if available."
     :initform nil
@@ -171,10 +176,10 @@ library, the term \"font\" denotes an instance of this class."))
   (print-unreadable-object (font stream :type t)
     (princ (name font) stream)))
 
-(defun make-font (name)
-  "Make a new FONT instance, and return it.
-Only font NAME is initialized. The other slots will be computed later on."
-  (make-instance 'font :name name))
+(defun make-font (name &rest initargs)
+  "Make a new NAMEd FONT instance, and return it.
+If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
+  (apply #'make-instance 'font :name name initargs))
 
 
 ;; ----------------
