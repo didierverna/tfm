@@ -35,13 +35,13 @@
 ;; Header
 ;; ==========================================================================
 
-(define-condition design-size (tfm-compliance-error)
+(define-condition invalid-design-size (tfm-compliance-error)
   ((value :initarg :value :accessor value))
-  (:report (lambda (design-size stream)
-	     (stream-report stream design-size
+  (:report (lambda (invalid-design-size stream)
+	     (stream-report stream invalid-design-size
 	       "~Apt~:P design size is too small (< 1pt)."
-	       (value design-size))))
-  (:documentation "The Design Size error.
+	       (value invalid-design-size))))
+  (:documentation "The Invalid Design Size error.
 It signals that a design size VALUE is too small (< 1pt)."))
 
 (defun parse-header (stream length font)
@@ -49,7 +49,8 @@ It signals that a design size VALUE is too small (< 1pt)."))
   (setf (checksum font) (read-u32 stream))
   (setf (design-size font) (read-fix-word stream))
   (unless (>= (design-size font) 1)
-    (restart-case (error 'design-size :value (design-size font) :stream stream)
+    (restart-case (error 'invalid-design-size
+		    :value (design-size font) :stream stream)
       (use-one () :report "Set to 1pt." (setf (design-size font) 1))))
   (decf length 2)
   ;; #### WARNING: we silently assume Xerox PARC headers below. Not sure if
@@ -157,14 +158,14 @@ See %make-ligature/kerning-program for more information."
   (:documentation "The TFM table errors root condition.
 This is the root condition for errors related to a NAMEd TFM table."))
 
-(define-condition table-start (tfm-table-error)
+(define-condition invalid-table-start (tfm-table-error)
   ((value :initarg :value :accessor value))
-  (:report (lambda (table stream)
-	     (stream-report stream table
+  (:report (lambda (invalid-table-start stream)
+	     (stream-report stream invalid-table-start
 	       "invalid first value in ~A table (should be 0): ~A."
-	       (name table)
-	       (value table))))
-  (:documentation "The Table Start error.
+	       (name invalid-table-start)
+	       (value invalid-table-start))))
+  (:documentation "The Invalid Table Start error.
 It signals that the first VALUE in a table is not 0."))
 
 (defun parse-character-information (stream nw nh nd ni nl nk ne font)
@@ -194,8 +195,8 @@ It signals that the first VALUE in a table is not 0."))
 	  :for name :in (list "width" "height" "depth" "italic correction")
 	  :unless (zerop (aref array 0))
 	    :do (restart-case
-		    (error 'table-start
-			   :value (aref array 0) :name name :stream stream)
+		    (error 'invalid-table-start
+		      :value (aref array 0) :name name :stream stream)
 		  (use-zero () :report "Set to 0." (setf (aref array 0) 0))))
 
     ;; 2. Create the character metrics.
@@ -297,51 +298,51 @@ It signals that the first VALUE in a table is not 0."))
 It is used in both errors and warnings to report different DECLARED- and
 ACTUAL-SIZEs."))
 
-(define-condition short-file (file-size-mixin tfm-compliance-error)
+(define-condition file-underflow (file-size-mixin tfm-compliance-error)
   ()
-  (:report (lambda (short-file stream)
-	     (stream-report stream short-file
+  (:report (lambda (file-underflow stream)
+	     (stream-report stream file-underflow
 	       "actual size ~A is lesser than declared one ~A."
-	       (actual-size short-file)
-	       (declared-size short-file))))
-  (:documentation "The Short File error.
+	       (actual-size file-underflow)
+	       (declared-size file-underflow))))
+  (:documentation "The File Underflow error.
 It signals that the file size is shorter than expected."))
 
 ;; #### NOTE: this one is a warning instead of an error because TeX silently
 ;; ignores junk at the end of TFM files (see TeX: the Program [575]). We hence
 ;; do the same, but still signal a warning.
-(define-condition long-file (file-size-mixin tfm-compliance-warning)
+(define-condition file-overflow (file-size-mixin tfm-compliance-warning)
   ()
-  (:report (lambda (long-file stream)
-	     (stream-report stream long-file
+  (:report (lambda (file-overflow stream)
+	     (stream-report stream file-overflow
 	       "declared size ~A is lesser than actual one ~A."
-	       (declared-size long-file)
-	       (actual-size long-file))))
-  (:documentation "The Long File warning.
+	       (declared-size file-overflow)
+	       (actual-size file-overflow))))
+  (:documentation "The File Overflow warning.
 It signals that the file size is longer than expected."))
 
-(define-condition header-length (tfm-compliance-error)
+(define-condition invalid-header-length (tfm-compliance-error)
   ((value :initarg :value :accessor value))
-  (:report (lambda (header-length stream)
-	     (stream-report stream header-length
+  (:report (lambda (invalid-header-length stream)
+	     (stream-report stream invalid-header-length
 	       "~A word~:P header length is too small (< 2 words)."
-	       (value header-length))))
-  (:documentation "The Header Length error.
+	       (value invalid-header-length))))
+  (:documentation "The Invalid Header Length error.
 It signals that a header length VALUE is too small (< 2 words)."))
 
-(define-condition character-range (tfm-compliance-error)
+(define-condition invalid-character-range (tfm-compliance-error)
   ((bc :initarg :bc :accessor bc)
    (ec :initarg :ec :accessor ec))
-  (:report (lambda (character-range stream)
-	     (stream-report stream character-range
+  (:report (lambda (invalid-character-range stream)
+	     (stream-report stream invalid-character-range
 	       "~
 character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
-	       (bc character-range)
-	       (ec character-range))))
-  (:documentation "The Character Range error.
+	       (bc invalid-character-range)
+	       (ec invalid-character-range))))
+  (:documentation "The Invalid Character Range error.
 It signals that BC-1 > EC, or that EC > 255."))
 
-(define-condition section-lengths (tfm-compliance-error)
+(define-condition invalid-section-lengths (tfm-compliance-error)
   ((lf :initarg :lf :accessor lf)
    (lh :initarg :lh :accessor lh)
    (nc :initarg :nc :accessor nc)
@@ -373,29 +374,29 @@ section lengths don't satisfy ~
   (:documentation "The Section Lengths error.
 It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 
-(define-condition table-length (tfm-table-error)
+(define-condition invalid-table-length (tfm-table-error)
   ((smallest :initarg :smallest :accessor smallest)
    (largest :initarg :largest :accessor largest)
    (value :initarg :value :accessor value))
-  (:report (lambda (table-length stream)
-	     (stream-report stream table-length
+  (:report (lambda (invalid-table-length stream)
+	     (stream-report stream invalid-table-length
 	       "~
 invalid ~A table length (should be in [~A,~A]): ~A."
-	       (name table-length)
-	       (smallest table-length)
-	       (largest table-length)
-	       (value table-length))))
-  (:documentation "The Table Length error.
+	       (name invalid-table-length)
+	       (smallest invalid-table-length)
+	       (largest invalid-table-length)
+	       (value invalid-table-length))))
+  (:documentation "The Invalid Table Length error.
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
 
-(define-condition tfm-extension (tfm-compliance-warning)
+(define-condition extended-tfm (tfm-compliance-warning)
   ((extension :initarg :extension :accessor extension))
-  (:report (lambda (tfm-extension stream)
-	     (stream-report stream tfm-extension
+  (:report (lambda (extended-tfm stream)
+	     (stream-report stream extended-tfm
 	       "probable ~A format. Not supported yet."
-	       (extension tfm-extension))))
-  (:documentation "The TFM Extension warning.
+	       (extension extended-tfm))))
+  (:documentation "The Extended TFM warning.
 It signals that STREAM is probably in EXTENSION format (JFM or OFM)
 rather than plain TFM."))
 
@@ -418,23 +419,23 @@ rather than plain TFM."))
     (let ((actual-size (file-length stream))
 	  (declared-size (* 4 lf)))
       (cond ((< actual-size declared-size)
-	     (error 'short-file
+	     (error 'file-underflow
 		    :actual-size actual-size
 		    :declared-size declared-size
 		    :stream stream))
 	    ((> actual-size declared-size)
-	     (warn 'long-file
+	     (warn 'file-overflow
 		   :actual-size actual-size
 		   :declared-size declared-size
 		   :stream stream))))
-    (unless (>= lh 2) (error 'header-length :value lh :stream stream))
+    (unless (>= lh 2) (error 'invalid-header-length :value lh :stream stream))
     (unless (and (<= (1- bc) ec) (<= ec 255))
-      (error 'character-range :bc bc :ec ec :stream stream))
+      (error 'invalid-character-range :bc bc :ec ec :stream stream))
     (when (> bc 255) (setq bc 1 ec 0))
     (setq nc (+ ec (- bc) 1))
     (setf (min-code font) bc (max-code font) ec (character-count font) nc)
     (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
-      (error 'section-lengths
+      (error 'invalid-section-lengths
 	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
 	     :ne ne :np np
 	     :stream stream))
@@ -444,7 +445,7 @@ rather than plain TFM."))
 	  :for name :in '("width" "height" "depth" "italic correction"
 			  "exten")
 	  :unless (<= min length max)
-	    :do (error 'table-length
+	    :do (error 'invalid-table-length
 		       :smallest min :largest max :value length :name name
 		       :stream stream))
 
@@ -466,9 +467,9 @@ contains OFM or JFM data."
       (stream file :direction :input :element-type '(unsigned-byte 8))
     (let ((lf (read-u16 stream t)))
       (cond ((zerop lf)
-	     (warn 'tfm-extension :extension "OFM" :stream stream))
+	     (warn 'extended-tfm :extension "OFM" :stream stream))
 	    ((or (= lf 9) (= lf 11))
-	     (warn 'tfm-extension :extension "JFM" :stream stream))
+	     (warn 'extended-tfm :extension "JFM" :stream stream))
 	    (t
 	     (load-tfm-font stream (pathname-name file) lf))))))
 

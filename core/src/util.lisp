@@ -91,13 +91,13 @@ is loaded."))
 ;; Numerical Values
 ;; ==========================================================================
 
-(define-condition u16 (tfm-compliance-error)
+(define-condition u16-overflow (tfm-compliance-error)
   ((value :initarg :value :accessor value))
-  (:report (lambda (u16 stream)
-	     (stream-report stream u16
+  (:report (lambda (u16-overflow stream)
+	     (stream-report stream u16-overflow
 	       "unsigned 16 bits integer ~A is greater than 2^15."
-	       (value u16))))
-  (:documentation "The U16 error.
+	       (value u16-overflow))))
+  (:documentation "The U16 Overflow error.
 It signals that an unsigned 16 bits integer VALUE is greater than 2^15."))
 
 
@@ -108,7 +108,7 @@ If LIMIT, check that the integer is less than 2^15."
     (setf (ldb (byte 8 8) u16) (read-byte stream)
 	  (ldb (byte 8 0) u16) (read-byte stream))
     (when (and limit (not (zerop (ldb (byte 1 15) u16))))
-      (restart-case (error 'u16 :value u16 :stream stream)
+      (restart-case (error 'u16-overflow :value u16 :stream stream)
 	(use-zero () :report "Use zero instead." (setq u16 0))))
     u16))
 
@@ -123,12 +123,12 @@ If LIMIT, check that the integer is less than 2^15."
     u32))
 
 
-(define-condition fix-word (tfm-compliance-error)
+(define-condition fix-word-overflow (tfm-compliance-error)
   ((value :initarg :value :accessor value))
-  (:report (lambda (fix-word stream)
-	     (stream-report stream fix-word
-	       "fix word ~A is outside ]-16,+16[." (value fix-word))))
-  (:documentation "The Fix Word error.
+  (:report (lambda (fix-word-overflow stream)
+	     (stream-report stream fix-word-overflow
+	       "fix word ~A is outside ]-16,+16[." (value fix-word-overflow))))
+  (:documentation "The Fix Word Overflow error.
 It signals that a fix word VALUE is outside ]-16,+16[."))
 
 (defun read-fix-word (stream &optional limit)
@@ -144,7 +144,7 @@ If LIMIT, check that the number lies within ]-16,+16[."
 		      (* (ldb (byte 8  0) bytes) (expt 2 -20))))
     (when neg (setq fix-word (- fix-word)))
     (when (and limit (not (< -16 fix-word 16)))
-      (restart-case (error 'fix-word :value fix-word :stream stream)
+      (restart-case (error 'fix-word-overflow :value fix-word :stream stream)
 	(use-zero () :report "Use zero instead." (setq fix-word 0))))
     fix-word))
 
