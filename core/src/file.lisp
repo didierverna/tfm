@@ -186,9 +186,9 @@ This is the root condition for errors related to a NAMEd TFM table."))
   (:documentation "The Invalid Table Start error.
 It signals that the first VALUE in a table is not 0."))
 
-(defun parse-character-information (stream nw nh nd ni nl nk ne font)
+(defun parse-character-information (stream nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from STREAM into FONT."
-  (let ((char-infos (make-array (character-count font) :fill-pointer 0))
+  (let ((char-infos (make-array nc :fill-pointer 0))
 	(widths (make-array nw :fill-pointer 0))
 	(heights (make-array nh :fill-pointer 0))
 	(depths (make-array nd :fill-pointer 0))
@@ -198,7 +198,7 @@ It signals that the first VALUE in a table is not 0."))
 	(extens (make-array ne :fill-pointer 0)))
 
     ;; 1. Read the tables.
-    (loop :repeat (character-count font)
+    (loop :repeat nc
 	  :for word = (read-u32 stream)
 	  :for char-info := (decode-char-info word)
 	  :unless (or (not (zerop (width-index char-info))) (zerop word))
@@ -234,7 +234,8 @@ It signals that the first VALUE in a table is not 0."))
 		       (aref heights (height-index char-info))
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
-
+    (setf (character-count font) (hash-table-count (characters font)))
+    
     ;; Now that we have all the characters registered, we can start processing
     ;; mutual references.
 
@@ -454,7 +455,7 @@ the FILE's base name, if any."
       (error 'invalid-character-range :bc bc :ec ec :stream stream))
     (when (> bc 255) (setq bc 1 ec 0))
     (setq nc (+ ec (- bc) 1))
-    (setf (min-code font) bc (max-code font) ec (character-count font) nc)
+    (setf (min-code font) bc (max-code font) ec)
     (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
       (error 'invalid-section-lengths
 	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
@@ -474,7 +475,7 @@ the FILE's base name, if any."
     (parse-header stream lh font)
 
     ;; 3. Parse the 8 character-related sections.
-    (parse-character-information stream nw nh nd ni nl nk ne font)
+    (parse-character-information stream nc nw nh nd ni nl nk ne font)
 
     ;; 4. Parse the parameters section.
     (parse-parameters stream np font))
