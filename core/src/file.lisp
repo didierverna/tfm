@@ -153,6 +153,16 @@ See %make-ligature/kerning-program for more information."
 ;; Character Information
 ;; ---------------------
 
+(define-condition invalid-char-info (tfm-compliance-error)
+  ((char-info :initarg :char-info :accessor char-info))
+  (:report (lambda (invalid-char-info stream)
+	     (stream-report stream invalid-char-info
+	       "char-info ~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
+	       (char-info invalid-char-info))))
+  (:documentation "The Invalid Char Info error.
+It signals that a CHAR-INFO with a width-index of 0 is not completely zero'ed
+out."))
+
 (define-condition tfm-table-error (tfm-compliance-error)
   ((name :initarg :name :accessor name))
   (:documentation "The TFM table errors root condition.
@@ -181,7 +191,14 @@ It signals that the first VALUE in a table is not 0."))
 
     ;; 1. Read the tables.
     (loop :repeat (character-count font)
-	  :do (vector-push (decode-char-info (read-u32 stream)) char-infos))
+	  :for word = (read-u32 stream)
+	  :for char-info := (decode-char-info word)
+	  :unless (or (not (zerop (width-index char-info))) (zerop word))
+	    :do (restart-case (error 'invalid-char-info
+				:char-info char-info :stream stream)
+		  (use-zero () :report "Zero it out."
+		    (setq char-info (decode-char-info 0))))
+	  :do (vector-push char-info char-infos))
     (loop :for name :in (list "width" "height" "depth" "italic correction")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
