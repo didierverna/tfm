@@ -82,39 +82,47 @@ It signals that a design size VALUE is too small (< 1pt)."))
 (defun %make-ligature/kerning-program (character index lig/kerns kerns font)
   "Make a ligature/kerning program for CHARACTER in FONT.
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
-  (loop :with continue := t
+  (loop :with rbc := (right-boundary-character font)
+	:with continue := t
 	:while continue
 	:for lig/kern := (aref lig/kerns index)
+	:for code := (next lig/kern)
 	:when (<= (skip lig/kern) 128)
 	  :if (>= (op lig/kern) 128)
 	    :do (setf (kerning character
-			       (character-by-code (next lig/kern) font t)
+			       ;; #### NOTE: kernings with the right boundary
+			       ;; character need to handle the case where that
+			       ;; character is not actually present in the
+			       ;; font.
+			       (if (or (and (typep rbc 'character-metrics)
+					    (= code (code rbc)))
+				       (and (numberp rbc)
+					    (= code rbc)))
+				 rbc
+				 (character-by-code code font t))
 			       font)
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
 	  :else
-	    :do (let ((rbc (right-boundary-character font))
-		      (code (next lig/kern)))
-		  (setf (ligature character
-				  ;; #### NOTE: ligatures with the right
-				  ;; boundary character need to handle the
-				  ;; case where that character is not actually
-				  ;; present in the font.
-				  (if (or
-				       (and (typep rbc 'character-metrics)
-					    (= code (code rbc)))
-				       (and (numberp rbc)
-					    (= code rbc)))
-				    rbc
-				    (character-by-code code font t))
-				  font)
-			(make-ligature
-			 (character-by-code (remainder lig/kern) font t)
-			 (when (member (op lig/kern) '(0 1 5)) t)
-			 (when (member (op lig/kern) '(0 2 6)) t)
-			 (cond ((member (op lig/kern) '(5 6 7)) 1)
-			       ((= (op lig/kern) 11) 2)
-			       (t 0)))))
+	    :do (setf (ligature character
+				;; #### NOTE: ligatures with the right
+				;; boundary character need to handle the case
+				;; where that character is not actually
+				;; present in the font.
+				(if (or (and (typep rbc 'character-metrics)
+					     (= code (code rbc)))
+					(and (numberp rbc)
+					     (= code rbc)))
+				  rbc
+				  (character-by-code code font t))
+				font)
+		      (make-ligature
+		       (character-by-code (remainder lig/kern) font t)
+		       (when (member (op lig/kern) '(0 1 5)) t)
+		       (when (member (op lig/kern) '(0 2 6)) t)
+		       (cond ((member (op lig/kern) '(5 6 7)) 1)
+			     ((= (op lig/kern) 11) 2)
+			     (t 0))))
 	:if (>= (skip lig/kern) 128)
 	  :do (setq continue nil)
 	:else
