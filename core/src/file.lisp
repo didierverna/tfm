@@ -354,8 +354,8 @@ It signals that BC-1 > EC, or that EC > 255."))
    (ne :initarg :ne :accessor ne)
    (np :initarg :np :accessor np))
   (:report (lambda (section-lengths stream)
-	     (report section-lengths stream)
-	     (format stream "~
+	     (stream-report stream section-lengths
+	       "~
 section lengths don't satisfy ~
 ~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
 + ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)."
@@ -378,8 +378,8 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
    (largest :initarg :largest :accessor largest)
    (value :initarg :value :accessor value))
   (:report (lambda (table-length stream)
-	     (report table-length stream)
-	     (format stream "~
+	     (stream-report stream table-length
+	       "~
 invalid ~A table length (should be in [~A,~A]): ~A."
 	       (name table-length)
 	       (smallest table-length)
@@ -392,8 +392,8 @@ greater than LARGEST."))
 (define-condition tfm-extension (tfm-compliance-warning)
   ((extension :initarg :extension :accessor extension))
   (:report (lambda (tfm-extension stream)
-	     (report tfm-extension stream)
-	     (format stream "probable ~A format. Not supported yet."
+	     (stream-report stream tfm-extension
+	       "probable ~A format. Not supported yet."
 	       (extension tfm-extension))))
   (:documentation "The TFM Extension warning.
 It signals that STREAM is probably in EXTENSION format (JFM or OFM)
