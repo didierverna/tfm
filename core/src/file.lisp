@@ -162,9 +162,9 @@ This is the root condition for errors related to a NAMEd TFM table."))
   ((value :initarg :value :accessor value))
   (:report (lambda (invalid-table-start stream)
 	     (stream-report stream invalid-table-start
-	       "invalid first value in ~A table (should be 0): ~A."
-	       (name invalid-table-start)
-	       (value invalid-table-start))))
+	       "first value ~A in ~A table is invalid (should be 0)."
+	       (value invalid-table-start)
+	       (name invalid-table-start))))
   (:documentation "The Invalid Table Start error.
 It signals that the first VALUE in a table is not 0."))
 
@@ -302,7 +302,7 @@ ACTUAL-SIZEs."))
   ()
   (:report (lambda (file-underflow stream)
 	     (stream-report stream file-underflow
-	       "actual size ~A is lesser than declared one ~A."
+	       "actual file size ~A is lesser than declared one ~A."
 	       (actual-size file-underflow)
 	       (declared-size file-underflow))))
   (:documentation "The File Underflow error.
@@ -315,7 +315,7 @@ It signals that the file size is shorter than expected."))
   ()
   (:report (lambda (file-overflow stream)
 	     (stream-report stream file-overflow
-	       "declared size ~A is lesser than actual one ~A."
+	       "declared file size ~A is lesser than actual one ~A."
 	       (declared-size file-overflow)
 	       (actual-size file-overflow))))
   (:documentation "The File Overflow warning.
@@ -381,11 +381,11 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
   (:report (lambda (invalid-table-length stream)
 	     (stream-report stream invalid-table-length
 	       "~
-invalid ~A table length (should be in [~A,~A]): ~A."
+~A table length ~A is invalid (should be in [~A,~A])."
 	       (name invalid-table-length)
+	       (value invalid-table-length)
 	       (smallest invalid-table-length)
-	       (largest invalid-table-length)
-	       (value invalid-table-length))))
+	       (largest invalid-table-length))))
   (:documentation "The Invalid Table Length error.
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
@@ -394,7 +394,7 @@ greater than LARGEST."))
   ((extension :initarg :extension :accessor extension))
   (:report (lambda (extended-tfm stream)
 	     (stream-report stream extended-tfm
-	       "probable ~A format. Not supported yet."
+	       "probable ~A format (not supported yet)."
 	       (extension extended-tfm))))
   (:documentation "The Extended TFM warning.
 It signals that STREAM is probably in EXTENSION format (JFM or OFM)
