@@ -288,7 +288,7 @@ It signals that the first VALUE in a table is not 0."))
 
 
 ;; ==========================================================================
-;; Entry Point
+;; Preamble
 ;; ==========================================================================
 
 (define-condition file-size-mixin ()
@@ -390,16 +390,6 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
 
-(define-condition extended-tfm (tfm-compliance-warning)
-  ((extension :initarg :extension :accessor extension))
-  (:report (lambda (extended-tfm stream)
-	     (stream-report stream extended-tfm
-	       "probable ~A format (not supported yet)."
-	       (extension extended-tfm))))
-  (:documentation "The Extended TFM warning.
-It signals that STREAM is probably in EXTENSION format (JFM or OFM)
-rather than plain TFM."))
-
 (defun load-tfm-font (stream name lf &aux (font (make-font name)))
   "Parse TFM STREAM of declared length LF into a new NAMEd font, and return it."
 
@@ -459,17 +449,34 @@ rather than plain TFM."))
     (parse-parameters stream np font))
   font)
 
+
+
+;; ==========================================================================
+;; Entry Point
+;; ==========================================================================
+
+(define-condition extended-tfm (tfm-warning)
+  ((file :initarg :file :accessor file)
+   (extension :initarg :extension :accessor extension))
+  (:report (lambda (extended-tfm stream)
+	     (format stream "File ~A contains ~A data (not supported yet)."
+	       (file extended-tfm)
+	       (extension extended-tfm))))
+  (:documentation "The Extended TFM warning.
+It signals that FILE contains EXTENSION data (OFM or JFM) rather than plain
+TFM data."))
+
 (defun load-font (file)
   "Load FILE into a new font, and return it.
-Only TFM files are currently supported. This function returns NIL if FILE
-contains OFM or JFM data."
+Only actual TFM data is currently supported. This function warns and returns
+NIL if FILE contains OFM or JFM data."
   (with-open-file
       (stream file :direction :input :element-type '(unsigned-byte 8))
     (let ((lf (read-u16 stream t)))
       (cond ((zerop lf)
-	     (warn 'extended-tfm :extension "OFM" :stream stream))
+	     (warn 'extended-tfm :file file :extension "OFM"))
 	    ((or (= lf 9) (= lf 11))
-	     (warn 'extended-tfm :extension "JFM" :stream stream))
+	     (warn 'extended-tfm :file file :extension "JFM"))
 	    (t
 	     (load-tfm-font stream (pathname-name file) lf))))))
 
