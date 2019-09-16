@@ -102,7 +102,7 @@ information in unavailable."
    (face
     :documentation "The font's face number.
 Note that meaningful values are numbers. A value of NIL means that the
-information in unavailable." 
+information in unavailable."
     :initform nil
     :accessor face)
    (design-size
