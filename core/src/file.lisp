@@ -182,22 +182,21 @@ It signals that the first VALUE in a table is not 0."))
     ;; 1. Read the tables.
     (loop :repeat (character-count font)
 	  :do (vector-push (decode-char-info (read-u32 stream)) char-infos))
-    (loop :repeat nw :do (vector-push (read-fix-word stream t) widths))
-    (loop :repeat nh :do (vector-push (read-fix-word stream t) heights))
-    (loop :repeat nd :do (vector-push (read-fix-word stream t) depths))
-    (loop :repeat ni :do (vector-push (read-fix-word stream t) italics))
-    (loop :repeat nl
-	  :do (vector-push (decode-lig/kern (read-u32 stream)) lig/kerns))
-    (loop :repeat nk :do (vector-push (read-fix-word stream t) kerns))
-    (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) extens))
-
-    (loop :for array :in (list widths heights depths italics)
-	  :for name :in (list "width" "height" "depth" "italic correction")
+    (loop :for name :in (list "width" "height" "depth" "italic correction")
+	  :for array :in (list widths heights depths italics)
+	  :for length :in (list nw nh nd ni)
+	  :do (vector-push (read-fix-word stream t) array)
 	  :unless (zerop (aref array 0))
 	    :do (restart-case
 		    (error 'invalid-table-start
 		      :value (aref array 0) :name name :stream stream)
-		  (use-zero () :report "Set to 0." (setf (aref array 0) 0))))
+		  (use-zero () :report "Set to 0." (setf (aref array 0) 0)))
+	  :do (loop :repeat (1- length)
+		    :do (vector-push (read-fix-word stream t) array)))
+    (loop :repeat nl
+	  :do (vector-push (decode-lig/kern (read-u32 stream)) lig/kerns))
+    (loop :repeat nk :do (vector-push (read-fix-word stream t) kerns))
+    (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) extens))
 
     ;; 2. Create the character metrics.
     (loop :for char-info :across char-infos
