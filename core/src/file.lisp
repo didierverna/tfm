@@ -21,8 +21,6 @@
 
 ;;; Commentary:
 
-;; #### FIXME: check all calls to character-by-code ... T to see whether it's
-;; #### actually required that the character exist in the font.
 
 
 ;;; Code:
