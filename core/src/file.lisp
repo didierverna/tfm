@@ -235,7 +235,7 @@ It signals that the first VALUE in a table is not 0."))
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
     (setf (character-count font) (hash-table-count (characters font)))
-    
+
     ;; Now that we have all the characters registered, we can start processing
     ;; mutual references.
 
