@@ -162,9 +162,10 @@ kerning, in design size units."
     :initform (make-hash-table :test #'equal)
     :accessor kernings)
    (right-boundary-character
-    :documentation "The font's right boundary character.
-This is either a character from this font, or a character code outside of this
-font's code boundaries (see TeX: the Program [545])."
+    :documentation "The font's right boundary character, if any.
+This character is also accessible by code, like normal ones. However, it is
+the only character the code of which may be outside [MIN-CODE,MAX-CODE] (see
+TeX: the Program [545]), and it is excluded from the character count."
     :initform nil
     :accessor right-boundary-character))
   (:documentation "The TeX Font Metrics class.

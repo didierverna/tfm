@@ -82,39 +82,19 @@ It signals that a design size VALUE is too small (< 1pt)."))
 (defun %make-ligature/kerning-program (character index lig/kerns kerns font)
   "Make a ligature/kerning program for CHARACTER in FONT.
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
-  (loop :with rbc := (right-boundary-character font)
-	:with continue := t
+  (loop :with continue := t
 	:while continue
 	:for lig/kern := (aref lig/kerns index)
-	:for code := (next lig/kern)
 	:when (<= (skip lig/kern) 128)
 	  :if (>= (op lig/kern) 128)
 	    :do (setf (kerning character
-			       ;; #### NOTE: kernings with the right boundary
-			       ;; character need to handle the case where that
-			       ;; character is not actually present in the
-			       ;; font.
-			       (if (or (and (typep rbc 'character-metrics)
-					    (= code (code rbc)))
-				       (and (numberp rbc)
-					    (= code rbc)))
-				 rbc
-				 (character-by-code code font t))
+			       (character-by-code (next lig/kern) font t)
 			       font)
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
 	  :else
 	    :do (setf (ligature character
-				;; #### NOTE: ligatures with the right
-				;; boundary character need to handle the case
-				;; where that character is not actually
-				;; present in the font.
-				(if (or (and (typep rbc 'character-metrics)
-					     (= code (code rbc)))
-					(and (numberp rbc)
-					     (= code rbc)))
-				  rbc
-				  (character-by-code code font t))
+				(character-by-code (next lig/kern) font t)
 				font)
 		      (make-ligature
 		       (character-by-code (remainder lig/kern) font t)
@@ -234,12 +214,14 @@ It signals that the first VALUE in a table is not 0."))
 		       (aref heights (height-index char-info))
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
+    ;; #### NOTE: this count doesn't include a right boundary character
+    ;; potentially added below.
     (setf (character-count font) (hash-table-count (characters font)))
 
     ;; Now that we have all the characters registered, we can start processing
     ;; mutual references.
 
-    ;; 3. Check for left and right boundary characters.
+    ;; 3. Check for right and left boundary characters.
     ;; #### WARNING: the left and right boundary characters thing is still
     ;; unclear to me (e.g. why a right boundary but a left lig/kern program?).
     ;; I still need to see this used to figure out which implementation is
@@ -247,17 +229,19 @@ It signals that the first VALUE in a table is not 0."))
     ;; instance directly, whereas there is a special lig/kern program
     ;; accessible from :LEFT-BOUNDARY-CHARACTER which is probably not very
     ;; good.
+    ;; #### FIXME: what happens when nl = 1 and the first lig/kern instruction
+    ;; is also the last one?
+    ;; #### FIXME: can a right boundary character be a normal one, with
+    ;; non-zero metrics?
     (unless (zerop nl)
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
-	  (setf (right-boundary-character font)
-		(or (character-by-code (next lig/kern) font)
-		    (next lig/kern)))))
-      ;; #### NOTE: there would be a problem for lig/kern arrays of size 1
-      ;; since the first element would also be the last one. I don't think
-      ;; this could happen however, as it would mean that only boundary
-      ;; characters would have lig/kern instructions, not regular ones.
-      (let ((lig/kern (aref lig/kerns (1- (length lig/kerns)))))
+	  (let ((code (next lig/kern)))
+	    (setf (right-boundary-character font)
+		  (or (character-by-code code font)
+		      (setf (character-by-code font)
+			    (make-character-metrics code 0 0 0 0)))))))
+      (let ((lig/kern (aref lig/kerns (1- nl))))
 	(when (= (skip lig/kern) 255)
 	  ;; #### NOTE: since we need to access the last instruction in the
 	  ;; lig/kern table, we may as well bypass
