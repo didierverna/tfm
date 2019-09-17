@@ -165,7 +165,8 @@ kerning, in design size units."
     :documentation "The font's right boundary character, if any.
 This character is also accessible by code, like normal ones. However, it is
 the only character the code of which may be outside [MIN-CODE,MAX-CODE] (see
-TeX: the Program [545]), and it is excluded from the character count."
+TeX: the Program [545]). Finally, this character is not included in the
+character count, unless it exists for real in the font."
     :initform nil
     :accessor right-boundary-character))
   (:documentation "The TeX Font Metrics class.

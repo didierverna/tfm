@@ -214,8 +214,8 @@ It signals that the first VALUE in a table is not 0."))
 		       (aref heights (height-index char-info))
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
-    ;; #### NOTE: this count doesn't include a right boundary character
-    ;; potentially added below.
+    ;; #### NOTE: this count doesn't (and shouldn't) include a zero'ed out
+    ;; right boundary character potentially added below.
     (setf (character-count font) (hash-table-count (characters font)))
 
     ;; Now that we have all the characters registered, we can start processing
@@ -231,8 +231,6 @@ It signals that the first VALUE in a table is not 0."))
     ;; good.
     ;; #### FIXME: what happens when nl = 1 and the first lig/kern instruction
     ;; is also the last one?
-    ;; #### FIXME: can a right boundary character be a normal one, with
-    ;; non-zero metrics?
     (unless (zerop nl)
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
