@@ -150,11 +150,19 @@ padded string length (~A) is larger than available space (~A)."
 It signals that the declared length of a padded string is larger than the
 available space."))
 
+(define-condition invalid-bcpl-string (tfm-compliance-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (invalid-bcpl-string stream)
+	     (report stream "BCPL string ~S contains parentheses."
+	       (value invalid-bcpl-string))))
+  (:documentation "The Invalid BCPL String error.
+It signals that the BCPL string contains parentheses."))
+
 (defun read-padded-string
     (padding &aux (length (read-byte *stream*)) string)
-  "Read a string out of PADDING bytes from *STREAM*.
+  "Read a BCPL string out of PADDING bytes from *STREAM*.
 The first byte in *STREAM* indicates the actual length of the string.
-The remaining bytes are ignored."
+The remaining bytes are ignored. The string should not contain parentheses."
   (unless (< length padding)
     (restart-case (error 'invalid-string-length :value length :padding padding)
       (read-max () :report "Read the maximum possible length."
@@ -166,7 +174,12 @@ The remaining bytes are ignored."
     (loop :for i :from 0 :upto (1- length)
 	  ;; #### NOTE: this assumes that Lisp's internal character encoding
 	  ;; agrees at least with ASCII.
-	  :do (setf (aref string i) (code-char (read-byte *stream*)))))
+	  :do (setf (aref string i) (code-char (read-byte *stream*))))
+    (when (or (find #\( string) (find #\) string))
+      (restart-case (error 'invalid-bcpl-string :value string)
+	(keep () :report "Keep the string anyway.")
+	(discard () :report "Discard the string completely."
+	  (setq string nil)))))
 
   ;; #### NOTE: David Fuchs'paper in TUGboat Vol.2 n.1 says that the remaining
   ;; bytes should be 0, but this doesn't appear to be always the case. For
