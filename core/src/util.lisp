@@ -85,13 +85,13 @@ This is the root condition for errors related to TFM compliance."))
 It signals that an unsigned 16 bits integer VALUE is greater than 2^15."))
 
 
-(defun read-u16 (&optional limit)
+(defun read-u16 ()
   "Read an unsigned 16 bits Big Endian integer from *STREAM*.
-If LIMIT, check that the integer is less than 2^15."
+Check that the integer is less than 2^15."
   (let ((u16 0))
     (setf (ldb (byte 8 8) u16) (read-byte *stream*)
 	  (ldb (byte 8 0) u16) (read-byte *stream*))
-    (when (and limit (not (zerop (ldb (byte 1 15) u16))))
+    (unless (zerop (ldb (byte 1 15) u16))
       (restart-case (error 'u16-overflow :value u16)
 	(use-zero () :report "Use zero instead." (setq u16 0))))
     u16))

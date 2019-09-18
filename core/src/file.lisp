@@ -409,17 +409,17 @@ FILE defaults to *STREAM*'s associated file if any, and NAME defaults to
 the FILE's base name, if any."
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
-  (let ((lh (read-u16 t))
-	(bc (read-u16 t))
-	(ec (read-u16 t))
-	(nw (read-u16 t))
-	(nh (read-u16 t))
-	(nd (read-u16 t))
-	(ni (read-u16 t))
-	(nl (read-u16 t))
-	(nk (read-u16 t))
-	(ne (read-u16 t))
-	(np (read-u16 t))
+  (let ((lh (read-u16))
+	(bc (read-u16))
+	(ec (read-u16))
+	(nw (read-u16))
+	(nh (read-u16))
+	(nd (read-u16))
+	(ni (read-u16))
+	(nl (read-u16))
+	(nk (read-u16))
+	(ne (read-u16))
+	(np (read-u16))
 	nc)
     (let ((actual-size (file-length *stream*))
 	  (declared-size (* 4 lf)))
@@ -483,7 +483,7 @@ Only actual TFM data is currently supported. This function warns and returns
 NIL if FILE contains OFM or JFM data."
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
-    (let ((lf (read-u16 t)))
+    (let ((lf (read-u16)))
       (cond ((zerop lf)
 	     (warn 'extended-tfm :file file :extension "OFM"))
 	    ((or (= lf 9) (= lf 11))
