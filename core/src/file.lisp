@@ -47,7 +47,7 @@ It signals that a design size VALUE is too small (< 1pt)."))
   (setf (design-size font) (read-fix-word nil))
   (unless (>= (design-size font) 1)
     (restart-case (error 'invalid-design-size :value (design-size font))
-      (use-one () :report "Set to 1pt." (setf (design-size font) 1))))
+      (use-ten () :report "Set to 10pt." (setf (design-size font) 10))))
   (decf length 2)
   ;; #### NOTE: we silently assume Xerox PARC headers below. Not sure if
   ;; anything else could be in use, but it's impossible to tell from the files
