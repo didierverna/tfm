@@ -43,49 +43,53 @@ It signals that a design size VALUE is too small (< 1pt)."))
 
 (defun parse-header (length font)
   "Parse a header of LENGTH words from *STREAM* into FONT."
-  (setf (checksum font) (read-u32))
-  (setf (design-size font) (read-fix-word nil))
+  ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
+  ;; LOAD-TFM-FONT.
+  (setf (checksum font) (read-u32)
+	(design-size font) (read-fix-word nil))
   (unless (>= (design-size font) 1)
     (restart-case (error 'invalid-design-size :value (design-size font))
       (use-ten () :report "Set to 10pt." (setf (design-size font) 10))))
   (decf length 2)
   ;; #### NOTE: we silently assume Xerox PARC headers below. Not sure if
   ;; anything else could be in use, but it's impossible to tell from the files
-  ;; themselves.
-  (when (>= length 10)
-    (setf (encoding font) (read-padded-string 40))
-    (decf length 10))
-  (when (>= length 5)
-    (setf (family font) (read-padded-string 20))
-    (decf length 5))
-  (when (>= length 1)
-    (let ((word (read-u32)))
-      (setf (7bits-safe font) (ldb (byte 1 31) word))
-      (let ((face (ldb (byte 8 0) word)))
-	(setf (face-number font) face)
-	(when (< face 18)
-	  (setf (face-code font) (make-string 3))
-	  (case face
-	    ((0 1  6  7 12 13)
-	     (setf (weight font) :medium (aref (face-code font) 0) #\M))
-	    ((2 3  8  9 14 15)
-	     (setf (weight font) :bold (aref (face-code font) 0) #\B))
-	    ((4 5 10 11 16 17)
-	     (setf (weight font) :light (aref (face-code font) 0) #\L)))
-	  (case face
-	    ((0 2 4 6 8 10 12 14 16)
-	     (setf (slope font) :roman (aref (face-code font) 1) #\R))
-	    ((1 3 5 7 9 11 13 15 17)
-	     (setf (slope font) :bold (aref (face-code font) 1) #\I)))
-	  (case face
-	    ((0  1  2  3  4  5)
-	     (setf (expansion font) :regular (aref (face-code font) 2) #\R))
-	    ((6  7  8  9  10 11)
-	     (setf (expansion font) :condensed (aref (face-code font) 2) #\C))
-	    ((12 13 14 15 16 17)
-	     (setf (expansion font) :extended
-		   (aref (face-code font) 2) #\E))))))
-    (decf length))
+  ;; themselves. TeX Live 2019 doesn't seem to have anything else.
+  #i(checking-length 1)
+  (macrolet ((checking-length (needed &body body)
+	       "Execute BODY if LENGTH >= NEEDED.
+If so, decrease LENGTH by NEEDED afterwards."
+	       ;; Yes, I know. This macro captures a variable and evaluates
+	       ;; something twice. But I know what I'm doing. It's local.
+	       `(when (>= length ,needed) ,@body (decf length ,needed))))
+    (checking-length 10 (setf (encoding font) (read-padded-string 40)))
+    (checking-length  5 (setf (family font) (read-padded-string 20)))
+    (checking-length  1
+      (let ((word (read-u32)))
+	(setf (7bits-safe font) (ldb (byte 1 31) word))
+	(let ((face (ldb (byte 8 0) word)))
+	  (setf (face-number font) face)
+	  (when (< face 18)
+	    (setf (face-code font) (make-string 3))
+	    (case face
+	      ((0 1  6  7 12 13)
+	       (setf (weight font) :medium (aref (face-code font) 0) #\M))
+	      ((2 3  8  9 14 15)
+	       (setf (weight font) :bold (aref (face-code font) 0) #\B))
+	      ((4 5 10 11 16 17)
+	       (setf (weight font) :light (aref (face-code font) 0) #\L)))
+	    (case face
+	      ((0 2 4 6 8 10 12 14 16)
+	       (setf (slope font) :roman (aref (face-code font) 1) #\R))
+	      ((1 3 5 7 9 11 13 15 17)
+	       (setf (slope font) :bold (aref (face-code font) 1) #\I)))
+	    (case face
+	      ((0  1  2  3  4  5)
+	       (setf (expansion font) :regular (aref (face-code font) 2) #\R))
+	      ((6  7  8  9  10 11)
+	       (setf (expansion font) :condensed (aref (face-code font) 2) #\C))
+	      ((12 13 14 15 16 17)
+	       (setf (expansion font) :extended
+		     (aref (face-code font) 2) #\E))))))))
   (loop :repeat length :do (read-u32)))
 
 
@@ -299,25 +303,24 @@ It signals that the first VALUE in a table is not 0."))
 
 (defun parse-parameters (length font)
   "Parse a parameters section of LENGTH words from *STREAM* into FONT."
-  (when (>= length 1)
-    (setf (slant font) (read-fix-word nil)))
-  (when (>= length 2)
-    (setf (interword-space font) (read-fix-word)))
-  (when (>= length 3)
-    (setf (interword-stretch font) (read-fix-word)))
-  (when (>= length 4)
-    (setf (interword-shrink font) (read-fix-word)))
-  (when (>= length 5)
-    (setf (ex font) (read-fix-word)))
-  (when (>= length 6)
-    (setf (em font) (read-fix-word)))
+  (macrolet ((checking-length (&body body)
+	       "Execute BODY if LENGTH >= 1.
+If so, decrement LENGTH afterwards."
+	       ;; Yes, I know. This macro captures a variable. But I know what
+	       ;; I'm doing. It's local.
+	       `(when (>= length 1) ,@body (decf length))))
+    (checking-length (setf (slant font) (read-fix-word nil)))
+    (checking-length (setf (interword-space font) (read-fix-word)))
+    (checking-length (setf (interword-stretch font) (read-fix-word)))
+    (checking-length (setf (interword-shrink font) (read-fix-word)))
+    (checking-length (setf (ex font) (read-fix-word)))
+    (checking-length (setf (em font) (read-fix-word)))
   ;; #### FIXME: in mathsy fonts, there is no extra-space, but 16 additional
   ;; parameters instead. In mathex fonts, the extra-space is here, and there
   ;; is 6 additional parameters. We need to figure this out by looking at the
   ;; font encoding. It is likely that the best solution would be to have
   ;; a font class hierarchy instead of a single one.
-  (when (>= length 7)
-    (setf (extra-space font) (read-fix-word))))
+  (checking-length (setf (extra-space font) (read-fix-word)))))
 
 
 
