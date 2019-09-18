@@ -153,10 +153,12 @@ available space."))
 (define-condition invalid-bcpl-string (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (invalid-bcpl-string stream)
-	     (report stream "BCPL string ~S contains parentheses."
+	     (report stream "~
+BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
+characters)."
 	       (value invalid-bcpl-string))))
   (:documentation "The Invalid BCPL String error.
-It signals that the BCPL string contains parentheses."))
+It signals that a BCPL string contains parentheses or non-ASCII characters."))
 
 (defun read-padded-string
     (padding &aux (length (read-byte *stream*)) string)
@@ -179,7 +181,15 @@ The remaining bytes are ignored. The string should not contain parentheses."
       (restart-case (error 'invalid-bcpl-string :value string)
 	(keep () :report "Keep the string anyway.")
 	(discard () :report "Discard the string completely."
-	  (setq string nil)))))
+	  (setq string nil))
+	(fix () :report "Fix the string, using /'s and ?'s."
+	  (loop :for i :from 0 :upto (1- (length string))
+		:when (or (char= (aref string i) #\()
+			  (char= (aref string i) #\)))
+		  :do (setf (aref string i) #\/)
+		:when (or (< (char-code (aref string i)) 32)
+			  (> (char-code (aref string i)) 126))
+		  :do (setf (aref string i) #\?))))))
 
   ;; #### NOTE: David Fuchs'paper in TUGboat Vol.2 n.1 says that the remaining
   ;; bytes should be 0, but this doesn't appear to be always the case. For
