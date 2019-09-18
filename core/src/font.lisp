@@ -98,12 +98,39 @@ Note that meaningful values are 0 or 1. A value of NIL means that the
 information in unavailable."
     :initform nil
     :accessor 7bits-safe)
-   (face
+   (face-number
     :documentation "The font's face number.
 Note that meaningful values are numbers. A value of NIL means that the
-information in unavailable."
+information in unavailable. For values less than 18, the slots FACE-CODE,
+WEIGHT, SLOPE, and EXPANSION are also filled in."
     :initform nil
-    :accessor face)
+    :accessor face-number)
+   (face-code
+    :documentation "The font's 3-letters face code, or NIL.
+A value of NIL means that the information in unavailable (FACE number is NIL
+or greater than 17). This code is constructed from the first letters of the
+WEIGHT, SLOPE, and EPXANSION slots. That is: [MBL][RI][RCE]."
+    :initform nil
+    :accessor face-code)
+   (weight
+    :documentation "The font's weight (:medium, :bold, :light, or NIL).
+A value of NIL means that the information in unavailable (FACE number is NIL
+or greater than 17)."
+    :initform nil
+    :accessor weight)
+   (slope
+    :documentation "The font's slope (:roman, :italic, or NIL).
+A value of NIL means that the information in unavailable (FACE number is NIL
+or greater than 17)."
+    :initform nil
+    :accessor slope)
+   (expansion
+    :documentation
+    "The font's expansion (:regular, :condensed, :extended, or NIL).
+A value of NIL means that the information in unavailable (FACE number is NIL
+or greater than 17)."
+    :initform nil
+    :accessor expansion)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :accessor design-size)
