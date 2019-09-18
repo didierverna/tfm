@@ -460,10 +460,6 @@ the FILE's base name, if any."
     (when (> bc 255) (setq bc 1 ec 0))
     (setq nc (+ ec (- bc) 1))
     (setf (min-code font) bc (max-code font) ec)
-    (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
-      (error 'invalid-section-lengths
-	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
-	     :ne ne :np np))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(256 16 16 64 256)
@@ -472,6 +468,10 @@ the FILE's base name, if any."
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
 		       :smallest min :largest max :value length :name name))
+    (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
+      (error 'invalid-section-lengths
+	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
+	     :ne ne :np np))
 
     ;; 2. Parse the header section.
     (parse-header lh font)
