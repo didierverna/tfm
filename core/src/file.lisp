@@ -36,36 +36,34 @@
 (define-condition invalid-design-size (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (invalid-design-size stream)
-	     (stream-report stream invalid-design-size
-	       "~Apt~:P design size is too small (< 1pt)."
+	     (report stream "~Apt~:P design size is too small (< 1pt)."
 	       (value invalid-design-size))))
   (:documentation "The Invalid Design Size error.
 It signals that a design size VALUE is too small (< 1pt)."))
 
-(defun parse-header (stream length font)
-  "Parse a header of LENGTH words from STREAM into FONT."
-  (setf (checksum font) (read-u32 stream))
-  (setf (design-size font) (read-fix-word stream))
+(defun parse-header (length font)
+  "Parse a header of LENGTH words from *STREAM* into FONT."
+  (setf (checksum font) (read-u32))
+  (setf (design-size font) (read-fix-word))
   (unless (>= (design-size font) 1)
-    (restart-case (error 'invalid-design-size
-		    :value (design-size font) :stream stream)
+    (restart-case (error 'invalid-design-size :value (design-size font))
       (use-one () :report "Set to 1pt." (setf (design-size font) 1))))
   (decf length 2)
   ;; #### WARNING: we silently assume Xerox PARC headers below. Not sure if
   ;; anything else could be in use, but it's impossible to tell from the files
   ;; themselves.
   (when (>= length 10)
-    (setf (encoding font) (read-padded-string stream 40))
+    (setf (encoding font) (read-padded-string 40))
     (decf length 10))
   (when (>= length 5)
-    (setf (family font) (read-padded-string stream 20))
+    (setf (family font) (read-padded-string 20))
     (decf length 5))
   (when (>= length 1)
-    (let ((word (read-u32 stream)))
+    (let ((word (read-u32)))
       (setf (7bits-safe font) (ldb (byte 1 31) word))
       (setf (face font) (ldb (byte 8 0) word)))
     (decf length))
-  (loop :repeat length :do (read-u32 stream)))
+  (loop :repeat length :do (read-u32)))
 
 
 
@@ -142,8 +140,8 @@ See %make-ligature/kerning-program for more information."
 (define-condition invalid-char-info (tfm-compliance-error)
   ((char-info :initarg :char-info :accessor char-info))
   (:report (lambda (invalid-char-info stream)
-	     (stream-report stream invalid-char-info
-	       "char-info ~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
+	     (report stream
+		 "~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
 	       (char-info invalid-char-info))))
   (:documentation "The Invalid Char Info error.
 It signals that a CHAR-INFO with a width-index of 0 is not completely zero'ed
@@ -157,15 +155,15 @@ This is the root condition for errors related to a NAMEd TFM table."))
 (define-condition invalid-table-start (tfm-table-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (invalid-table-start stream)
-	     (stream-report stream invalid-table-start
-	       "first value ~A in ~A table is invalid (should be 0)."
+	     (report stream
+		 "first value ~A in ~A table is invalid (should be 0)."
 	       (value invalid-table-start)
 	       (name invalid-table-start))))
   (:documentation "The Invalid Table Start error.
 It signals that the first VALUE in a table is not 0."))
 
-(defun parse-character-information (stream nc nw nh nd ni nl nk ne font)
-  "Parse the 8 character information tables from STREAM into FONT."
+(defun parse-character-information (nc nw nh nd ni nl nk ne font)
+  "Parse the 8 character information tables from *STREAM* into FONT."
   (let ((char-infos (make-array nc :fill-pointer 0))
 	(widths (make-array nw :fill-pointer 0))
 	(heights (make-array nh :fill-pointer 0))
@@ -177,29 +175,30 @@ It signals that the first VALUE in a table is not 0."))
 
     ;; 1. Read the tables.
     (loop :repeat nc
-	  :for word = (read-u32 stream)
+	  :for word = (read-u32)
 	  :for char-info := (decode-char-info word)
 	  :unless (or (not (zerop (width-index char-info))) (zerop word))
-	    :do (restart-case (error 'invalid-char-info
-				:char-info char-info :stream stream)
+	    :do (restart-case (error 'invalid-char-info :char-info char-info)
 		  (use-zero () :report "Zero it out."
 		    (setq char-info (decode-char-info 0))))
 	  :do (vector-push char-info char-infos))
     (loop :for name :in (list "width" "height" "depth" "italic correction")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
-	  :do (vector-push (read-fix-word stream t) array)
+	  :do (vector-push (read-fix-word t) array)
 	  :unless (zerop (aref array 0))
 	    :do (restart-case
 		    (error 'invalid-table-start
-		      :value (aref array 0) :name name :stream stream)
+		      :value (aref array 0) :name name)
 		  (use-zero () :report "Set to 0." (setf (aref array 0) 0)))
 	  :do (loop :repeat (1- length)
-		    :do (vector-push (read-fix-word stream t) array)))
+		    :do (vector-push (read-fix-word t) array)))
     (loop :repeat nl
-	  :do (vector-push (decode-lig/kern (read-u32 stream)) lig/kerns))
-    (loop :repeat nk :do (vector-push (read-fix-word stream t) kerns))
-    (loop :repeat ne :do (vector-push (decode-exten (read-u32 stream)) extens))
+	  :do (vector-push (decode-lig/kern (read-u32)) lig/kerns))
+    (loop :repeat nk
+	  :do (vector-push (read-fix-word t) kerns))
+    (loop :repeat ne
+	  :do (vector-push (decode-exten (read-u32)) extens))
 
     ;; 2. Create the character metrics.
     (loop :for char-info :across char-infos
@@ -275,20 +274,27 @@ It signals that the first VALUE in a table is not 0."))
 ;; Parameters Section
 ;; ==========================================================================
 
-(defun parse-parameters (stream length font)
-  "Parse a parameters section of LENGTH words from STREAM into FONT."
-  (when (>= length 1) (setf (slant font) (read-fix-word stream)))
-  (when (>= length 2) (setf (interword-space font) (read-fix-word stream t)))
-  (when (>= length 3) (setf (interword-stretch font) (read-fix-word stream t)))
-  (when (>= length 4) (setf (interword-shrink font) (read-fix-word stream t)))
-  (when (>= length 5) (setf (ex font) (read-fix-word stream t)))
-  (when (>= length 6) (setf (em font) (read-fix-word stream t)))
+(defun parse-parameters (length font)
+  "Parse a parameters section of LENGTH words from *STREAM* into FONT."
+  (when (>= length 1)
+    (setf (slant font) (read-fix-word)))
+  (when (>= length 2)
+    (setf (interword-space font) (read-fix-word t)))
+  (when (>= length 3)
+    (setf (interword-stretch font) (read-fix-word t)))
+  (when (>= length 4)
+    (setf (interword-shrink font) (read-fix-word t)))
+  (when (>= length 5)
+    (setf (ex font) (read-fix-word t)))
+  (when (>= length 6)
+    (setf (em font) (read-fix-word t)))
   ;; #### FIXME: in mathsy fonts, there is no extra-space, but 16 additional
   ;; parameters instead. In mathex fonts, the extra-space is here, and there
   ;; is 6 additional parameters. We need to figure this out by looking at the
   ;; font encoding. It is likely that the best solution would be to have
   ;; a font class hierarchy instead of a single one.
-  (when (>= length 7) (setf (extra-space font) (read-fix-word stream t))))
+  (when (>= length 7)
+    (setf (extra-space font) (read-fix-word t))))
 
 
 
@@ -306,8 +312,8 @@ ACTUAL-SIZEs."))
 (define-condition file-underflow (file-size-mixin tfm-compliance-error)
   ()
   (:report (lambda (file-underflow stream)
-	     (stream-report stream file-underflow
-	       "actual file size ~A is lesser than declared one ~A."
+	     (report stream
+		 "actual file size ~A is lesser than declared one ~A."
 	       (actual-size file-underflow)
 	       (declared-size file-underflow))))
   (:documentation "The File Underflow error.
@@ -319,8 +325,8 @@ It signals that the file size is shorter than expected."))
 (define-condition file-overflow (file-size-mixin tfm-compliance-warning)
   ()
   (:report (lambda (file-overflow stream)
-	     (stream-report stream file-overflow
-	       "declared file size ~A is lesser than actual one ~A."
+	     (report stream
+		 "declared file size ~A is lesser than actual one ~A."
 	       (declared-size file-overflow)
 	       (actual-size file-overflow))))
   (:documentation "The File Overflow warning.
@@ -329,8 +335,8 @@ It signals that the file size is longer than expected."))
 (define-condition invalid-header-length (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (invalid-header-length stream)
-	     (stream-report stream invalid-header-length
-	       "~A word~:P header length is too small (< 2 words)."
+	     (report stream
+		 "~A word~:P header length is too small (< 2 words)."
 	       (value invalid-header-length))))
   (:documentation "The Invalid Header Length error.
 It signals that a header length VALUE is too small (< 2 words)."))
@@ -339,8 +345,7 @@ It signals that a header length VALUE is too small (< 2 words)."))
   ((bc :initarg :bc :accessor bc)
    (ec :initarg :ec :accessor ec))
   (:report (lambda (invalid-character-range stream)
-	     (stream-report stream invalid-character-range
-	       "~
+	     (report stream "~
 character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
 	       (bc invalid-character-range)
 	       (ec invalid-character-range))))
@@ -360,8 +365,7 @@ It signals that BC-1 > EC, or that EC > 255."))
    (ne :initarg :ne :accessor ne)
    (np :initarg :np :accessor np))
   (:report (lambda (section-lengths stream)
-	     (stream-report stream section-lengths
-	       "~
+	     (report stream "~
 section lengths don't satisfy ~
 ~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
 + ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)."
@@ -384,8 +388,7 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
    (largest :initarg :largest :accessor largest)
    (value :initarg :value :accessor value))
   (:report (lambda (invalid-table-length stream)
-	     (stream-report stream invalid-table-length
-	       "~
+	     (report stream "~
 ~A table length ~A is invalid (should be in [~A,~A])."
 	       (name invalid-table-length)
 	       (value invalid-table-length)
@@ -395,52 +398,49 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
 greater than LARGEST."))
 
-(defun load-tfm-font (stream lf
-		      &key (file (when (typep stream 'file-stream)
-				   (pathname stream)))
+(defun load-tfm-font (lf
+		      &key (file (when (typep *stream* 'file-stream)
+				   (pathname *stream*)))
 			   (name (when file
 				   (pathname-name file)))
 		      &aux (font (make-font name :file file)))
-  "Parse TFM STREAM of declared length LF into a new font, and return it.
-FILE defaults to the STREAM's associated file if any, and NAME defaults to
+  "Parse *STREAM* of declared length LF into a new font, and return it.
+FILE defaults to *STREAM*'s associated file if any, and NAME defaults to
 the FILE's base name, if any."
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
-  (let ((lh (read-u16 stream t))
-	(bc (read-u16 stream t))
-	(ec (read-u16 stream t))
-	(nw (read-u16 stream t))
-	(nh (read-u16 stream t))
-	(nd (read-u16 stream t))
-	(ni (read-u16 stream t))
-	(nl (read-u16 stream t))
-	(nk (read-u16 stream t))
-	(ne (read-u16 stream t))
-	(np (read-u16 stream t))
+  (let ((lh (read-u16 t))
+	(bc (read-u16 t))
+	(ec (read-u16 t))
+	(nw (read-u16 t))
+	(nh (read-u16 t))
+	(nd (read-u16 t))
+	(ni (read-u16 t))
+	(nl (read-u16 t))
+	(nk (read-u16 t))
+	(ne (read-u16 t))
+	(np (read-u16 t))
 	nc)
-    (let ((actual-size (file-length stream))
+    (let ((actual-size (file-length *stream*))
 	  (declared-size (* 4 lf)))
       (cond ((< actual-size declared-size)
 	     (error 'file-underflow
 		    :actual-size actual-size
-		    :declared-size declared-size
-		    :stream stream))
+		    :declared-size declared-size))
 	    ((> actual-size declared-size)
 	     (warn 'file-overflow
 		   :actual-size actual-size
-		   :declared-size declared-size
-		   :stream stream))))
-    (unless (>= lh 2) (error 'invalid-header-length :value lh :stream stream))
+		   :declared-size declared-size))))
+    (unless (>= lh 2) (error 'invalid-header-length :value lh))
     (unless (and (<= (1- bc) ec) (<= ec 255))
-      (error 'invalid-character-range :bc bc :ec ec :stream stream))
+      (error 'invalid-character-range :bc bc :ec ec))
     (when (> bc 255) (setq bc 1 ec 0))
     (setq nc (+ ec (- bc) 1))
     (setf (min-code font) bc (max-code font) ec)
     (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
       (error 'invalid-section-lengths
 	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
-	     :ne ne :np np
-	     :stream stream))
+	     :ne ne :np np))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(256 16 16 64 256)
@@ -448,17 +448,16 @@ the FILE's base name, if any."
 			  "exten")
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
-		       :smallest min :largest max :value length :name name
-		       :stream stream))
+		       :smallest min :largest max :value length :name name))
 
     ;; 2. Parse the header section.
-    (parse-header stream lh font)
+    (parse-header lh font)
 
     ;; 3. Parse the 8 character-related sections.
-    (parse-character-information stream nc nw nh nd ni nl nk ne font)
+    (parse-character-information nc nw nh nd ni nl nk ne font)
 
     ;; 4. Parse the parameters section.
-    (parse-parameters stream np font))
+    (parse-parameters np font))
   font)
 
 
@@ -483,13 +482,13 @@ TFM data."))
 Only actual TFM data is currently supported. This function warns and returns
 NIL if FILE contains OFM or JFM data."
   (with-open-file
-      (stream file :direction :input :element-type '(unsigned-byte 8))
-    (let ((lf (read-u16 stream t)))
+      (*stream* file :direction :input :element-type '(unsigned-byte 8))
+    (let ((lf (read-u16 t)))
       (cond ((zerop lf)
 	     (warn 'extended-tfm :file file :extension "OFM"))
 	    ((or (= lf 9) (= lf 11))
 	     (warn 'extended-tfm :file file :extension "JFM"))
 	    (t
-	     (load-tfm-font stream lf))))))
+	     (load-tfm-font lf))))))
 
 ;;; file.lisp ends here
