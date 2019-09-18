@@ -83,14 +83,8 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
   (loop :with continue := t
 	:while continue
 	:for lig/kern := (aref lig/kerns index)
-	:when (<= (skip lig/kern) 128)
-	  :if (>= (op lig/kern) 128)
-	    :do (setf (kerning character
-			       (character-by-code (next lig/kern) font t)
-			       font)
-		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
-				     (remainder lig/kern))))
-	  :else
+	:unless (> (skip lig/kern) 128)
+	  :if (< (op lig/kern) 128)
 	    :do (setf (ligature character
 				(character-by-code (next lig/kern) font t)
 				font)
@@ -101,6 +95,12 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 		       (cond ((member (op lig/kern) '(5 6 7)) 1)
 			     ((= (op lig/kern) 11) 2)
 			     (t 0))))
+	  :else
+	    :do (setf (kerning character
+			       (character-by-code (next lig/kern) font t)
+			       font)
+		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
+				     (remainder lig/kern))))
 	:if (>= (skip lig/kern) 128)
 	  :do (setq continue nil)
 	:else

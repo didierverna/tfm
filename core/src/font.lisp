@@ -33,12 +33,6 @@
 ;; Ligatures
 ;; ==========================================================================
 
-;; #### FIXME: Knuth's description of the lig/kern programming language is
-;; somewhat confusing. I don't understand the purpose of "halt" (skip > 128)
-;; in particular. What's the difference with having no instruction associated
-;; with a character at all? Otherwise, it would be in contradiction with the
-;; description of regular instruction (perform and then stop).
-
 (defclass ligature ()
   ((composite
     :documentation "The character to insert."
