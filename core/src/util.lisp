@@ -138,15 +138,35 @@ If LIMIT (the default), check that the number lies within ]-16,+16[."
 ;; Strings
 ;; ==========================================================================
 
+(define-condition invalid-string-length (tfm-compliance-error)
+  ((value :initarg :value :accessor value)
+   (padding :initarg :padding :accessor padding))
+  (:report (lambda (invalid-string-length stream)
+	     (report stream "~
+padded string length (~A) is larger than available space (~A)."
+	       (value invalid-string-length)
+	       (1- (padding invalid-string-length)))))
+  (:documentation "The Invalid String Length error.
+It signals that the declared length of a padded string is larger than the
+available space."))
+
 (defun read-padded-string
-    (padding &aux (length (read-byte *stream*)) (string (make-string length)))
+    (padding &aux (length (read-byte *stream*)) string)
   "Read a string out of PADDING bytes from *STREAM*.
 The first byte in *STREAM* indicates the actual length of the string.
 The remaining bytes are ignored."
-  (loop :for i :from 0 :upto (1- length)
-	;; #### NOTE: this assumes that Lisp's internal character encoding
-	;; agrees at least with ASCII.
-	:do (setf (aref string i) (code-char (read-byte *stream*))))
+  (unless (< length padding)
+    (restart-case (error 'invalid-string-length :value length :padding padding)
+      (read-max () :report "Read the maximum possible length."
+	(setq length (1- padding)))
+      (discard () :report "Discard the string completely."
+	(setq length 0))))
+  (unless (zerop length)
+    (setq string (make-string length))
+    (loop :for i :from 0 :upto (1- length)
+	  ;; #### NOTE: this assumes that Lisp's internal character encoding
+	  ;; agrees at least with ASCII.
+	  :do (setf (aref string i) (code-char (read-byte *stream*)))))
 
   ;; #### NOTE: David Fuchs'paper in TUGboat Vol.2 n.1 says that the remaining
   ;; bytes should be 0, but this doesn't appear to be always the case. For
