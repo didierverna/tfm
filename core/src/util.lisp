@@ -115,9 +115,9 @@ If LIMIT, check that the integer is less than 2^15."
   (:documentation "The Fix Word Overflow error.
 It signals that a fix word VALUE is outside ]-16,+16[."))
 
-(defun read-fix-word (&optional limit)
+(defun read-fix-word (&optional (limit t))
   "Read a fix word from *STREAM*.
-If LIMIT, check that the number lies within ]-16,+16[."
+If LIMIT (the default), check that the number lies within ]-16,+16[."
   (let* ((bytes (read-u32))
 	 (neg (= (ldb (byte 1 31) bytes) 1))
 	 fix-word)
