@@ -45,21 +45,6 @@
   ()
   (:documentation "The TFM errors root condition."))
 
-
-(defvar *stream* nil "The stream being read.")
-
-#i(report 2)
-(defun report (stream format-string &rest format-arguments)
-  "Like FORMAT, but if *STREAM* is bound, report that we're reading from it."
-  (if *stream*
-    (format stream "While reading ~A, "
-      (or (when (typep *stream* 'file-stream) (pathname *stream*))
-	  *stream*))
-    (when (alpha-char-p (aref format-string 0))
-      (setf (aref format-string 0) (char-upcase (aref format-string 0)))))
-  (apply #'format stream format-string format-arguments))
-
-
 (define-condition tfm-compliance-warning (tfm-warning)
   ()
   (:documentation "The TFM  compliance warnings root condition.
@@ -73,8 +58,31 @@ This is the root condition for errors related to TFM compliance."))
 
 
 ;; ==========================================================================
-;; Numerical Values
+;; Stream Reading
 ;; ==========================================================================
+
+(defvar *stream* nil "The stream being read.")
+
+
+;; -----------------------
+;; Miscellaneous utilities
+;; -----------------------
+
+#i(report 2)
+(defun report (stream format-string &rest format-arguments)
+  "Like FORMAT, but if *STREAM* is bound, report that we're reading from it."
+  (if *stream*
+    (format stream "While reading ~A, "
+      (or (when (typep *stream* 'file-stream) (pathname *stream*))
+	  *stream*))
+    (when (alpha-char-p (aref format-string 0))
+      (setf (aref format-string 0) (char-upcase (aref format-string 0)))))
+  (apply #'format stream format-string format-arguments))
+
+
+;; ----------------
+;; Numerical values
+;; ----------------
 
 (define-condition u16-overflow (tfm-compliance-error)
   ((value :initarg :value :accessor value))
@@ -133,10 +141,9 @@ If LIMIT (the default), check that the number lies within ]-16,+16[."
     fix-word))
 
 
-
-;; ==========================================================================
+;; -------
 ;; Strings
-;; ==========================================================================
+;; -------
 
 (define-condition invalid-string-length (tfm-compliance-error)
   ((value :initarg :value :accessor value)
