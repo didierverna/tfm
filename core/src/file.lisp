@@ -58,10 +58,15 @@ It signals that a design size VALUE is too small (< 1pt)."))
   (macrolet ((checking-length (needed &body body)
 	       "Execute BODY if LENGTH >= NEEDED.
 If so, decrease LENGTH by NEEDED afterwards."
-	       ;; Yes, I know. This macro captures a variable and evaluates
-	       ;; something twice. But I know what I'm doing. It's local.
 	       `(when (>= length ,needed) ,@body (decf length ,needed))))
     (checking-length 10 (setf (encoding font) (read-padded-string 40)))
+    (when (encoding font)
+      ;; #### NOTE: we don't upcase the BCPL strings, but tftopl does, so it's
+      ;; probably better to do string comparisons on upcased versions.
+      (cond ((string= (string-upcase (encoding font)) "TEX MATH SYMBOLS")
+	     (change-class font 'math-symbols-font))
+	    ((string= (string-upcase (encoding font)) "TEX MATH EXTENSION")
+	     (change-class font 'math-extension-font))))
     (checking-length  5 (setf (family font) (read-padded-string 20)))
     (checking-length  1
       (let ((word (read-u32)))
@@ -301,26 +306,50 @@ It signals that the first VALUE in a table is not 0."))
 ;; Parameters Section
 ;; ==========================================================================
 
-(defun parse-parameters (length font)
-  "Parse a parameters section of LENGTH words from *STREAM* into FONT."
-  (macrolet ((checking-length (&body body)
-	       "Execute BODY if LENGTH >= 1.
-If so, decrement LENGTH afterwards."
-	       ;; Yes, I know. This macro captures a variable. But I know what
-	       ;; I'm doing. It's local.
-	       `(when (>= length 1) ,@body (decf length))))
-    (checking-length (setf (slant font) (read-fix-word nil)))
-    (checking-length (setf (interword-space font) (read-fix-word)))
-    (checking-length (setf (interword-stretch font) (read-fix-word)))
-    (checking-length (setf (interword-shrink font) (read-fix-word)))
-    (checking-length (setf (ex font) (read-fix-word)))
-    (checking-length (setf (em font) (read-fix-word)))
-  ;; #### FIXME: in mathsy fonts, there is no extra-space, but 16 additional
-  ;; parameters instead. In mathex fonts, the extra-space is here, and there
-  ;; is 6 additional parameters. We need to figure this out by looking at the
-  ;; font encoding. It is likely that the best solution would be to have
-  ;; a font class hierarchy instead of a single one.
-  (checking-length (setf (extra-space font) (read-fix-word)))))
+;; #### WARNING: this local macro intentionally captures LENGTH and FONT!
+(macrolet ((read-parameter (parameter)
+	     "Read a fix word into font's PARAMETER if length >= 1.
+If so, decrement length afterwards."
+	     `(when (>= length 1)
+		(setf (,parameter font) (read-fix-word))
+		(decf length)))
+	   (read-parameters (&rest parameters)
+	     "Read fix words into font's PARAMETERS, length permitting.
+Decrement length accordingly afterwards."
+	     `(progn ,@(mapcar (lambda (parameter)
+				 (list 'read-parameter parameter))
+			 parameters))))
+  (defgeneric parse-parameters (length font)
+    (:documentation
+     "Parse a parameters section of LENGTH words from *STREAM* into FONT.
+Return remaining LENGTH.")
+    (:method (length font)
+      "Parse the 7 regular FONT parameters. Return remaining LENGTH."
+      (when (>= length 1)
+	(setf (slant font) (read-fix-word nil))
+	(decf length))
+      (read-parameters interword-space interword-stretch interword-shrink
+		       ex em
+		       extra-space)
+      length)
+    (:method (length (font math-symbols-font))
+      "Parse the 15 additional TeX math symbols FONT parameters."
+      (setq length (call-next-method))
+      (read-parameters num1 num2 num3
+		       denom1 denom2
+		       sup1 sup2 sup3
+		       sub1 sub2
+		       subdrop supdrop
+		       delim1 delim2
+		       axis-height)
+      length)
+    (:method (length (font math-extension-font))
+      "Parse the 6 additional TeX math extension FONT parameters."
+      (setq length (call-next-method))
+      (read-parameters default-rule-thickness
+		       big-op-spacing1 big-op-spacing2 big-op-spacing3
+		       big-op-spacing4 big-op-spacing5)
+      length)))
 
 
 

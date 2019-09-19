@@ -66,7 +66,7 @@ library, the term \"ligature\" denotes an instance of this class."))
 
 
 ;; ==========================================================================
-;; Font
+;; Base Font
 ;; ==========================================================================
 
 ;; -----
@@ -192,7 +192,8 @@ character count, unless it exists for real in the font."
     :accessor right-boundary-character))
   (:documentation "The TeX Font Metrics class.
 This class represents decoded font information. Within the context of this
-library, the term \"font\" denotes an instance of this class."))
+library, the term \"font\" denotes an instance of this class, or of one of its
+subclasses."))
 
 (defmethod print-object ((font font) stream)
   "Print FONT unreadably with its name to STREAM."
@@ -235,4 +236,110 @@ If ERRORP, signal an error if not found."
   "Set FONT's KERNING for CHARACTER1 and CHARACTER2."
   (setf (gethash (cons character1 character2) (kernings font)) kerning))
 
+
+
+;; ==========================================================================
+;; Math Symbols Font
+;; ==========================================================================
+
+(defclass math-symbols-font (font)
+  ((num1
+    :documentation "The font's NUM1 parameter."
+    :initform 0
+    :accessor num1)
+   (num2
+    :documentation "The font's NUM2 parameter."
+    :initform 0
+    :accessor num2)
+   (num3
+    :documentation "The font's NUM2 parameter."
+    :initform 0
+    :accessor num3)
+   (denom1
+    :documentation "The font's DENOM1 parameter."
+    :initform 0
+    :accessor denom1)
+   (denom2
+    :documentation "The font's DENOM2 parameter."
+    :initform 0
+    :accessor denom2)
+   (sup1
+    :documentation "The font's SUP1 parameter."
+    :initform 0
+    :accessor sup1)
+   (sup2
+    :documentation "The font's SUP2 parameter."
+    :initform 0
+    :accessor sup2)
+   (sup3
+    :documentation "The font's SUP2 parameter."
+    :initform 0
+    :accessor sup3)
+   (sub1
+    :documentation "The font's SUB1 parameter."
+    :initform 0
+    :accessor sub1)
+   (sub2
+    :documentation "The font's SUB2 parameter."
+    :initform 0
+    :accessor sub2)
+   (supdrop
+    :documentation "The font's SUPDROP parameter."
+    :initform 0
+    :accessor supdrop)
+   (subdrop
+    :documentation "The font's SUBDROP parameter."
+    :initform 0
+    :accessor subdrop)
+   (delim1
+    :documentation "The font's DELIM1 parameter."
+    :initform 0
+    :accessor delim1)
+   (delim2
+    :documentation "The font's DELIM2 parameter."
+    :initform 0
+    :accessor delim2)
+   (axis-height
+    :documentation "The font's AXIS-HEIGHT parameter."
+    :initform 0
+    :accessor axis-height))
+  (:documentation "The Math Symbols Font class.
+This class represents fonts with the \"TeX math symbols\" character coding
+scheme."))
+
+
+
+;; ==========================================================================
+;; Math Symbols Font
+;; ==========================================================================
+
+(defclass math-extension-font (font)
+  ((default-rule-thickness
+    :documentation "The font's default rule thickness."
+    :initform 0
+    :accessor default-rule-thickness)
+   (big-op-spacing1
+    :documentation "The font's BIG-OP-SPACING1 parameter."
+    :initform 0
+    :accessor big-op-spacing1)
+   (big-op-spacing2
+    :documentation "The font's BIG-OP-SPACING2 parameter."
+    :initform 0
+    :accessor big-op-spacing2)
+   (big-op-spacing3
+    :documentation "The font's BIG-OP-SPACING3 parameter."
+    :initform 0
+    :accessor big-op-spacing3)
+   (big-op-spacing4
+    :documentation "The font's BIG-OP-SPACING4 parameter."
+    :initform 0
+    :accessor big-op-spacing4)
+   (big-op-spacing5
+    :documentation "The font's BIG-OP-SPACING5 parameter."
+    :initform 0
+    :accessor big-op-spacing5))
+  (:documentation "The Math Extension Font class.
+This class represents fonts with the \"TeX math extension\" character coding
+scheme."))
+    
 ;;; font.lisp ends here
