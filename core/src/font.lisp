@@ -189,7 +189,11 @@ the only character the code of which may be outside [MIN-CODE,MAX-CODE] (see
 TeX: the Program [545]). Finally, this character is not included in the
 character count, unless it exists for real in the font."
     :initform nil
-    :accessor boundary-character))
+    :accessor boundary-character)
+   (parameters
+    :documentation "The font's additional parameters array, if any."
+    :initform nil
+    :accessor parameters))
   (:documentation "The TeX Font Metrics class.
 This class represents decoded font information. Within the context of this
 library, the term \"font\" denotes an instance of this class, or of one of its

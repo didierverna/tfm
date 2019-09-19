@@ -359,7 +359,15 @@ Return remaining LENGTH.")
       (read-parameters default-rule-thickness
 		       big-op-spacing1 big-op-spacing2 big-op-spacing3
 		       big-op-spacing4 big-op-spacing5)
-      length)))
+      length)
+    (:method :around (length font)
+      "Read remaining parameters into a parameters array."
+      (setq length (call-next-method))
+      (unless (zerop length)
+	(let ((array (make-array length)))
+	  (loop :for i :from 0 :upto (1- length)
+		:do (setf (aref array i) (read-fix-word)))
+	  (setf (parameters font) array))))))
 
 
 
