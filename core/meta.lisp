@@ -50,7 +50,7 @@
     :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
     :min-code :max-code
     :character-by-code :character-count
-    :ligature :kerning :right-boundary-character
+    :ligature :kerning :boundary-character
     ;; From src/file.lisp:
     :load-font))
 

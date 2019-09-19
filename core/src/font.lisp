@@ -182,14 +182,14 @@ This is a hash table associating conses of characters with the corresponding
 kerning, in design size units."
     :initform (make-hash-table :test #'equal)
     :accessor kernings)
-   (right-boundary-character
-    :documentation "The font's right boundary character, if any.
+   (boundary-character
+    :documentation "The font's boundary character, if any.
 This character is also accessible by code, like normal ones. However, it is
 the only character the code of which may be outside [MIN-CODE,MAX-CODE] (see
 TeX: the Program [545]). Finally, this character is not included in the
 character count, unless it exists for real in the font."
     :initform nil
-    :accessor right-boundary-character))
+    :accessor boundary-character))
   (:documentation "The TeX Font Metrics class.
 This class represents decoded font information. Within the context of this
 library, the term \"font\" denotes an instance of this class, or of one of its

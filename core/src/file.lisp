@@ -194,6 +194,18 @@ This is the root condition for errors related to a NAMEd TFM table."))
   (:documentation "The Invalid Table Start error.
 It signals that the first VALUE in a table is not 0."))
 
+(define-condition no-boundary-character (tfm-compliance-error)
+  ()
+  (:report (lambda (no-boundary-character stream)
+	     (declare (ignore no-boundary-character))
+	     (report stream
+		 "found a boundary character ligature/kerning program,~
+without a boundary character being defined.")))
+  (:documentation "The No Boundary Character error.
+It signals that a boundary character ligature/kerning program was found,
+without a boundary character being defined."))
+  
+
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT."
   (let ((char-infos (make-array nc :fill-pointer 0))
@@ -244,27 +256,21 @@ It signals that the first VALUE in a table is not 0."))
 		       (aref depths (depth-index char-info))
 		       (aref italics (italic-index char-info)))))
     ;; #### NOTE: this count doesn't (and shouldn't) include a zero'ed out
-    ;; right boundary character potentially added below.
+    ;; boundary character potentially added below.
     (setf (character-count font) (hash-table-count (characters font)))
 
     ;; Now that we have all the characters registered, we can start processing
     ;; mutual references.
 
-    ;; 3. Check for right and left boundary characters.
-    ;; #### WARNING: the left and right boundary characters thing is still
-    ;; unclear to me (e.g. why a right boundary but a left lig/kern program?).
-    ;; I still need to see this used to figure out which implementation is
-    ;; best. Right now, the right boundary character is stored in the FONT
-    ;; instance directly, whereas there is a special lig/kern program
-    ;; accessible from :LEFT-BOUNDARY-CHARACTER which is probably not very
-    ;; good.
-    ;; #### FIXME: what happens when nl = 1 and the first lig/kern instruction
-    ;; is also the last one?
+    ;; 3. Check for a boundary character and an associated lig/kern program.
+    ;; #### NOTE: boundary characters is an obscure matter, even for
+    ;; old-timers. See this thread for some (mis)information:
+    ;; https://tug.org/pipermail/texhax/2019-September/023988.html
     (unless (zerop nl)
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
 	  (let ((code (next lig/kern)))
-	    (setf (right-boundary-character font)
+	    (setf (boundary-character font)
 		  (or (character-by-code code font)
 		      (setf (character-by-code font)
 			    (make-character-metrics code 0 0 0 0)))))))
@@ -273,13 +279,17 @@ It signals that the first VALUE in a table is not 0."))
 	  ;; #### NOTE: since we need to access the last instruction in the
 	  ;; lig/kern table, we may as well bypass
 	  ;; MAKE-LIGATURE/KERNING-PROGRAM.
-	  (%make-ligature/kerning-program
-	   :left-boundary-character
-	   (+ (* 256 (op lig/kern)) (remainder lig/kern))
-	   lig/kerns
-	   kerns
-	   font))))
-
+	  (if (boundary-character font)
+	    (%make-ligature/kerning-program
+	     (boundary-character font)
+	     (+ (* 256 (op lig/kern)) (remainder lig/kern))
+	     lig/kerns
+	     kerns
+	     font)
+	    (with-simple-restart
+		(ignore "Ignore this ligature/kerning program.")
+	      (error 'no-boundary-character))))))
+    
     ;; 4. Process ligature / kerning programs, character lists, and extension
     ;; recipes, character by character.
     (loop :for char-info :across char-infos
