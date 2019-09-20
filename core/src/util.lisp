@@ -55,6 +55,16 @@ This is the root condition for warnings related to TFM compliance."))
   (:documentation "The TFM compliance errors root condition.
 This is the root condition for errors related to TFM compliance."))
 
+(define-condition tfm-usage-warning (tfm-warning)
+  ()
+  (:documentation "The TFM usage warnings root condition.
+This is the root condition for warnings related to the use of the library."))
+
+(define-condition tfm-usage-error (tfm-error)
+  ()
+  (:documentation "The TFM usage errors root condition.
+This is the root condition for errors related to the use of the library."))
+
 
 
 ;; ==========================================================================

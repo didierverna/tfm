@@ -69,14 +69,11 @@ mutually exclusive with the EXTENSION-RECIPE slot, and also with the existence
 of a ligature or kerning program for this character."
     :initform nil
     :accessor next-larger-character)
-   ;; #### WARNING: for now, extension recipes are stored as an array of top,
-   ;; middle, bottom and repeated characters. I'm not sure whether storing
-   ;; extension recipes within characters is the right way to do it (as
-   ;; opposed to, for example, in the font instance directly). I guess I'll
-   ;; have to wait until it's actually used to figure this out.
    (extension-recipe
     :documentation "The character's extension recipe.
-This slot is non-null only if this character is extensible (see TeX: the
+This is an array of top, middle, bottom, and repeated characters. Only the
+first 3 may be NIL, meaning that the final character is constructed without
+them. This slot is non-null only if this character is extensible (see TeX: the
 Program [544]). It is mutually exclusive with the NEXT-LARGER-CHARACTER slot,
 and also with the existence of a ligature or kerning program for this
 character."
@@ -110,23 +107,41 @@ metrics instances are created."
 ;; Extension Recipe Pseudo-Accessors
 ;; ==========================================================================
 
-;; #### NOTE: The pseudo-accessors below assume that an extension recipe
-;; exists in the target character.
+(defun extensiblep (character)
+  "Return T if CHARACTER has an extension recipe."
+  ;; We don't want to expose the array itself.
+  (when (extension-recipe character) t))
+
+(define-condition not-extensible (tfm-usage-error)
+  ((character-metrics :initarg :character-metrics :accessor character-metrics))
+  (:report (lambda (not-extensible stream)
+	     (format stream "Character ~A is not extensible."
+	       (character-metrics not-extensible))))
+  (:documentation "The Not Extensible error.
+It signals an attempt to access a non-extensible character's extension
+recipe.")) 
+
+(defun safe-extension-recipe-access (character index)
+  "Return CHARACTER's INDEXth extension recipe value.
+If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
+  (if (extensiblep character)
+    (aref (extension-recipe character) index)
+    (error 'not-extensible :character-metrics character)))
 
 (defun top-character (character)
   "Return the top character in CHARACTER's extension recipe, or NIL."
-  (aref (extension-recipe character) 0))
+  (safe-extension-recipe-access character 0))
 
 (defun middle-character (character)
   "Return the middle character in CHARACTER's extension recipe, or NIL."
-  (aref (extension-recipe character) 1))
+  (safe-extension-recipe-access character 1))
 
 (defun bottom-character (character)
   "Return the bottom character in CHARACTER's extension recipe, or NIL."
-  (aref (extension-recipe character) 2))
+  (safe-extension-recipe-access character 2))
 
 (defun repeated-character (character)
   "Return the repeated character in CHARACTER's extension recipe."
-  (aref (extension-recipe character) 3))
+  (safe-extension-recipe-access character 3))
 
 ;;; character-metrics.lisp ends here
