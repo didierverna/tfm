@@ -54,13 +54,6 @@
     :documentation "The character's italic correction, in design size units."
     :initarg :italic-correction
     :reader italic-correction)
-   ;; #### WARNING: for now, the handling of character lists is very basic: I
-   ;; only store the "next character" here, exactly as it is provided in the
-   ;; TFM file. There's no specific representation of character lists and no
-   ;; checking for cycles for instance. I'm not sure whether storing the next
-   ;; character here is the right way to do it (as opposed to creating
-   ;; character lists in the font instance directly). I guess I'll have to
-   ;; wait until it's actually used to figure this out.
    (next-larger-character
     :documentation "The character's next larger character.
 This slot is non-null only if the character is part of a chain of characters

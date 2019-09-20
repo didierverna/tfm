@@ -301,6 +301,7 @@ without a boundary character being defined."))
 		 lig/kerns
 		 kerns
 		 font)
+          ;; #### FIXME: check for loops.
 	  :when (next-char char-info)
 	    :do (setf (next-larger-character (character-by-code code font t))
 		      (character-by-code (next-char char-info) font t))
