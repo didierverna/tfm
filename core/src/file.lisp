@@ -205,6 +205,13 @@ without a boundary character being defined.")))
 It signals that a boundary character ligature/kerning program was found,
 without a boundary character being defined."))
   
+(define-condition character-list-cycle (tfm-compliance-error)
+  ((cycle :initarg :cycle :accessor cycle))
+  (:report (lambda (character-list-cycle stream)
+	     (report stream "found a cycle in character list ~A."
+	       (cycle character-list-cycle))))
+  (:documentation "The Character List Cycle error.
+It signals that a cycle was found in a list of ascending character sizes."))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT."
@@ -301,7 +308,6 @@ without a boundary character being defined."))
 		 lig/kerns
 		 kerns
 		 font)
-          ;; #### FIXME: check for loops.
 	  :when (next-char char-info)
 	    :do (setf (next-larger-character (character-by-code code font t))
 		      (character-by-code (next-char char-info) font t))
@@ -309,7 +315,24 @@ without a boundary character being defined."))
 	    :do (setf (extension-recipe (character-by-code code font t))
 		      (make-extension-recipe
 		       (aref extens (exten-index char-info))
-		       font)))))
+		       font))))
+
+  ;; 5. Check for loops in character lists, character by character. Note that
+  ;; this is not the best way to do it, as we will end up checking the same
+  ;; lists multiple times from different entry points, but who cares (at least
+  ;; for now).
+  (maphash (lambda (code character)
+	     (declare (ignore code))
+	     (when (next-larger-character character)
+	       (loop :with seen := (list character)
+		     :while (next-larger-character character)
+		     :if (member (next-larger-character character) seen)
+		       :do (error 'character-list-cycle :cycle seen)
+		     :else
+		       :do (push (next-larger-character character) seen)
+		       :and :do (setq character
+				      (next-larger-character character)))))
+	   (characters font)))
 
 
 
