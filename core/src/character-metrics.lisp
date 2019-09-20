@@ -106,10 +106,10 @@ metrics instances are created."
   (when (extension-recipe character) t))
 
 (define-condition not-extensible (tfm-usage-error)
-  ((character-metrics :initarg :character-metrics :accessor character-metrics))
+  ((value :initarg :value :accessor value))
   (:report (lambda (not-extensible stream)
 	     (format stream "Character ~A is not extensible."
-	       (character-metrics not-extensible))))
+	       (value not-extensible))))
   (:documentation "The Not Extensible error.
 It signals an attempt to access a non-extensible character's extension
 recipe.")) 
@@ -119,7 +119,7 @@ recipe."))
 If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
   (if (extensiblep character)
     (aref (extension-recipe character) index)
-    (error 'not-extensible :character-metrics character)))
+    (error 'not-extensible :value character)))
 
 (defun top-character (character)
   "Return the top character in CHARACTER's extension recipe, or NIL."

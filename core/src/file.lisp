@@ -49,7 +49,7 @@ It signals that a design size VALUE is too small (< 1pt)."))
 	(design-size font) (read-fix-word nil))
   (unless (>= (design-size font) 1)
     (restart-case (error 'invalid-design-size :value (design-size font))
-      (use-ten () :report "Set to 10pt." (setf (design-size font) 10))))
+      (set-to-ten () :report "Set it to 10pt." (setf (design-size font) 10))))
   (decf length 2)
   ;; #### NOTE: we silently assume Xerox PARC headers below. Not sure if
   ;; anything else could be in use, but it's impossible to tell from the files
@@ -170,14 +170,14 @@ See %make-ligature/kerning-program for more information."
 ;; ---------------------
 
 (define-condition invalid-char-info (tfm-compliance-error)
-  ((char-info :initarg :char-info :accessor char-info))
+  ((value :initarg :value :accessor value))
   (:report (lambda (invalid-char-info stream)
 	     (report stream
 		 "~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
-	       (char-info invalid-char-info))))
+	       (value invalid-char-info))))
   (:documentation "The Invalid Char Info error.
-It signals that a CHAR-INFO with a width-index of 0 is not completely zero'ed
-out."))
+It signals that a char-info VALUE with a width-index of 0 is not completely
+zero'ed out."))
 
 (define-condition tfm-table-error (tfm-compliance-error)
   ((name :initarg :name :accessor name))
@@ -192,7 +192,7 @@ This is the root condition for errors related to a NAMEd TFM table."))
 	       (value invalid-table-start)
 	       (name invalid-table-start))))
   (:documentation "The Invalid Table Start error.
-It signals that the first VALUE in a table is not 0."))
+It signals that the first VALUE in a NAMEd table is not 0."))
 
 (define-condition no-boundary-character (tfm-compliance-error)
   ()
@@ -206,12 +206,13 @@ It signals that a boundary character ligature/kerning program was found,
 without a boundary character being defined."))
   
 (define-condition character-list-cycle (tfm-compliance-error)
-  ((cycle :initarg :cycle :accessor cycle))
+  ((value :initarg :value :accessor value))
   (:report (lambda (character-list-cycle stream)
 	     (report stream "found a cycle in character list ~A."
-	       (cycle character-list-cycle))))
+	       (value character-list-cycle))))
   (:documentation "The Character List Cycle error.
-It signals that a cycle was found in a list of ascending character sizes."))
+It signals that a cycle was found in a list of ascending character sizes
+VALUE.")) 
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT."
@@ -229,8 +230,8 @@ It signals that a cycle was found in a list of ascending character sizes."))
 	  :for word = (read-u32)
 	  :for char-info := (decode-char-info word)
 	  :unless (or (not (zerop (width-index char-info))) (zerop word))
-	    :do (restart-case (error 'invalid-char-info :char-info char-info)
-		  (use-zero () :report "Zero it out."
+	    :do (restart-case (error 'invalid-char-info :value char-info)
+		  (set-to-zero () :report "Zero it out."
 		    (setq char-info (decode-char-info 0))))
 	  :do (vector-push char-info char-infos))
     (loop :for name :in (list "width" "height" "depth" "italic correction")
@@ -241,7 +242,7 @@ It signals that a cycle was found in a list of ascending character sizes."))
 	    :do (restart-case
 		    (error 'invalid-table-start
 		      :value (aref array 0) :name name)
-		  (use-zero () :report "Set to 0." (setf (aref array 0) 0)))
+		  (set-to-zero () :report "Set to 0." (setf (aref array 0) 0)))
 	  :do (loop :repeat (1- length)
 		    :do (vector-push (read-fix-word) array)))
     (loop :repeat nl
@@ -294,7 +295,7 @@ It signals that a cycle was found in a list of ascending character sizes."))
 	     kerns
 	     font)
 	    (with-simple-restart
-		(ignore "Ignore this ligature/kerning program.")
+		(discard-lig/kern "Discard the ligature/kerning program.")
 	      (error 'no-boundary-character))))))
     
     ;; 4. Process ligature / kerning programs, character lists, and extension
@@ -327,7 +328,7 @@ It signals that a cycle was found in a list of ascending character sizes."))
 	       (loop :with seen := (list character)
 		     :while (next-larger-character character)
 		     :if (member (next-larger-character character) seen)
-		       :do (error 'character-list-cycle :cycle seen)
+		       :do (error 'character-list-cycle :value seen)
 		     :else
 		       :do (push (next-larger-character character) seen)
 		       :and :do (setq character
@@ -541,7 +542,7 @@ the FILE's base name, if any."
 			  "exten")
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
-		       :smallest min :largest max :value length :name name))
+		       :value length :smallest min :largest max :name name))
     (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
       (error 'invalid-section-lengths
 	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
@@ -565,14 +566,14 @@ the FILE's base name, if any."
 
 (define-condition extended-tfm (tfm-warning)
   ((file :initarg :file :accessor file)
-   (extension :initarg :extension :accessor extension))
+   (value :initarg :value :accessor value))
   (:report (lambda (extended-tfm stream)
 	     (format stream "File ~A contains ~A data (not supported yet)."
 	       (file extended-tfm)
-	       (extension extended-tfm))))
+	       (value extended-tfm))))
   (:documentation "The Extended TFM warning.
-It signals that FILE contains EXTENSION data (OFM or JFM) rather than plain
-TFM data."))
+It signals that FILE contains VALUE extension data (OFM or JFM) rather than
+plain TFM data."))
 
 (defun load-font (file)
   "Load FILE into a new font, and return it.
@@ -582,9 +583,9 @@ NIL if FILE contains OFM or JFM data."
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
     (let ((lf (read-u16)))
       (cond ((zerop lf)
-	     (warn 'extended-tfm :file file :extension "OFM"))
+	     (warn 'extended-tfm :value "OFM" :file file))
 	    ((or (= lf 9) (= lf 11))
-	     (warn 'extended-tfm :file file :extension "JFM"))
+	     (warn 'extended-tfm :value "JFM" :file file))
 	    (t
 	     (load-tfm-font lf))))))
 

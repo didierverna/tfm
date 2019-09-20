@@ -41,17 +41,53 @@
     :version
     ;; From meta.lisp (this file):
     :nickname-package
+    ;; From src/util.lisp
+    :tfm :tfm-warning :tfm-error
+    :tfm-compliance-warning :tfm-compliance-error
+    :tfm-usage-warning :tfm-usage-error
+    :u16-overflow :fix-word-overflow :value :set-to-zero
+    :invalid-string-length :invalid-bcpl-string :padding
+    :read-maximum-length :discard-string :keep-string :fix-string
     ;; From src/character-metrics.lisp:
     :code :width :height :depth :italic-correction
-    :next-larger-character :extension-recipe
+    :next-larger-character
+    :extensiblep :not-extensible
     :top-character :middle-character :bottom-character :repeated-character
-    ;; Font src/font-metrics.lisp:
-    :name :checksum :design-size :slant
+    ;; Font src/font.lisp:
+    :composite :delete-before :delete-after :pass-over
+    :font :name :file :checksum
+    :encoding :family
+    :7bits-safe :face-number :face-code :weight :slope :expansion
+    :design-size :slant
     :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
-    :min-code :max-code
-    :character-by-code :character-count
-    :ligature :kerning :boundary-character
+    :min-code :max-code :character-count
+    :boundary-character
+    :parameters
+    :character-by-code :ligature :kerning
+    :math-symbols-font
+    :num1 :num2 :num3
+    :denom1 :denom2
+    :sup1 :sup2 :sup3
+    :sub1 :sub2
+    :supdrop :subdrop
+    :delim1 :delim2
+    :axis-height
+    :math-extension-font
+    :default-rule-thickness
+    :big-op-spacing1 :big-op-spacing2 :big-op-spacing3 :big-op-spacing4
+    :big-op-spacing5
     ;; From src/file.lisp:
+    :invalid-design-size :set-to-ten
+    :invalid-char-info
+    :invalid-table-start :name
+    :no-boundary-character :discard-lig/kern
+    :character-list-cycle
+    :file-underflow :file-overflow :declared-size :actual-size
+    :invalid-header-length
+    :invalid-character-range :bc :ec
+    :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
+    :invalid-table-length :smallest :largest
+    :extended-tfm
     :load-font))
 
 (in-package :net.didierverna.tfm)

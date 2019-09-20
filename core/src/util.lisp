@@ -111,7 +111,7 @@ Check that the integer is less than 2^15."
 	  (ldb (byte 8 0) u16) (read-byte *stream*))
     (unless (zerop (ldb (byte 1 15) u16))
       (restart-case (error 'u16-overflow :value u16)
-	(use-zero () :report "Use zero instead." (setq u16 0))))
+	(set-to-zero () :report "Set it to 0." (setq u16 0))))
     u16))
 
 
@@ -147,7 +147,7 @@ If LIMIT (the default), check that the number lies within ]-16,+16[."
     (when neg (setq fix-word (- fix-word)))
     (when (and limit (not (< -16 fix-word 16)))
       (restart-case (error 'fix-word-overflow :value fix-word)
-	(use-zero () :report "Use zero instead." (setq fix-word 0))))
+	(set-to-zero () :report "Set it to 0." (setq fix-word 0))))
     fix-word))
 
 
@@ -160,12 +160,12 @@ If LIMIT (the default), check that the number lies within ]-16,+16[."
    (padding :initarg :padding :accessor padding))
   (:report (lambda (invalid-string-length stream)
 	     (report stream "~
-padded string length (~A) is larger than available space (~A)."
+declared padded string length ~A is greater than its maximum ~A."
 	       (value invalid-string-length)
 	       (1- (padding invalid-string-length)))))
   (:documentation "The Invalid String Length error.
-It signals that the declared length of a padded string is larger than the
-available space."))
+It signals that the declared length VALUE of a padded string is greater than
+its maximum PADDING."))
 
 (define-condition invalid-bcpl-string (tfm-compliance-error)
   ((value :initarg :value :accessor value))
@@ -175,7 +175,8 @@ BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
 characters)."
 	       (value invalid-bcpl-string))))
   (:documentation "The Invalid BCPL String error.
-It signals that a BCPL string contains parentheses or non-ASCII characters."))
+It signals that a BCPL string VALUE contains parentheses or non-ASCII
+characters."))
 
 (defun read-padded-string
     (padding &aux (length (read-byte *stream*)) string)
@@ -184,9 +185,9 @@ The first byte in *STREAM* indicates the actual length of the string.
 The remaining bytes are ignored. The string should not contain parentheses."
   (unless (< length padding)
     (restart-case (error 'invalid-string-length :value length :padding padding)
-      (read-max () :report "Read the maximum possible length."
+      (read-maximum-length () :report "Read the maximum possible length."
 	(setq length (1- padding)))
-      (discard () :report "Discard the string completely."
+      (discard-string () :report "Discard the string."
 	(setq length 0))))
   (unless (zerop length)
     (setq string (make-string length))
@@ -196,10 +197,10 @@ The remaining bytes are ignored. The string should not contain parentheses."
 	  :do (setf (aref string i) (code-char (read-byte *stream*))))
     (when (or (find #\( string) (find #\) string))
       (restart-case (error 'invalid-bcpl-string :value string)
-	(keep () :report "Keep the string anyway.")
-	(discard () :report "Discard the string completely."
+	(keep-string () :report "Keep it anyway.")
+	(discard-string () :report "Discard it."
 	  (setq string nil))
-	(fix () :report "Fix the string, using /'s and ?'s."
+	(fix-string () :report "Fix it using /'s and ?'s."
 	  (loop :for i :from 0 :upto (1- (length string))
 		:when (or (char= (aref string i) #\()
 			  (char= (aref string i) #\)))
