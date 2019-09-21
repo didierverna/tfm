@@ -210,9 +210,9 @@ If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
 ;; Pseudo-accessors
 ;; ----------------
 
-(defun character-by-code (code font &optional errorp)
-  "Return FONT's character with CODE.
-If ERRORP, signal an error if not found."
+(defun character-by-code (code font &optional (errorp t))
+  "Return FONT's CODE character.
+If ERRORP (the default), signal an error if the character is not found."
   (or (gethash code (characters font))
       (when errorp (error "Character code ~A not found in ~S." code font))))
 
