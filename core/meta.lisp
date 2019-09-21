@@ -50,7 +50,7 @@
     :read-maximum-length :discard-string :keep-string :fix-string
     ;; From src/character-metrics.lisp:
     :code :width :height :depth :italic-correction
-    :next-larger-character
+    :next-character
     :extensiblep :not-extensible
     :top-character :middle-character :bottom-character :repeated-character
     ;; Font src/font.lisp:

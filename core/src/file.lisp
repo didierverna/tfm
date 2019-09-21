@@ -310,7 +310,7 @@ VALUE."))
 		 kerns
 		 font)
 	  :when (next-char char-info)
-	    :do (setf (next-larger-character (character-by-code code font t))
+	    :do (setf (next-character (character-by-code code font t))
 		      (character-by-code (next-char char-info) font t))
 	  :when (exten-index char-info)
 	    :do (setf (extension-recipe (character-by-code code font t))
@@ -324,15 +324,15 @@ VALUE."))
   ;; for now).
   (maphash (lambda (code character)
 	     (declare (ignore code))
-	     (when (next-larger-character character)
+	     (when (next-character character)
 	       (loop :with seen := (list character)
-		     :while (next-larger-character character)
-		     :if (member (next-larger-character character) seen)
+		     :while (next-character character)
+		     :if (member (next-character character) seen)
 		       :do (error 'character-list-cycle :value seen)
 		     :else
-		       :do (push (next-larger-character character) seen)
+		       :do (push (next-character character) seen)
 		       :and :do (setq character
-				      (next-larger-character character)))))
+				      (next-character character)))))
 	   (characters font)))
 
 

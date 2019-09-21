@@ -54,20 +54,20 @@
     :documentation "The character's italic correction, in design size units."
     :initarg :italic-correction
     :reader italic-correction)
-   (next-larger-character
-    :documentation "The character's next larger character.
+   (next-character
+    :documentation "The next character in a character list.
 This slot is non-null only if the character is part of a chain of characters
 of ascending size, and not the last one (see TeX: the Program [544]). It is
 mutually exclusive with the EXTENSION-RECIPE slot, and also with the existence
 of a ligature or kerning program for this character."
     :initform nil
-    :accessor next-larger-character)
+    :accessor next-character)
    (extension-recipe
     :documentation "The character's extension recipe.
 This is an array of top, middle, bottom, and repeated characters. Only the
 first 3 may be NIL, meaning that the final character is constructed without
 them. This slot is non-null only if this character is extensible (see TeX: the
-Program [544]). It is mutually exclusive with the NEXT-LARGER-CHARACTER slot,
+Program [544]). It is mutually exclusive with the NEXT-CHARACTER slot,
 and also with the existence of a ligature or kerning program for this
 character."
     :initform nil
@@ -84,7 +84,7 @@ this library, the term \"character\" denotes an instance of this class."))
 (defun make-character-metrics (code width height depth italic-correction)
   "Make a new CHARACTER-METRICS instance, and return it.
 Initialize the character's CODE, WIDTH, HEIGHT, DEPTH, and ITALIC-CORRECTION
-appropriately. The two remaining slots (NEXT-LARGER-CHARACTER and
+appropriately. The two remaining slots (NEXT--CHARACTER and
 EXTENSION-RECIPE) will be initialized later if needed, when all character
 metrics instances are created."
   (make-instance 'character-metrics
@@ -112,7 +112,7 @@ metrics instances are created."
 	       (value not-extensible))))
   (:documentation "The Not Extensible error.
 It signals an attempt to access a non-extensible character's extension
-recipe.")) 
+recipe."))
 
 (defun safe-extension-recipe-access (character index)
   "Return CHARACTER's INDEXth extension recipe value.
