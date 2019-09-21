@@ -341,5 +341,5 @@ scheme."))
   (:documentation "The Math Extension Font class.
 This class represents fonts with the \"TeX math extension\" character coding
 scheme."))
-    
+
 ;;; font.lisp ends here

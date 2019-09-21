@@ -204,7 +204,7 @@ without a boundary character being defined.")))
   (:documentation "The No Boundary Character error.
 It signals that a boundary character ligature/kerning program was found,
 without a boundary character being defined."))
-  
+
 (define-condition character-list-cycle (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (character-list-cycle stream)
@@ -212,7 +212,7 @@ without a boundary character being defined."))
 	       (value character-list-cycle))))
   (:documentation "The Character List Cycle error.
 It signals that a cycle was found in a list of ascending character sizes
-VALUE.")) 
+VALUE."))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT."
@@ -297,7 +297,7 @@ VALUE."))
 	    (with-simple-restart
 		(discard-lig/kern "Discard the ligature/kerning program.")
 	      (error 'no-boundary-character))))))
-    
+
     ;; 4. Process ligature / kerning programs, character lists, and extension
     ;; recipes, character by character.
     (loop :for char-info :across char-infos
