@@ -163,10 +163,10 @@ Common Lisp
 @tpindex @r{Class, }\cls\
 @end macro
 
-@c Class slots
-@macro clssindex{cls,slot}
-@tpindex \cls\@r{, slot, }\slot\
-@tpindex @r{Class, }\cls\@r{, slot, }\slot\
+@c Class accessors
+@macro clsaindex{cls,name}
+@tpindex \cls\@r{, access., }\name\
+@tpindex @r{Class, }\cls\@r{, access., }\name\
 @end macro
 
 @c Conditions
@@ -175,10 +175,10 @@ Common Lisp
 @tpindex @r{Condition, }\cond\
 @end macro
 
-@c Condition slots
-@macro condsindex{cond,slot}
-@tpindex \cond\@r{, slot, }\slot\
-@tpindex @r{Condition , }\cond\@r{, slot, }\slot\
+@c Condition accessors
+@macro condsindex{cond,name}
+@tpindex \cond\@r{, access., }\name\
+@tpindex @r{Condition , }\cond\@r{, access., }\name\
 @end macro
 
 @c Warning subindex
@@ -197,16 +197,10 @@ Common Lisp
 @tpindex @r{Error, }\cond\
 @end macro
 
-@c Errors
-@macro errindex{cond}
-@tpindex \cond\
-@errsubindex{\cond\}
-@end macro
-
-@c Error slots
-@macro errsindex{cond,slot}
-@tpindex \cond\@r{, slot, }\slot\
-@tpindex @r{Error , }\cond\@r{, slot, }\slot\
+@c Error accessors
+@macro errsindex{cond,name}
+@tpindex \cond\@r{, access., }\name\
+@tpindex @r{Error , }\cond\@r{, access., }\name\
 @end macro
 
 
@@ -479,18 +473,18 @@ classes are subclasses of @code{font}.
 A font is identified by a number of general attributes described below.
 @itemize @bullet
 @item
-@clssindex{font,name}@c
+@clsaindex{font,name}@c
 @rfindex{name}@c
 A font has a @code{name}, which is computed by @tfm{} as the file's base
 name. For example, the 10pt Computer Modern font loaded from
 @file{/path/to/cmr10.tfm} will be named @code{"cmr10"}.
 @item
-@clssindex{font,checkum}@c
+@clsaindex{font,checkum}@c
 @rfindex{checkum}@c
 A font has a @code{checksum}, which is provided by Metafont and stored
 in the TFM file.
 @item
-@clssindex{font,encoding}@c
+@clsaindex{font,encoding}@c
 @rfindex{encoding}@c
 A font has a specific @code{encoding} describing the relation between
 characters and their numerical code. The encoding is an informal string.
@@ -509,35 +503,35 @@ A font also contains a number of global properties described below.
 @cindex Unit, @TeX{} point
 @cindex Design size unit
 @cindex Unit, design size
-@clssindex{font,design-size}@c
+@clsaindex{font,design-size}@c
 @rfindex{design-size}@c
 @code{design-size} is the font's design size, in @TeX{} point units.
 For example, the design size of @t{cmr10} (the Computer Modern 10pt
 font) is 10. Apart from the @emph{slant} (see below), all other
 dimensions are given in design size units (not @TeX{} point units!).
 @item
-@clssindex{font,slant}@c
+@clsaindex{font,slant}@c
 @rfindex{slant}@c
 The @code{slant} of the font is a scalar ratio.
 @item
-@clssindex{font,interword-space}@c
+@clsaindex{font,interword-space}@c
 @rfindex{interword-space}@c
-@clssindex{font,interword-stretch}@c
+@clsaindex{font,interword-stretch}@c
 @rfindex{interword-stretch}@c
-@clssindex{font,interword-shrink}@c
+@clsaindex{font,interword-shrink}@c
 @rfindex{interword-shrink}@c
 The font's normal interword ``glue'' is provided by three separate
 values: @code{interword-space}, @code{interword-stretch}, and
 @code{interword-shrink}.
 @item
-@clssindex{font,ex}@c
+@clsaindex{font,ex}@c
 @rfindex{ex}@c
-@clssindex{font,em}@c
+@clsaindex{font,em}@c
 @rfindex{em}@c
 @TeX{}'s usual font-dependent units are provided as @code{em} and
 @code{ex}.
 @item
-@clssindex{font,extra-space}@c
+@clsaindex{font,extra-space}@c
 @rfindex{extra-space}@c
 Finally, the font's additional space to put at the end of sentences is
 available as @code{extra-space}.
@@ -547,11 +541,11 @@ available as @code{extra-space}.
 @node Character Metrics, Ligatures and Kernings, Font Metrics, Usage
 @section Character Metrics
 @cindex Character code
-@clssindex{font,min-code}@c
+@clsaindex{font,min-code}@c
 @rfindex{min-code}@c
-@clssindex{font,max-code}@c
+@clsaindex{font,max-code}@c
 @rfindex{max-code}@c
-@clssindex{font,character-count}@c
+@clsaindex{font,character-count}@c
 @rfindex{character-count}@c
 A TFM font contains at most 256 characters, represented by consecutive
 numerical @emph{codes}. The font instance has two readable slots named
@@ -578,22 +572,22 @@ A character contains a number of specific properties, unsurprisingly
 stored in readable slots.
 @itemize @bullet
 @item
-@clssindex{character-metrics,code}@c
+@clsaindex{character-metrics,code}@c
 @rfindex{code}@c
 @findex character-by-code
 A character has a numerical @code{code}, which makes it accessible from
 the font instance (see the function @code{character-by-code}).
 @item
-@clssindex{character-metrics,width}@c
+@clsaindex{character-metrics,width}@c
 @rfindex{width}@c
-@clssindex{character-metrics,height}@c
+@clsaindex{character-metrics,height}@c
 @rfindex{height}@c
-@clssindex{character-metrics,depth}@c
+@clsaindex{character-metrics,depth}@c
 @rfindex{depth}@c
 The character's box is described by its @code{width}, @code{height}, and
 @code{depth} (again, in design size units).
 @item
-@clssindex{character-metrics,italic-correction}@c
+@clsaindex{character-metrics,italic-correction}@c
 @rfindex{italic-correction}@c
 Finally, a character may also have an @code{italic-correction} (still in
 design size units), used in @TeX{} for regular characters followed by
@@ -618,7 +612,7 @@ it in a more accessible fashion.
 @node Kernings, Ligatures, Ligatures and Kernings, Ligatures and Kernings
 @subsection Kernings
 @cindex Kerning
-@clssindex{font,kernings}@c
+@clsaindex{font,kernings}@c
 A font stores kerning information in the @code{kernings} slot. If a
 specific kerning exists for some pair of characters, you may retrieve
 that information with the following function.
@@ -637,7 +631,7 @@ in design size units.
 @node Ligatures,  , Kernings, Ligatures and Kernings
 @subsection Ligatures
 @cindex Ligature
-@clssindex{font,ligatures}@c
+@clsaindex{font,ligatures}@c
 A font stores ligature information in the @code{ligatures} slot. If a
 specific ligature exists for some pair of characters, you may retrieve
 that information with the following function.
@@ -659,19 +653,19 @@ A ligature contains four readable slots describing how the ligature
 should be made.
 @itemize @bullet
 @item
-@clssindex{ligature,composite}@c
+@clsaindex{ligature,composite}@c
 @rfindex{composite}@c
 The @code{composite} character is the character to insert between the
 two original ones.
 @item
-@clssindex{ligature,delete-before}@c
+@clsaindex{ligature,delete-before}@c
 @rfindex{delete-before}@c
-@clssindex{ligature,delete-after}@c
+@clsaindex{ligature,delete-after}@c
 @rfindex{delete-after}@c
 Whether to delete the characters before and after the composite is
 indicated by @code{delete-before} and @code{delete-after}.
 @item
-@clssindex{ligature,pass-over}@c
+@clsaindex{ligature,pass-over}@c
 @rfindex{pass-over}@c
 Finally, @code{pass-over} indicates the number of characters to skip for
 reaching the next one, once the ligature has been made.
