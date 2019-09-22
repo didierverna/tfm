@@ -116,10 +116,10 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	:unless (> (skip lig/kern) 128)
 	  :if (< (op lig/kern) 128)
 	    :do (setf (ligature character
-				(character-by-code (next lig/kern) font)
+				(code-character (next lig/kern) font)
 				font)
 		      (make-ligature
-		       (character-by-code (remainder lig/kern) font)
+		       (code-character (remainder lig/kern) font)
 		       (when (member (op lig/kern) '(0 1 5)) t)
 		       (when (member (op lig/kern) '(0 2 6)) t)
 		       (cond ((member (op lig/kern) '(5 6 7)) 1)
@@ -127,7 +127,7 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 			     (t 0))))
 	  :else
 	    :do (setf (kerning character
-			       (character-by-code (next lig/kern) font)
+			       (code-character (next lig/kern) font)
 			       font)
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
@@ -160,8 +160,8 @@ See %make-ligature/kerning-program for more information."
     (loop :for code :in (list (top exten) (mid exten) (bot exten))
 	  :for index :from 0
 	  :unless (zerop code)
-	    :do (setf (aref recipe index) (character-by-code code font)))
-    (setf (aref recipe 3) (character-by-code (rep exten) font))
+	    :do (setf (aref recipe index) (code-character code font)))
+    (setf (aref recipe 3) (code-character (rep exten) font))
     recipe))
 
 
@@ -256,7 +256,7 @@ VALUE."))
     (loop :for char-info :across char-infos
 	  :for code :from (min-code font)
 	  :unless (zerop (width-index char-info))
-	    :do (setf (character-by-code font)
+	    :do (setf (code-character font)
 		      (make-character-metrics
 		       code
 		       (aref widths (width-index char-info))
@@ -279,8 +279,8 @@ VALUE."))
 	(when (= (skip lig/kern) 255)
 	  (let ((code (next lig/kern)))
 	    (setf (boundary-character font)
-		  (or (character-by-code code font nil)
-		      (setf (character-by-code font)
+		  (or (code-character code font nil)
+		      (setf (code-character font)
 			    (make-character-metrics code 0 0 0 0)))))))
       (let ((lig/kern (aref lig/kerns (1- nl))))
 	(when (= (skip lig/kern) 255)
@@ -304,16 +304,16 @@ VALUE."))
 	  :for code :from (min-code font)
 	  :when (lig/kern-index char-info)
 	    :do (make-ligature/kerning-program
-		 (character-by-code code font)
+		 (code-character code font)
 		 (lig/kern-index char-info)
 		 lig/kerns
 		 kerns
 		 font)
 	  :when (next-char char-info)
-	    :do (setf (next-character (character-by-code code font))
-		      (character-by-code (next-char char-info) font))
+	    :do (setf (next-character (code-character code font))
+		      (code-character (next-char char-info) font))
 	  :when (exten-index char-info)
-	    :do (setf (extension-recipe (character-by-code code font))
+	    :do (setf (extension-recipe (code-character code font))
 		      (make-extension-recipe
 		       (aref extens (exten-index char-info))
 		       font))))

@@ -210,16 +210,39 @@ If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
 ;; Pseudo-accessors
 ;; ----------------
 
-(defun character-by-code (code font &optional (errorp t))
-  "Return FONT's CODE character.
-If ERRORP (the default), signal an error if the character is not found."
-  (or (gethash code (characters font))
-      (when errorp (error "Character code ~A not found in ~S." code font))))
+;; #### NOTE: this is a compliance error. It may only be signalled by the
+;; internal API, meaning that the TFM data contains invalid references to
+;; characters that don't exist in the font (remember that we do add a fake
+;; boundary character if needed, so even this one can be retrieved).
+(define-condition invalid-character-code (tfm-compliance-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (invalid-character-code stream)
+	     (report stream "character code ~A is invalid."
+		     (value invalid-character-code))))
+  (:documentation "The Invalid Character Code error.
+It signals an invalid code VALUE for this font."))
 
-(defun (setf character-by-code) (character font)
+;; #### NOTE: this is the internal API, used while loading TFM data.
+(defun code-character (code font &optional (errorp t))
+  "Return FONT's CODE character.
+If ERRORP (the default), signal an error if CODE is invalid. Note that even a
+fake boundary character may be retrieved by this function"
+  (or (gethash code (characters font))
+      (when errorp (error 'invalid-character-code :value code))))
+
+(defun (setf code-character) (character font)
   "Make FONT's CHARACTER accessible by its code."
   (setf (gethash (code character) (characters font)) character))
 
+;; #### NOTE: this is the public API.
+(defun get-character (code font &optional (errorp t))
+  "Return FONT's CODE character, or NIL if there is not such character."
+  (gethash code (characters font)))
+
+;; #### NOTE: we don't bother to make a distinction between internal and
+;; external API here, because these functions use characters, not character
+;; codes (hence, an error would be signalled when characters are retrieved by
+;; the internal API).
 (defun ligature (character1 character2 font)
   "Return FONT's ligature for CHARACTER1 and CHARACTER2 if any."
   (gethash (cons character1 character2) (ligatures font)))
