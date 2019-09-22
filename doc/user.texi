@@ -186,16 +186,10 @@ Common Lisp
 @tpindex @r{Warning, }\cond\
 @end macro
 
-@c Warnings
-@macro warnindex{cond}
-@tpindex \cond\
-@warnsubindex{\cond\}
-@end macro
-
-@c Warning slots
-@macro warnsindex{cond,slot}
-@tpindex \cond\@r{, slot, }\slot\
-@tpindex @r{Warning , }\cond\@r{, slot, }\slot\
+@c Warning accessors
+@macro warnaindex{cond,name}
+@tpindex \cond\@r{, access., }\name\
+@tpindex @r{Warning , }\cond\@r{, access., }\name\
 @end macro
 
 @c Error subindex
@@ -447,24 +441,38 @@ located, and provide a specific pathname.
 @cindex Format, OFM
 @cindex JFM
 @cindex Format, JFM
-@warnindex{extended-tfm}@c
-Note that some @code{tfm} files actually contain OFM or JFM data rather
-than just plain TFM. @tfm{} is able to detect those extensions, but
-doesn't currently handle them. If OFM or JFM contents is detected,
+Some @code{tfm} files actually contain OFM or JFM data rather than just
+plain TFM. @tfm{} is able to detect those extensions, but doesn't
+currently support them. If OFM or JFM contents is detected,
 @code{load-font} signals an @code{extended-tfm} warning, and returns
-@nil{}. @c #### FIXME: point to the future conditions section.
+@nil{}.
 
+@deftp {Warning} extended-tfm
+@warnsubindex{extended-tfm}@c
+Accessors:
+@itemize
+@item
+@warnaindex{extended-tfm,file}@c
+@code{file}: the pathname of the file containing extended TFM data,
+@item
+@warnaindex{extended-tfm,value}@c
+@code{value}: currently either @code{"OFM"} or @code{"JFM"}.
+@end itemize
+@end deftp
 
 @cindex Font
+@c #### FIXME: point to the future section on TFM compliance.
+Otherwise, the return value is an instance of some font class. In the
+context of this library, the term ``font'' denotes such an instance.
 @clsindex{font}@c
-If everything goes well, this function will return a new instance of a
-class called @code{font}. In the context of this library, and from now
-on, the term ``font'' denotes an instance of this class.
+@clsindex{math-symbols-font}@c
+@clsindex{math-extension-font}@c
+There are currently three different font classes. The most general and
+frequent one is simply called @code{font}. @TeX{}, however, recognizes
+two special font categories for which the corresponding classes are
+@code{math-symbols-font}, and @code{math-extension-font}. Both of these
+classes are subclasses of @code{font}.
 
-A font contains a lot of information (identity, description, characters,
-@etc{}). This information is stored in various slots which are
-accessible with the eponym reader functions. The following sections
-describe that information and how to access it.
 
 @node Font Identity, Font Metrics, TFM Files, Usage
 @section Font Indentity
