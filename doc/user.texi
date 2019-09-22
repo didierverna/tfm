@@ -169,6 +169,52 @@ Common Lisp
 @tpindex @r{Class, }\cls\@r{, slot, }\slot\
 @end macro
 
+@c Conditions
+@macro condindex{cond}
+@tpindex \cond\
+@tpindex @r{Condition, }\cond\
+@end macro
+
+@c Condition slots
+@macro condsindex{cond,slot}
+@tpindex \cond\@r{, slot, }\slot\
+@tpindex @r{Condition , }\cond\@r{, slot, }\slot\
+@end macro
+
+@c Warning subindex
+@macro warnsubindex{cond}
+@tpindex @r{Warning, }\cond\
+@end macro
+
+@c Warnings
+@macro warnindex{cond}
+@tpindex \cond\
+@warnsubindex{\cond\}
+@end macro
+
+@c Warning slots
+@macro warnsindex{cond,slot}
+@tpindex \cond\@r{, slot, }\slot\
+@tpindex @r{Warning , }\cond\@r{, slot, }\slot\
+@end macro
+
+@c Error subindex
+@macro errsubindex{cond}
+@tpindex @r{Error, }\cond\
+@end macro
+
+@c Errors
+@macro errindex{cond}
+@tpindex \cond\
+@errsubindex{\cond\}
+@end macro
+
+@c Error slots
+@macro errsindex{cond,slot}
+@tpindex \cond\@r{, slot, }\slot\
+@tpindex @r{Error , }\cond\@r{, slot, }\slot\
+@end macro
+
 
 
 @c ====================================================================
