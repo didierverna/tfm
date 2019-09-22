@@ -441,6 +441,20 @@ support searching for TFM files in common or standard places (such as
 @TeX{}Live installations), so you need to know where those files are
 located, and provide a specific pathname.
 
+@cindex TFM
+@cindex Format, TFM
+@cindex OFM
+@cindex Format, OFM
+@cindex JFM
+@cindex Format, JFM
+@warnindex{extended-tfm}@c
+Note that some @code{tfm} files actually contain OFM or JFM data rather
+than just plain TFM. @tfm{} is able to detect those extensions, but
+doesn't currently handle them. If OFM or JFM contents is detected,
+@code{load-font} signals an @code{extended-tfm} warning, and returns
+@nil{}. @c #### FIXME: point to the future conditions section.
+
+
 @cindex Font
 @clsindex{font}@c
 If everything goes well, this function will return a new instance of a
