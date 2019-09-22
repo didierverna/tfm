@@ -195,7 +195,12 @@ The remaining bytes are ignored. The string should not contain parentheses."
 	  ;; #### NOTE: this assumes that Lisp's internal character encoding
 	  ;; agrees at least with ASCII.
 	  :do (setf (aref string i) (code-char (read-byte *stream*))))
-    (when (or (find #\( string) (find #\) string))
+    (when (or (find #\( string)
+	      (find #\) string)
+	      (find-if (lambda (character)
+			 (or (< (char-code character) 32)
+			     (> (char-code character) 126)))
+		       string))
       (restart-case (error 'invalid-bcpl-string :value string)
 	(keep-string () :report "Keep it anyway.")
 	(discard-string () :report "Discard it."
