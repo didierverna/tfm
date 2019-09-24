@@ -256,8 +256,8 @@ fake boundary character may be retrieved by this function"
   (setf (gethash (code character) (characters font)) character))
 
 ;; #### NOTE: this is the public API.
-(defun get-character (code font &optional (errorp t))
-  "Return FONT's CODE character, or NIL if there is not such character."
+(defun get-character (code font)
+  "Return FONT's CODE character, or NIL."
   (gethash code (characters font)))
 
 ;; #### NOTE: we don't bother to make a distinction between internal and
