@@ -273,13 +273,15 @@ fake boundary character may be retrieved by this function"
 It signals that CHARACTER1 and CHARACTER2 don't belong to the same font."))
 
 (defun ligature (character1 character2)
-  "Return ligature for CHARACTER1 and CHARACTER2, or NIL."
+  "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
+Both characters must belong to the same font."
   (unless (eq (font character1) (font character2))
     (error 'different-fonts :character1 character1 :character2 character2))
   (gethash (cons character1 character2) (ligatures (font character1))))
 
 (defun kerning (character1 character2)
-  "Return FONT's kerning for CHARACTER1 and CHARACTER2, or NIL."
+  "Return FONT's kerning for CHARACTER1 and CHARACTER2, or NIL.
+Both characters must belong to the same font."
   (unless (eq (font character1) (font character2))
     (error 'different-fonts :character1 character1 :character2 character2))
   (gethash (cons character1 character2) (kernings (font character1))))
