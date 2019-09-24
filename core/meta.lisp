@@ -55,6 +55,7 @@
     :top-character :middle-character :bottom-character :repeated-character
     ;; Font src/font.lisp:
     :composite :delete-before :delete-after :pass-over
+    :anonymous-font
     :font :name :file :checksum
     :encoding :family
     :7bits-safe :face-number :face-code :weight :slope :expansion

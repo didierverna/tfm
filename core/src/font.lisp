@@ -75,7 +75,8 @@ library, the term \"ligature\" denotes an instance of this class."))
 
 (defclass font ()
   ((name
-    :documentation "The font's name."
+    :documentation "The font's name.
+When the font is loaded from a file, it defaults to the file's base name."
     :initarg :name
     :reader name)
    (file
@@ -83,58 +84,57 @@ library, the term \"ligature\" denotes an instance of this class."))
     :initform nil
     :initarg :file
     :accessor file)
-   (checksum :documentation "The font's checksum." :accessor checksum)
+   (checksum
+    :documentation "The font's checksum, as provided by Metafont."
+    :accessor checksum)
+   (design-size
+    :documentation "The font's design size, in units of TeX points."
+    :accessor design-size)
    (encoding
-    :documentation "The font's character coding scheme, if available."
+    :documentation "The font's character coding scheme (a BCPL string), or NIL."
     :initform nil
     :accessor encoding)
    (family
-    :documentation "The font's family, if available."
+    :documentation "The font's family (a BCPL string), or NIL."
     :initform nil
     :accessor family)
    (7bits-safe
-    :documentation "Whether the font is 7 bits safe, if available.
-Note that meaningful values are 0 or 1. A value of NIL means that the
-information in unavailable."
+    :documentation "Whether the font is 7 bits safe (0 or 1), or NIL.
+When 1, it means that no character of code lesser than 128 can lead to a
+character of code greater than 128 by ways of ligatures or extensible
+recipes."
     :initform nil
     :accessor 7bits-safe)
    (face-number
-    :documentation "The font's face number.
-Note that meaningful values are numbers. A value of NIL means that the
-information in unavailable. For values less than 18, the slots FACE-CODE,
-WEIGHT, SLOPE, and EXPANSION are also filled in."
+    :documentation "The font's face number, or NIL."
     :initform nil
     :accessor face-number)
-   (face-code
-    :documentation "The font's 3-letters face code, or NIL.
-A value of NIL means that the information in unavailable (FACE number is NIL
-or greater than 17). This code is constructed from the first letters of the
-WEIGHT, SLOPE, and EPXANSION slots. That is: [MBL][RI][RCE]."
-    :initform nil
-    :accessor face-code)
    (weight
-    :documentation "The font's weight (:medium, :bold, :light, or NIL).
-A value of NIL means that the information in unavailable (FACE number is NIL
-or greater than 17)."
+    :documentation "The font's weight (:medium, :bold, :light), or NIL.
+When available, it is decoded from the font face number."
     :initform nil
     :accessor weight)
    (slope
-    :documentation "The font's slope (:roman, :italic, or NIL).
-A value of NIL means that the information in unavailable (FACE number is NIL
-or greater than 17)."
+    :documentation "The font's slope (:roman, :italic) or NIL.
+When available, it is decoded from the font face number."
     :initform nil
     :accessor slope)
    (expansion
     :documentation
-    "The font's expansion (:regular, :condensed, :extended, or NIL).
-A value of NIL means that the information in unavailable (FACE number is NIL
-or greater than 17)."
+    "The font's expansion (:regular, :condensed, :extended), or NIL.
+When available, it is decoded from the font face number."
     :initform nil
     :accessor expansion)
-   (design-size
-    :documentation "The font's design size, in units of TeX points."
-    :accessor design-size)
-   (slant :documentation "The font's slant ratio." :initform 0 :accessor slant)
+   (face-code
+    :documentation "The font's 3-letters face code, or NIL.
+When available, it is the concatenation of the upcased first letters of the
+font's weight, slope, and expansion."
+    :initform nil
+    :accessor face-code)
+   (slant
+    :documentation "The font's slant (a scalar ratio)."
+    :initform 0
+    :accessor slant)
    (interword-space
     :documentation "The font's normal interword space, in design size units."
     :initform 0
@@ -147,11 +147,22 @@ or greater than 17)."
     :documentation "The font's interword shrinkability, in design size units."
     :initform 0
     :accessor interword-shrink)
-   (ex :documentation "The font's ex size." :initform 0 :accessor ex)
-   (em  :documentation "The font's em size." :initform 0 :accessor em)
+   (ex
+    :documentation "The font's ex size, in design size units."
+    :initform 0
+    :accessor ex)
+   (em
+    :documentation "The font's em size, in design size units."
+    :initform 0
+    :accessor em)
    (extra-space
-    :documentation "The font's extra space to put at the end of sentences."
+    :documentation "The font's extra space, in design size units.
+This is the additional space to put at the end of sentences."
     :initform 0 :accessor extra-space)
+   (parameters
+    :documentation "The font's additional parameters array, or NIL."
+    :initform nil
+    :accessor parameters)
    (min-code
     :documentation "The font's smallest character code."
     :accessor min-code)
@@ -164,7 +175,9 @@ This is a hash table associating character codes with characters."
     :initform (make-hash-table :test #'eq)
     :accessor characters)
    (character-count
-    :documentation "The font's number of characters."
+    :documentation "The font's number of characters.
+The character count does not include the boundary character, unless that
+character really exists in the font (has non-zerop metrics)."
     :accessor character-count)
    (ligatures
     :documentation "The font's ligatures.
@@ -183,13 +196,10 @@ kerning, in design size units."
 This character is also accessible by code, like normal ones. However, it is
 the only character the code of which may be outside [MIN-CODE,MAX-CODE] (see
 TeX: the Program [545]). Finally, this character is not included in the
-character count, unless it exists for real in the font."
+character count, unless it exists for real in the font (has non-zero
+metrics)."
     :initform nil
-    :accessor boundary-character)
-   (parameters
-    :documentation "The font's additional parameters array, if any."
-    :initform nil
-    :accessor parameters))
+    :accessor boundary-character))
   (:documentation "The TeX Font Metrics class.
 This class represents decoded font information. Within the context of this
 library, the term \"font\" denotes an instance of this class, or of one of its
@@ -199,6 +209,17 @@ subclasses."))
   "Print FONT unreadably with its name to STREAM."
   (print-unreadable-object (font stream :type t)
     (princ (name font) stream)))
+
+(define-condition anonymous-font (tfm-usage-error)
+  ((value :initarg font :accessor value))
+  (:report (lambda (anonymous-font stream)
+	     (report stream "~A font has no name." (value anonymous-font))))
+  (:documentation "The Anonymous Font error.
+It signals that the  VALUE font has non name."))
+
+(defmethod initialize-instance :after ((font font) &key)
+  "Check that FONT has a name."
+  (unless (name font) (error 'anonymous-font :value font)))
 
 (defun make-font (name &rest initargs)
   "Make a new NAMEd FONT instance, and return it.
