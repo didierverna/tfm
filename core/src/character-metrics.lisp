@@ -21,6 +21,9 @@
 
 ;;; Commentary:
 
+;; #### FIXME: consider adding a back pointer to the font in the character
+;; #### metrics. This would simplify ligature and kerning access in particular
+;; #### (maybe other things as well).
 
 
 ;;; Code:

@@ -35,7 +35,7 @@
 
 (defclass ligature ()
   ((composite
-    :documentation "The character to insert."
+    :documentation "The character to insert between the two original ones."
     :initarg :composite
     :reader composite)
    (delete-before
@@ -115,7 +115,7 @@ When available, it is decoded from the font face number."
     :initform nil
     :accessor weight)
    (slope
-    :documentation "The font's slope (:roman, :italic) or NIL.
+    :documentation "The font's slope (:roman, :italic), or NIL.
 When available, it is decoded from the font face number."
     :initform nil
     :accessor slope)
@@ -192,7 +192,7 @@ kerning, in design size units."
     :initform (make-hash-table :test #'equal)
     :accessor kernings)
    (boundary-character
-    :documentation "The font's boundary character, if any.
+    :documentation "The font's boundary character, or NIL.
 This character is also accessible by code, like normal ones. However, it is
 the only character the code of which may be outside [MIN-CODE,MAX-CODE] (see
 TeX: the Program [545]). Finally, this character is not included in the
@@ -265,7 +265,7 @@ fake boundary character may be retrieved by this function"
 ;; codes (hence, an error would be signalled when characters are retrieved by
 ;; the internal API).
 (defun ligature (character1 character2 font)
-  "Return FONT's ligature for CHARACTER1 and CHARACTER2 if any."
+  "Return FONT's ligature for CHARACTER1 and CHARACTER2, or NIL."
   (gethash (cons character1 character2) (ligatures font)))
 
 (defun (setf ligature) (ligature character1 character2 font)
@@ -273,7 +273,7 @@ fake boundary character may be retrieved by this function"
   (setf (gethash (cons character1 character2) (ligatures font)) ligature))
 
 (defun kerning (character1 character2 font)
-  "Return FONT's kerning for CHARACTER1 and CHARACTER2 if any."
+  "Return FONT's kerning for CHARACTER1 and CHARACTER2, or NIL."
   (gethash (cons character1 character2) (kernings font)))
 
 (defun (setf kerning) (kerning character1 character2 font)
