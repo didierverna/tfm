@@ -634,45 +634,67 @@ character doesn't exist for real in the font, it has zero metrics and is
 not included in the character count.
 @end itemize
 
-The font's characters are internally stored in a hash table, which can
-be accessed with the following function.
-@defun character-by-code CODE FONT &optional ERRORP
-Return @var{FONT}'s character with @var{CODE}.
-If @var{ERRORP}, signal an error if not found.
+The characters in a font are individually accessible by their code,
+thanks to the following function (when this function returns @nil{}, it
+means that no character is defined for the code in question).
+@defun get-character CODE FONT
+Return @var{FONT}'s @var{CODE} character, or @nil{}.
 @end defun
 
 @cindex Character
 @clsindex{character-metrics}@c
-The function above actually returns an instance of a class called
-@code{character-metrics}, which contains character-specific information.
-In the context of this library, and from now on, the term ``character''
-denotes an instance of this class.
-
-A character contains a number of specific properties, unsurprisingly
-stored in readable slots.
-@itemize @bullet
+This function actually returns an instance of a class called
+@code{character-metrics}, which contains character-specific data. In the
+context of this library, the term ``character'' denotes an instance of
+this class. The following accessors return the different character
+properties available.
+@itemize
 @item
 @clsaindex{character-metrics,code}@c
-@rfindex{code}@c
-@findex character-by-code
-A character has a numerical @code{code}, which makes it accessible from
-the font instance (see the function @code{character-by-code}).
+@findex get-character
+@code{code}: the character @code{code} which makes it accessible from
+the font instance (see the function @code{get-character}).
 @item
 @clsaindex{character-metrics,width}@c
-@rfindex{width}@c
 @clsaindex{character-metrics,height}@c
-@rfindex{height}@c
 @clsaindex{character-metrics,depth}@c
-@rfindex{depth}@c
-The character's box is described by its @code{width}, @code{height}, and
-@code{depth} (again, in design size units).
+@code{width}, @code{height}, and @code{depth}: the character box
+dimensions, in design size units.
 @item
 @clsaindex{character-metrics,italic-correction}@c
-@rfindex{italic-correction}@c
-Finally, a character may also have an @code{italic-correction} (still in
-design size units), used in @TeX{} for regular characters followed by
+@code{italic-correction}: the character's italic correction, in design
+size units. @TeX{} uses this value for regular characters followed by
 the command @code{\/}, and also in math mode for superscript placement.
+@item
+@cindex Character list
+@clsaindex{character-metrics,next-character}@c
+@code{next-character}: the next character in a character list, or
+@nil{}. If non-@nil{}, this character is part of a chain of characters
+of ascending size, and not the last one (see @TeX{}: the Program [544]).
+It is mutually exclusive with the exsitence of an extension recipe (see
+below), and also with the existence of a ligature or kerning program for
+this character (@pxref{Ligatures and Kernings}).
 @end itemize
+
+@cindex Extensible character
+@cindex Character, extensible
+Some characters are said to be ``extensible'' (meaning that they are
+constructed out of up to four components, themselves characters). To
+test whether a character is extensible, use the following function.
+@defun extensiblep CHARACTER
+Return @code{T} if @var{CHARACTER} has an extension recipe.
+@end defun
+@clsaindex{character-metrics,top-character}@c
+@clsaindex{character-metrics,middle-character}@c
+@clsaindex{character-metrics,bottom-character}@c
+@clsaindex{character-metrics,repeated-character}@c
+When a character is extensible, the four components of the extensible
+recipe may be retrieved with the @code{top-}, @code{middle-},
+@code{bottom-}, and @code{repeated-character} accessors. These functions
+return a character, or @nil{} if the corresponding component isn't used
+in the recipe. Note however that a repeated character always exists in
+an extension recipe (so only the top, middle, and bottom characters may
+be @nil{}).
 
 
 @node Ligatures and Kernings,  , Character Information, Usage
