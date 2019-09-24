@@ -81,6 +81,10 @@ Common Lisp
 @code{nil}
 @end macro
 
+@macro kwd{name}
+@code{:\name\}
+@end macro
+
 
 @c --------------------------------
 @c Manuals cross-referencing macros
@@ -410,13 +414,12 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 
 @menu
 * TFM Files::                   Loading a font
-* Font Identity::               Name, encoding, etc.
-* Font Metrics::                Size, shape, etc.
-* Character Metrics::           Code, box dimensions, etc.
+* Font Information::            Global properties
+* Character Information::       Code, box dimensions, etc.
 * Ligatures and Kernings::      For pairs of characters
 @end menu
 
-@node TFM Files, Font Identity, Usage, Usage
+@node TFM Files, Font Information, Usage, Usage
 @section TFM Files
 The main entry point to @tfm{} is @code{load-font}, the function which
 allows you to load a @code{tfm} file in memory.
@@ -447,7 +450,7 @@ Accessors:
 @itemize
 @item
 @warnaindex{extended-tfm,file}@c
-@code{file}: the pathname of the file containing extended TFM data,
+@code{file}: the extended TFM data (a pathname designator).
 @item
 @warnaindex{extended-tfm,value}@c
 @code{value}: currently either @code{"OFM"} or @code{"JFM"}.
@@ -468,78 +471,142 @@ two special font categories for which the corresponding classes are
 classes are subclasses of @code{font}.
 
 
-@node Font Identity, Font Metrics, TFM Files, Usage
-@section Font Indentity
-A font is identified by a number of general attributes described below.
-@itemize @bullet
+@node Font Information, Character Information, TFM Files, Usage
+@section Font Information
+General font information decoded from the TFM data can be individually
+retrieved via a number of font accessors described below.
+@itemize
 @item
 @clsaindex{font,name}@c
-@rfindex{name}@c
-A font has a @code{name}, which is computed by @tfm{} as the file's base
-name. For example, the 10pt Computer Modern font loaded from
-@file{/path/to/cmr10.tfm} will be named @code{"cmr10"}.
+@code{name}: computed by @tfm{} as base name of the file the font was
+loaded from (for example @code{"cmr10"}).
 @item
-@clsaindex{font,checkum}@c
-@rfindex{checkum}@c
-A font has a @code{checksum}, which is provided by Metafont and stored
-in the TFM file.
+@clsaindex{font,file}@c
+@code{file}: the argument to @code{load-font}.
 @item
-@clsaindex{font,encoding}@c
-@rfindex{encoding}@c
-A font has a specific @code{encoding} describing the relation between
-characters and their numerical code. The encoding is an informal string.
-For some examples, see the paper
-@uref{http://www.tug.org/TUGboat/Articles/tb02-1/tb02fuchstfm.pdf,,@TeX{}
-Font Metric Files} from David Fuchs (TUGboat, Volume 2, N.1, pages
-12--16).
-@end itemize
-
-@node Font Metrics, Character Metrics, Font Identity, Usage
-@section Font Metrics
-A font also contains a number of global properties described below.
-@itemize @bullet
+@clsaindex{font,checksum}@c
+@code{checksum}: part of the TFM format, provided by Metafont.
 @item
 @cindex @TeX{} point unit
 @cindex Unit, @TeX{} point
 @cindex Design size unit
 @cindex Unit, design size
 @clsaindex{font,design-size}@c
-@rfindex{design-size}@c
-@code{design-size} is the font's design size, in @TeX{} point units.
-For example, the design size of @t{cmr10} (the Computer Modern 10pt
-font) is 10. Apart from the @emph{slant} (see below), all other
-dimensions are given in design size units (not @TeX{} point units!).
-@item
-@clsaindex{font,slant}@c
-@rfindex{slant}@c
-The @code{slant} of the font is a scalar ratio.
-@item
-@clsaindex{font,interword-space}@c
-@rfindex{interword-space}@c
-@clsaindex{font,interword-stretch}@c
-@rfindex{interword-stretch}@c
-@clsaindex{font,interword-shrink}@c
-@rfindex{interword-shrink}@c
-The font's normal interword ``glue'' is provided by three separate
-values: @code{interword-space}, @code{interword-stretch}, and
-@code{interword-shrink}.
-@item
-@clsaindex{font,ex}@c
-@rfindex{ex}@c
-@clsaindex{font,em}@c
-@rfindex{em}@c
-@TeX{}'s usual font-dependent units are provided as @code{em} and
-@code{ex}.
-@item
-@clsaindex{font,extra-space}@c
-@rfindex{extra-space}@c
-Finally, the font's additional space to put at the end of sentences is
-available as @code{extra-space}.
+@code{design-size}: in units of @TeX{} point. For example, the design
+size of @t{cmr10} (the Computer Modern 10pt font) is 10. Apart from the
+@emph{slant} (see below), all other dimensions are given in design size
+units (not @TeX{} point units!).
 @end itemize
 
+@tfm{} is able to decode Xerox PARC headers when provided (see @TeX{}
+Font Metric Files, @i{David Fuchs, TUGboat Volume 2, n.1, pages 12--16}
+and PLtoPF[9,10]). The following information is extracted from them, and
+defaults to @nil{} otherwise. Note that when a header of sufficient
+length is available, it is in fact impossible to tell for sure whether
+it is a Xerox PARC one or not. @tfm{} simply assumes it is. As no other
+kind of header has been encountered yet (and the whole @TeX{} Live
+distribution has been tested), it is a pretty safe assumption. Finally,
+if a header size is greater than that of a Xerox PARC one, @tfm{}
+discards what's left of it.
+@itemize
+@item
+@clsaindex{font,encoding}@c
+@code{encoding}: the font's character coding scheme if known (an
+informal BCPL string, that is, plain ASCII and no parentheses). The
+class @tfm{} instantiates when loading a font depends on this string
+(@pxref{TFM Files}), and in particular, on the specific values
+@code{"TeX math symbols"} and @code{"TeX math extension"}.
+@item
+@clsaindex{font,family}@c
+@code{family}: another BCPL string, if known (for example @code{"CMR"}).
+@item
+@clsaindex{font,7bits-safe}@c
+@code{7bits-safe} 0 or 1 if known. When 1, it means that no character of
+code lesser than 128 can lead to a character of code greater than 128 by
+ways of ligatures or extensible recipes.
+@item
+@clsaindex{font,face-number}@c
+@code{face-number} a number identifying the font, if known.
+@item
+@clsaindex{font,weight}@c
+@clsaindex{font,slope}@c
+@clsaindex{font,expansion}@c
+@clsaindex{font,face-code}@c
+@code{weight}, @code{slope}, @code{expansion}, and @code{face-code}:
+decoded from, and filled in when @code{face-number} is lesser than 18
+(see also TFtoPL[10]). The weight is @kwd{medium}, @kwd{bold}, or
+@kwd{light}. The slope is @kwd{roman} or @kwd{italic}. The expansion is
+@kwd{regular}, @kwd{condensed}, or @kwd{extended}. Finally, the face
+code is the concatenation of the upcased first letters of these values.
+For example, @code{"MRR"} stands for ``medium roman regular''.
+@end itemize
 
-@node Character Metrics, Ligatures and Kernings, Font Metrics, Usage
-@section Character Metrics
+A font also contains a number of properties extracted from the so-called
+``parameters'' section. They all default to 0.
+@itemize @bullet
+@item
+@clsaindex{font,slant}@c
+@code{slant}: a scalar ratio (not in design size units; that's the only
+exception).
+@item
+@clsaindex{font,interword-space}@c
+@clsaindex{font,interword-stretch}@c
+@clsaindex{font,interword-shrink}@c
+@code{interword-space}, @code{interword-stretch}, and
+@code{interword-shrink}: the font's normal interword ``glue'' as three
+separate values.
+@item
+@clsaindex{font,ex}@c
+@clsaindex{font,em}@c
+@code{em} and @code{ex}: @TeX{}'s usual font-dependent units.
+@item
+@clsaindex{font,extra-space}@c
+@code{extra-space}: the font's additional space to put at the end of
+sentences.
+@end itemize
+
+@TeX{} math symbols and extension fonts have respectively 15 and 6
+additionnal parameters which are also accessible.
+@itemize
+@item
+@clsindex{math-symbols-font}@c
+@clsaindex{math-symbols-font,num1}@c
+@clsaindex{math-symbols-font,num2}@c
+@clsaindex{math-symbols-font,num3}@c
+@clsaindex{math-symbols-font,denom1}@c
+@clsaindex{math-symbols-font,denom2}@c
+@clsaindex{math-symbols-font,sup1}@c
+@clsaindex{math-symbols-font,sup2}@c
+@clsaindex{math-symbols-font,sup3}@c
+@clsaindex{math-symbols-font,sub1}@c
+@clsaindex{math-symbols-font,sub2}@c
+@clsaindex{math-symbols-font,subdrop}@c
+@clsaindex{math-symbols-font,supdrop}@c
+@clsaindex{math-symbols-font,delim1}@c
+@clsaindex{math-symbols-font,delim2}@c
+@clsaindex{math-symbols-font,axis-height}@c
+@code{num1..3}, @code{denom1..2}, @code{sup1..3}, @code{sub1..2},
+@code{subdrop}, @code{supdrop}, @code{delim1..2}, and @code{axis-height}
+are available in the @code{math-symbols-font} subclass.
+@item
+@clsindex{math-extension-font}@c
+@clsaindex{math-extension-font,default-rule-thickness}@c
+@clsaindex{math-extension-font,big-op-spacing1}@c
+@clsaindex{math-extension-font,big-op-spacing2}@c
+@clsaindex{math-extension-font,big-op-spacing3}@c
+@clsaindex{math-extension-font,big-op-spacing4}@c
+@clsaindex{math-extension-font,big-op-spacing5}@c
+@code{default-rule-thickness} and @code{big-op-spacing1..5} are
+available in the @code{math-extension-font} subclass.
+@end itemize
+
+@clsaindex{font,parameters}@c
+Finally, if the font has any parameters left, they are collected in an
+array of numeric values, accessible via the @code{parameters} function.
+
+
+@node Character Information, Ligatures and Kernings, Font Information, Usage
+@section Character Information
 @cindex Character code
 @clsaindex{font,min-code}@c
 @rfindex{min-code}@c
@@ -595,7 +662,7 @@ the command @code{\/}, and also in math mode for superscript placement.
 @end itemize
 
 
-@node Ligatures and Kernings,  , Character Metrics, Usage
+@node Ligatures and Kernings,  , Character Information, Usage
 @section Ligatures and Kernings
 The TFM format encodes so called ``ligature / kerning programs'',
 allowing font designers to specify particular spacing between
