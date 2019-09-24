@@ -51,7 +51,9 @@
     :initarg :depth
     :reader depth)
    (italic-correction
-    :documentation "The character's italic correction, in design size units."
+    :documentation "The character's italic correction, in design size units.
+TeX uses this value for regular characters followed by the command \/, and
+also in math mode for superscript placement."
     :initarg :italic-correction
     :reader italic-correction)
    (next-character
@@ -84,9 +86,9 @@ this library, the term \"character\" denotes an instance of this class."))
 (defun make-character-metrics (code width height depth italic-correction)
   "Make a new CHARACTER-METRICS instance, and return it.
 Initialize the character's CODE, WIDTH, HEIGHT, DEPTH, and ITALIC-CORRECTION
-appropriately. The two remaining slots (NEXT--CHARACTER and
-EXTENSION-RECIPE) will be initialized later if needed, when all character
-metrics instances are created."
+appropriately. The two remaining slots (NEXT-CHARACTER and EXTENSION-RECIPE)
+will be initialized later if needed, when all character metrics instances are
+created."
   (make-instance 'character-metrics
     :code code
     :width width
