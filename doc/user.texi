@@ -608,18 +608,31 @@ array of numeric values, accessible via the @code{parameters} function.
 @node Character Information, Ligatures and Kernings, Font Information, Usage
 @section Character Information
 @cindex Character code
+A TFM font contains at most 256 characters, represented by numerical
+codes (called @emph{character codes}). Some general information about
+the font's characters is available through the following accessors.
+@itemize
+@item
 @clsaindex{font,min-code}@c
-@rfindex{min-code}@c
 @clsaindex{font,max-code}@c
-@rfindex{max-code}@c
+@code{min-code} and @code{max-code}: respectively the smallest and
+greatest character codes for this font.
+@item
 @clsaindex{font,character-count}@c
-@rfindex{character-count}@c
-A TFM font contains at most 256 characters, represented by consecutive
-numerical @emph{codes}. The font instance has two readable slots named
-@code{min-code} and @code{max-code} representing the character code
-range. Additionally, the number of characters in the font is available
-as @code{character-count} (this is in fact equal to @emph{max-code -
-min-code + 1}).
+@code{character-count}: the number of characters defined in this font.
+Note that some characters between @code{min-code} and @code{max-code}
+may not be defined, so the character count may be smaller than
+@emph{max-code - min-code + 1}. Also, the character count doesn't
+include a potential boundary character (see below), unless it exists for
+real in the font (it has non-zero metrics).
+@item
+@clsaindex{font,boundary-character}@c
+@code{boundary-character}: the font's boundary character if defined, or
+@nil{}. The boundary character is the only character the code of which
+is allowed to be outside the @emph{[min-code,max-code]} range. If this
+character doesn't exist for real in the font, it has zero metrics and is
+not included in the character count.
+@end itemize
 
 The font's characters are internally stored in a hash table, which can
 be accessed with the following function.
