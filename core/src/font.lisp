@@ -260,25 +260,44 @@ fake boundary character may be retrieved by this function"
   "Return FONT's CODE character, or NIL."
   (gethash code (characters font)))
 
-;; #### NOTE: we don't bother to make a distinction between internal and
-;; external API here, because these functions use characters, not character
-;; codes (hence, an error would be signalled when characters are retrieved by
-;; the internal API).
-(defun ligature (character1 character2 font)
-  "Return FONT's ligature for CHARACTER1 and CHARACTER2, or NIL."
-  (gethash (cons character1 character2) (ligatures font)))
 
-(defun (setf ligature) (ligature character1 character2 font)
-  "Set FONT's LIGATURE for CHARACTER1 and CHARACTER2."
-  (setf (gethash (cons character1 character2) (ligatures font)) ligature))
+(define-condition different-fonts (tfm-usage-error)
+  ((character1 :initarg :character1 :accessor character1)
+   (character2 :initarg :character2 :accessor character2))
+  (:report (lambda (different-fonts stream)
+	     (format stream
+		 "characters ~A and ~A don't belong to the same font."
+	       (character1 different-fonts)
+	       (character2 different-fonts))))
+  (:documentation "The Different Fonts error.
+It signals that CHARACTER1 and CHARACTER2 don't belong to the same font."))
 
-(defun kerning (character1 character2 font)
+(defun ligature (character1 character2)
+  "Return ligature for CHARACTER1 and CHARACTER2, or NIL."
+  (unless (eq (font character1) (font character2))
+    (error 'different-fonts :character1 character1 :character2 character2))
+  (gethash (cons character1 character2) (ligatures (font character1))))
+
+(defun kerning (character1 character2)
   "Return FONT's kerning for CHARACTER1 and CHARACTER2, or NIL."
-  (gethash (cons character1 character2) (kernings font)))
+  (unless (eq (font character1) (font character2))
+    (error 'different-fonts :character1 character1 :character2 character2))
+  (gethash (cons character1 character2) (kernings (font character1))))
 
-(defun (setf kerning) (kerning character1 character2 font)
+
+;; #### NOTE: we don't currently bother to check that the two characters
+;; belong to the same font. These functions are internal only (although the
+;; symbols are exported, damn you CL), so let's just say I trust my own code
+;; for now.
+(defun (setf ligature) (ligature character1 character2)
+  "Set LIGATURE for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (ligatures (font character1)))
+	ligature))
+
+(defun (setf kerning) (kerning character1 character2)
   "Set FONT's KERNING for CHARACTER1 and CHARACTER2."
-  (setf (gethash (cons character1 character2) (kernings font)) kerning))
+  (setf (gethash (cons character1 character2) (kernings (font character1)))
+	kerning))
 
 
 

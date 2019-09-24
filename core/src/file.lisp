@@ -107,17 +107,16 @@ If so, decrease LENGTH by NEEDED afterwards."
 ;; Ligature/Kerning Programs
 ;; -------------------------
 
-(defun %make-ligature/kerning-program (character index lig/kerns kerns font)
-  "Make a ligature/kerning program for CHARACTER in FONT.
+(defun %make-ligature/kerning-program
+    (character index lig/kerns kerns &aux (font (font character)))
+  "Make a ligature/kerning program for CHARACTER.
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
   (loop :with continue := t
 	:while continue
 	:for lig/kern := (aref lig/kerns index)
 	:unless (> (skip lig/kern) 128)
 	  :if (< (op lig/kern) 128)
-	    :do (setf (ligature character
-				(code-character (next lig/kern) font)
-				font)
+	    :do (setf (ligature character (code-character (next lig/kern) font))
 		      (make-ligature
 		       (code-character (remainder lig/kern) font)
 		       (when (member (op lig/kern) '(0 1 5)) t)
@@ -126,9 +125,7 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 			     ((= (op lig/kern) 11) 2)
 			     (t 0))))
 	  :else
-	    :do (setf (kerning character
-			       (code-character (next lig/kern) font)
-			       font)
+	    :do (setf (kerning character (code-character (next lig/kern) font))
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
 	:if (>= (skip lig/kern) 128)
@@ -136,7 +133,7 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	:else
 	  :do (incf index (1+ (skip lig/kern)))))
 
-(defun make-ligature/kerning-program (character index lig/kerns kerns font
+(defun make-ligature/kerning-program (character index lig/kerns kerns
 				      &aux (lig/kern (aref lig/kerns index)))
   "Find the real start of a ligature/kerning program and make it.
 See %make-ligature/kerning-program for more information."
@@ -146,8 +143,7 @@ See %make-ligature/kerning-program for more information."
      (+ (* 256 (op lig/kern)) (remainder lig/kern))
      index)
    lig/kerns
-   kerns
-   font))
+   kerns))
 
 
 ;; -----------------
@@ -259,6 +255,7 @@ VALUE."))
 	    :do (setf (code-character font)
 		      (make-character-metrics
 		       code
+		       font
 		       (aref widths (width-index char-info))
 		       (aref heights (height-index char-info))
 		       (aref depths (depth-index char-info))
@@ -281,7 +278,7 @@ VALUE."))
 	    (setf (boundary-character font)
 		  (or (code-character code font nil)
 		      (setf (code-character font)
-			    (make-character-metrics code 0 0 0 0)))))))
+			    (make-character-metrics code font 0 0 0 0)))))))
       (let ((lig/kern (aref lig/kerns (1- nl))))
 	(when (= (skip lig/kern) 255)
 	  ;; #### NOTE: since we need to access the last instruction in the
@@ -292,8 +289,7 @@ VALUE."))
 	     (boundary-character font)
 	     (+ (* 256 (op lig/kern)) (remainder lig/kern))
 	     lig/kerns
-	     kerns
-	     font)
+	     kerns)
 	    (with-simple-restart
 		(discard-lig/kern "Discard the ligature/kerning program.")
 	      (error 'no-boundary-character))))))
@@ -307,8 +303,7 @@ VALUE."))
 		 (code-character code font)
 		 (lig/kern-index char-info)
 		 lig/kerns
-		 kerns
-		 font)
+		 kerns)
 	  :when (next-char char-info)
 	    :do (setf (next-character (code-character code font))
 		      (code-character (next-char char-info) font))

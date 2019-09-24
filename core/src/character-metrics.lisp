@@ -21,9 +21,6 @@
 
 ;;; Commentary:
 
-;; #### FIXME: consider adding a back pointer to the font in the character
-;; #### metrics. This would simplify ligature and kerning access in particular
-;; #### (maybe other things as well).
 
 
 ;;; Code:
@@ -41,6 +38,10 @@
     :documentation "The character's numerical code."
     :initarg :code
     :reader code)
+   (font
+    :documentation "The character's font."
+    :initarg :font
+    :reader font)
    (width
     :documentation "The character's width, in design size units."
     :initarg :width
@@ -86,14 +87,15 @@ this library, the term \"character\" denotes an instance of this class."))
   (print-unreadable-object (character stream :type t)
     (princ (code character) stream)))
 
-(defun make-character-metrics (code width height depth italic-correction)
+(defun make-character-metrics (code font width height depth italic-correction)
   "Make a new CHARACTER-METRICS instance, and return it.
-Initialize the character's CODE, WIDTH, HEIGHT, DEPTH, and ITALIC-CORRECTION
-appropriately. The two remaining slots (NEXT-CHARACTER and EXTENSION-RECIPE)
-will be initialized later if needed, when all character metrics instances are
-created."
+Initialize the character's CODE, FONT, WIDTH, HEIGHT, DEPTH, and
+ITALIC-CORRECTION appropriately. The two remaining slots (NEXT-CHARACTER and
+EXTENSION-RECIPE) will be initialized later if needed, when all character
+metrics instances are created."
   (make-instance 'character-metrics
     :code code
+    :font font
     :width width
     :height height
     :depth depth
