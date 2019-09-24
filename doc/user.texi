@@ -690,8 +690,8 @@ The TFM format encodes so called ``ligature / kerning programs'',
 allowing font designers to specify particular spacing between
 characters, or character replacements. Ligatures and kernings depend on
 @emph{pairs} of characters (and a pair of characters cannot have both
-some kerning and a ligature). @tfm{} decodes this information and stores
-it in a more accessible fashion.
+kerning and ligature specifications). @tfm{} decodes this information
+and stores it in a more accessible fashion.
 
 @menu
 * Kernings::                    Specific spacing
@@ -701,63 +701,50 @@ it in a more accessible fashion.
 @node Kernings, Ligatures, Ligatures and Kernings, Ligatures and Kernings
 @subsection Kernings
 @cindex Kerning
-@clsaindex{font,kernings}@c
-A font stores kerning information in the @code{kernings} slot. If a
-specific kerning exists for some pair of characters, you may retrieve
-that information with the following function.
+In order to get kerning information for some pair of characters in a
+font, use the following function.
 
 @defun kerning CHARACTER1 CHARACTER2 FONT
-Return @var{FONT}'s kerning for @var{CHARACTER1} and @var{CHARACTER2} if
-any.
+Return @var{FONT}'s kerning for @var{CHARACTER1} and @var{CHARACTER2},
+or @nil{}.
 @end defun
 
-If no such kerning has been specified (meaning that the two characters
-have a ligature, or that their boxes should just be put next to each
-other), this function returns @nil{}. Otherwise, it returns a dimension
-in design size units.
-
+The kerning, if it exists, is in design size units. Otherwise, the two
+characters may have a ligature, or their boxes should just be put next
+to each other.
 
 @node Ligatures,  , Kernings, Ligatures and Kernings
 @subsection Ligatures
 @cindex Ligature
-@clsaindex{font,ligatures}@c
-A font stores ligature information in the @code{ligatures} slot. If a
-specific ligature exists for some pair of characters, you may retrieve
-that information with the following function.
+In order to get ligature information for some pair of characters in a
+font, use the following function.
 
 @defun ligature CHARACTER1 CHARACTER2 FONT
-Return @var{FONT}'s ligature for @var{CHARACTER1} and @var{CHARACTER2}
-if any.
+Return @var{FONT}'s ligature for @var{CHARACTER1} and @var{CHARACTER2},
+or @nil{}.
 @end defun
 
 @clsindex{ligature}@c
-If no such ligature has been specified (meaning that the two characters
-should be left alone, possibly with some particular kerning), this
-function returns @nil{}. Otherwise, it returns an instance of a class
-called @code{ligature}, which contains the decoded ligature
-specification. In the context of this library, and from now on, the term
-``ligature'' denotes an instance of this class.
+Unless there's no such ligature (meaning that the two characters should
+be left alone, possibly with some particular kerning), the value
+returned by this function is an instance of a class called
+@code{ligature}. In the context of this library, the term ``ligature''
+denotes an instance of this class.
 
-A ligature contains four readable slots describing how the ligature
-should be made.
-@itemize @bullet
+A ligature contains four bits of information accessible as described below.
+@itemize
 @item
 @clsaindex{ligature,composite}@c
-@rfindex{composite}@c
-The @code{composite} character is the character to insert between the
-two original ones.
+@code{composite}: the character to insert between the two original ones.
 @item
 @clsaindex{ligature,delete-before}@c
-@rfindex{delete-before}@c
 @clsaindex{ligature,delete-after}@c
-@rfindex{delete-after}@c
-Whether to delete the characters before and after the composite is
-indicated by @code{delete-before} and @code{delete-after}.
+@code{delete-before} and @code{delete-after}: whether to delete the
+characters before and after the composite.
 @item
 @clsaindex{ligature,pass-over}@c
-@rfindex{pass-over}@c
-Finally, @code{pass-over} indicates the number of characters to skip for
-reaching the next one, once the ligature has been made.
+@code{pass-over}: the number of characters to skip in order to reach the
+next one, once the ligature has been made.
 @end itemize
 
 
