@@ -90,6 +90,11 @@ Common Lisp
 @c Manuals cross-referencing macros
 @c --------------------------------
 
+@c #### FIXME: everything defined with @defstuff is indexed
+@c automatically, so I canno't change the way indexing is done. The only
+@c solution would be to /not/ typeset any of the standard indexes, and
+@c provide my own.
+
 @c ---------------
 @c Indexing macros
 @c ---------------
@@ -100,7 +105,7 @@ Common Lisp
 @c Configuration options
 @macro coindex{name}
 @vindex net.didierverna.declt.configuration
-@cindex Configuration Option, @t{:\name\}
+@cindex Configuration option, @t{:\name\}
 @cindex @t{:\name\}
 @end macro
 
@@ -116,6 +121,12 @@ Common Lisp
 @c Function keys
 @macro fkindex{func,key}
 @findex \func\@r{, key, }\key\
+@end macro
+
+@c Class accessors
+@macro clsaindex{cls,name}
+@findex \name\@r{ (}\cls\ @r{accessor)}
+@findex \cls\@r{, accessor, }\name\
 @end macro
 
 @c Reader functions subindex
@@ -135,13 +146,13 @@ Common Lisp
 
 @c Constant variables
 @macro cvindex{var}
-@vindex \var\
+@vindex \var\@r{ (constant)}
 @vindex @r{Constant, }\var\
 @end macro
 
 @c Parameter variables
 @macro pvindex{var}
-@vindex \var\
+@vindex \var\@r{ (parameter)}
 @vindex @r{Parameter, }\var\
 @end macro
 
@@ -151,38 +162,26 @@ Common Lisp
 
 @c Packages
 @macro pkgindex{name}
-@tpindex \name\
+@tpindex \name\@r{ (package)}
 @tpindex @r{Package, }\name\
 @end macro
 
 @c Systems
 @macro sysindex{name}
-@tpindex \name\
+@tpindex \name\@r{ (system)}
 @tpindex @r{System, }\name\
 @end macro
 
 @c Classes
 @macro clsindex{cls}
-@tpindex \cls\
+@tpindex \cls\@r{ (class)}
 @tpindex @r{Class, }\cls\
-@end macro
-
-@c Class accessors
-@macro clsaindex{cls,name}
-@tpindex \cls\@r{, access., }\name\
-@tpindex @r{Class, }\cls\@r{, access., }\name\
 @end macro
 
 @c Conditions
 @macro condindex{cond}
-@tpindex \cond\
+@tpindex \cond\@r{ (condition)}
 @tpindex @r{Condition, }\cond\
-@end macro
-
-@c Condition accessors
-@macro condsindex{cond,name}
-@tpindex \cond\@r{, access., }\name\
-@tpindex @r{Condition , }\cond\@r{, access., }\name\
 @end macro
 
 @c Warning subindex
@@ -190,21 +189,9 @@ Common Lisp
 @tpindex @r{Warning, }\cond\
 @end macro
 
-@c Warning accessors
-@macro warnaindex{cond,name}
-@tpindex \cond\@r{, access., }\name\
-@tpindex @r{Warning , }\cond\@r{, access., }\name\
-@end macro
-
 @c Error subindex
 @macro errsubindex{cond}
 @tpindex @r{Error, }\cond\
-@end macro
-
-@c Error accessors
-@macro errsindex{cond,name}
-@tpindex \cond\@r{, access., }\name\
-@tpindex @r{Error , }\cond\@r{, access., }\name\
 @end macro
 
 
@@ -449,10 +436,10 @@ currently support them. If OFM or JFM contents is detected,
 Accessors:
 @itemize
 @item
-@warnaindex{extended-tfm,file}@c
+@clsaindex{extended-tfm,file}@c
 @code{file}: the extended TFM data (a pathname designator).
 @item
-@warnaindex{extended-tfm,value}@c
+@clsaindex{extended-tfm,value}@c
 @code{value}: currently either @code{"OFM"} or @code{"JFM"}.
 @end itemize
 @end deftp
