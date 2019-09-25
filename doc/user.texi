@@ -642,6 +642,9 @@ properties available.
 @code{code}: the character @code{code} which makes it accessible from
 the font instance (see the function @code{get-character}).
 @item
+@clsaindex{character-metrics,font}@c
+@code{font}: the font the character belongs to.
+@item
 @clsaindex{character-metrics,width}@c
 @clsaindex{character-metrics,height}@c
 @clsaindex{character-metrics,depth}@c
@@ -704,9 +707,9 @@ and stores it in a more accessible fashion.
 In order to get kerning information for some pair of characters in a
 font, use the following function.
 
-@defun kerning CHARACTER1 CHARACTER2 FONT
-Return @var{FONT}'s kerning for @var{CHARACTER1} and @var{CHARACTER2},
-or @nil{}.
+@defun kerning CHARACTER1 CHARACTER2
+Return kerning for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.@*
+Both characters must belong to the same font.
 @end defun
 
 The kerning, if it exists, is in design size units. Otherwise, the two
@@ -719,9 +722,9 @@ to each other.
 In order to get ligature information for some pair of characters in a
 font, use the following function.
 
-@defun ligature CHARACTER1 CHARACTER2 FONT
-Return @var{FONT}'s ligature for @var{CHARACTER1} and @var{CHARACTER2},
-or @nil{}.
+@defun ligature CHARACTER1 CHARACTER2
+Return ligature for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.@*
+Both characters must belong to the same font.
 @end defun
 
 @clsindex{ligature}@c
