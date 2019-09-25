@@ -213,7 +213,7 @@ subclasses."))
 (define-condition anonymous-font (tfm-usage-error)
   ((value :initarg font :accessor value))
   (:report (lambda (anonymous-font stream)
-	     (report stream "~A font has no name." (value anonymous-font))))
+	     (format stream "~A font has no name." (value anonymous-font))))
   (:documentation "The Anonymous Font error.
 It signals that the  VALUE font has non name."))
 
