@@ -64,7 +64,9 @@
     :min-code :max-code :character-count
     :boundary-character
     :parameters
-    :get-character :ligature :kerning
+    :invalid-character-code
+    :get-character
+    :ligature :kerning :different-fonts
     :math-symbols-font
     :num1 :num2 :num3
     :denom1 :denom2
