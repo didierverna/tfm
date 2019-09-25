@@ -37,6 +37,7 @@
   ()
   (:documentation "The TFM root condition."))
 
+
 (define-condition tfm-warning (tfm warning)
   ()
   (:documentation "The TFM warnings root condition."))
@@ -45,22 +46,34 @@
   ()
   (:documentation "The TFM errors root condition."))
 
-(define-condition tfm-compliance-warning (tfm-warning)
+
+(define-condition tfm-compliance (tfm)
+  ()
+  (:documentation "The TFM Compliance root condition.
+This is the mixin for conditions related to TFM compliance."))
+
+(define-condition tfm-compliance-warning (tfm-warning tfm-compliance)
   ()
   (:documentation "The TFM  compliance warnings root condition.
 This is the root condition for warnings related to TFM compliance."))
 
-(define-condition tfm-compliance-error (tfm-error)
+(define-condition tfm-compliance-error (tfm-error tfm-compliance)
   ()
   (:documentation "The TFM compliance errors root condition.
 This is the root condition for errors related to TFM compliance."))
 
-(define-condition tfm-usage-warning (tfm-warning)
+
+(define-condition tfm-usage (tfm)
+  ()
+  (:documentation "The TFM Usage root condition.
+This is the mixin for conditions related to the use of the library."))
+
+(define-condition tfm-usage-warning (tfm-warning tfm-usage)
   ()
   (:documentation "The TFM usage warnings root condition.
 This is the root condition for warnings related to the use of the library."))
 
-(define-condition tfm-usage-error (tfm-error)
+(define-condition tfm-usage-error (tfm-error tfm-usage)
   ()
   (:documentation "The TFM usage errors root condition.
 This is the root condition for errors related to the use of the library."))

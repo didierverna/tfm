@@ -42,7 +42,7 @@
     ;; From meta.lisp (this file):
     :nickname-package
     ;; From src/util.lisp
-    :tfm :tfm-warning :tfm-error
+    :tfm :tfm-warning :tfm-error :tfm-compliance :tfm-usage
     :tfm-compliance-warning :tfm-compliance-error
     :tfm-usage-warning :tfm-usage-error
     :u16-overflow :fix-word-overflow :value :set-to-zero
