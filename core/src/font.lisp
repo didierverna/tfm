@@ -211,15 +211,16 @@ subclasses."))
     (princ (name font) stream)))
 
 (define-condition anonymous-font (tfm-usage-error)
-  ((value :initarg font :accessor value))
+  ()
   (:report (lambda (anonymous-font stream)
-	     (format stream "~A font has no name." (value anonymous-font))))
+	     (declare (ignore anonymous-font))
+	     (princ "All fonts must be named." stream)))
   (:documentation "The Anonymous Font error.
-It signals that the  VALUE font has non name."))
+It signals an attempt at creating a font with no name."))
 
-(defmethod initialize-instance :after ((font font) &key)
+(defmethod initialize-instance :before ((font font) &key name)
   "Check that FONT has a name."
-  (unless (name font) (error 'anonymous-font :value font)))
+  (unless name (error 'anonymous-font)))
 
 (defun make-font (name &rest initargs)
   "Make a new NAMEd FONT instance, and return it.
