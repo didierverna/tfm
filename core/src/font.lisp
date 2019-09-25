@@ -267,7 +267,7 @@ fake boundary character may be retrieved by this function"
    (character2 :initarg :character2 :accessor character2))
   (:report (lambda (different-fonts stream)
 	     (format stream
-		 "characters ~A and ~A don't belong to the same font."
+		 "Characters ~A and ~A don't belong to the same font."
 	       (character1 different-fonts)
 	       (character2 different-fonts))))
   (:documentation "The Different Fonts error.
