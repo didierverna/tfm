@@ -323,7 +323,10 @@ VALUE."))
 	       (loop :with seen := (list character)
 		     :while (next-character character)
 		     :if (member (next-character character) seen)
-		       :do (error 'character-list-cycle :value seen)
+		       :do (restart-case
+			       (error 'character-list-cycle :value seen)
+			     (break-cycle () :report "Break the cycle."
+			       (setf (next-character character) nil)))
 		     :else
 		       :do (push (next-character character) seen)
 		       :and :do (setq character

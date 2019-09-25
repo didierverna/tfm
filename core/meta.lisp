@@ -84,7 +84,7 @@
     :invalid-char-info
     :invalid-table-start :name
     :no-boundary-character :discard-lig/kern
-    :character-list-cycle
+    :character-list-cycle :break-cycle
     :file-underflow :file-overflow :declared-size :actual-size
     :invalid-header-length
     :invalid-character-range :bc :ec
