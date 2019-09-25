@@ -131,6 +131,9 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	:if (>= (skip lig/kern) 128)
 	  :do (setq continue nil)
 	:else
+	  ;; #### NOTE: because of the way the next instruction is computed
+	  ;; below, it is inherently impossible to have a cycle in a lig/kern
+	  ;; program.
 	  :do (incf index (1+ (skip lig/kern)))))
 
 (defun make-ligature/kerning-program (character index lig/kerns kerns
