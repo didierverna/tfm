@@ -588,6 +588,7 @@ NIL if FILE contains OFM or JFM data."
 	    ((or (= lf 9) (= lf 11))
 	     (warn 'extended-tfm :value "JFM" :file file))
 	    (t
-	     (load-tfm-font lf))))))
+	     (with-simple-restart (cancel-loading "Cancel loading this font.")
+	       (load-tfm-font lf)))))))
 
 ;;; file.lisp ends here
