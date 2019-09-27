@@ -121,9 +121,9 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 		       (code-character (remainder lig/kern) font)
 		       (when (member (op lig/kern) '(0 1 5)) t)
 		       (when (member (op lig/kern) '(0 2 6)) t)
-		       (cond ((member (op lig/kern) '(5 6 7)) 1)
-			     ((= (op lig/kern) 11) 2)
-			     (t 0))))
+		       (cond ((member (op lig/kern) '(0 1 2 3)) 0)
+			     (member (op lig/kern) '(5 6 7)) 1)
+			     ((= (op lig/kern) 11) 2)))
 	  :else
 	    :do (setf (kerning character (code-character (next lig/kern) font))
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
