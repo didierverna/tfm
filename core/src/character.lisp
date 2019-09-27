@@ -1,4 +1,4 @@
-;;; character-metrics.lisp --- Character Metrics Information
+;;; character.lisp --- Character Metrics Information
 
 ;; Copyright (C) 2018, 2019 Didier Verna
 
@@ -144,4 +144,4 @@ If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
   "Return the repeated character in CHARACTER's extension recipe."
   (safe-extension-recipe-access character 3))
 
-;;; character-metrics.lisp ends here
+;;; character.lisp ends here

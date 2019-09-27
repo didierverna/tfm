@@ -45,7 +45,7 @@ For a more complete description of TFM, see the net.didierverna.tfm system."
 		:serial t
 		:components ((:file "util")
 			     (:file "intermediate")
-			     (:file "character-metrics")
+			     (:file "character")
 			     (:file "font")
 			     (:file "file")))))
 
