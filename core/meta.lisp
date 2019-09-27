@@ -92,7 +92,7 @@
     :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
     :invalid-table-length :smallest :largest
     :extended-tfm
-    :load-font))
+    :load-font :cancel-loading))
 
 (in-package :net.didierverna.tfm)
 
