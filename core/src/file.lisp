@@ -107,6 +107,14 @@ If so, decrease LENGTH by NEEDED afterwards."
 ;; Ligature/Kerning Programs
 ;; -------------------------
 
+(define-condition invalid-ligature-opcode (tfm-compliance-error)
+  ((value :initarg :value :accessor value))
+  (:report (lambda (invalid-ligature-opcode stream)
+	     (report stream "ligature opcode ~A is invalid."
+	       (value invalid-ligature-opcode))))
+  (:documentation "The Invalid Ligature Opcode error.
+It signals that a ligature opcode is invalid."))
+
 (defun %make-ligature/kerning-program
     (character index lig/kerns kerns &aux (font (font character)))
   "Make a ligature/kerning program for CHARACTER.
@@ -116,14 +124,25 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	:for lig/kern := (aref lig/kerns index)
 	:unless (> (skip lig/kern) 128)
 	  :if (< (op lig/kern) 128)
-	    :do (setf (ligature character (code-character (next lig/kern) font))
-		      (make-ligature
-		       (code-character (remainder lig/kern) font)
-		       (when (member (op lig/kern) '(0 1 5)) t)
-		       (when (member (op lig/kern) '(0 2 6)) t)
-		       (cond ((member (op lig/kern) '(0 1 2 3)) 0)
-			     (member (op lig/kern) '(5 6 7)) 1)
-			     ((= (op lig/kern) 11) 2)))
+	    :do (let ((opcode (op lig/kern)))
+		  (when (or (= opcode 4)
+			    (and (> opcode 7) (not (= opcode 11))))
+		    (restart-case
+			(error 'invalid-ligature-opcode :value opcode)
+		      (set-to-zero () :report "Set opcode to 0."
+			(setq opcode 0))
+		      (discard-ligature () :report "Discard this ligature."
+			(setq opcode nil))))
+		  (when opcode
+		    (setf (ligature character
+				    (code-character (next lig/kern) font))
+			  (make-ligature
+			   (code-character (remainder lig/kern) font)
+			   (when (member opcode '(0 1 5)) t)
+			   (when (member opcode '(0 2 6)) t)
+			   (cond ((member opcode '(0 1 2 3)) 0)
+				 ((member opcode '(5 6 7)) 1)
+				 ((= opcode 11) 2))))))
 	  :else
 	    :do (setf (kerning character (code-character (next lig/kern) font))
 		      (aref kerns (+ (* 256 (- (op lig/kern) 128))

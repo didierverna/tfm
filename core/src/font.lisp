@@ -55,6 +55,9 @@
 This class represents a decoded ligature program. Within the context of this
 library, the term \"ligature\" denotes an instance of this class."))
 
+;; #### NOTE: the pass-over must not exceed the number of original characters
+;; retained, but this has been checked already by the (unique) caller when
+;; decoding the ligature op-code.
 (defun make-ligature (composite delete-before delete-after pass-over)
   "Make a new LIGATURE instance, and return it."
   (make-instance 'ligature
