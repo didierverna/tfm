@@ -346,6 +346,11 @@ It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS."))
 		       (aref extens (exten-index char-info))
 		       font))))
 
+  ;; #### WARNING: the two checks below have not been tested thoroughly. They
+  ;; #### have been applied to all fonts in TeX Live, but not on fonts made
+  ;; #### explicitly to contain cycles, so we're not really sure that they
+  ;; #### work.
+
   ;; 5. Check for cycles in character lists, character by character. Note that
   ;; this is not the best way to do it, as we will end up checking the same
   ;; lists multiple times from different entry points, but who cares (at least
