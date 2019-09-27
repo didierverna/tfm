@@ -62,7 +62,9 @@ If so, decrease LENGTH by NEEDED afterwards."
     (checking-length 10 (setf (encoding font) (read-padded-string 40)))
     (when (encoding font)
       ;; #### NOTE: we don't upcase the BCPL strings, but tftopl does, so it's
-      ;; probably better to do string comparisons on upcased versions.
+      ;; probably better to do string comparisons on upcased versions. Also,
+      ;; tftopl only checks for SY and EX, not the full strings, but I don't
+      ;; think that really matters.
       (cond ((string= (string-upcase (encoding font)) "TEX MATH SYMBOLS")
 	     (change-class font 'math-symbols-font))
 	    ((string= (string-upcase (encoding font)) "TEX MATH EXTENSION")
