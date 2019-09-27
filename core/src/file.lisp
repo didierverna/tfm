@@ -232,6 +232,17 @@ without a boundary character being defined."))
 It signals that a cycle was found in a list of ascending character sizes
 VALUE."))
 
+(define-condition ligature-cycle (tfm-compliance-error)
+  ((value :initarg :value :accessor value)
+   (characters :initarg :characters :accessor characters))
+  (:report (lambda (ligature-cycle stream)
+	     (report stream
+		 "ligature ~A introduces a cycle for characters ~A."
+	       (value ligature-cycle)
+	       (characters ligature-cycle))))
+  (:documentation "The Ligature Cycle error.
+It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS."))
+
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT."
   (let ((char-infos (make-array nc :fill-pointer 0))
@@ -353,7 +364,37 @@ VALUE."))
 		       :do (push (next-character character) seen)
 		       :and :do (setq character
 				      (next-character character)))))
-	   (characters font)))
+	   (characters font))
+
+  ;; 6. Check for ligature cycles, ligature by ligature. Again, this is
+  ;; perhaps not the most efficient way to do it and maybe I should study the
+  ;; algorithm used in TFtoPL[88..], but we don't care right now.
+  (maphash (lambda (characters first-ligature)
+	     (loop :with state := (list (car characters) (cdr characters))
+		   :with seen := (list state)
+		   :with ligature := first-ligature
+		   :while ligature
+		   :do (setq state (apply-ligature ligature state))
+		   :if (= (length state) 1)
+		     :do (setq ligature nil)
+		   :else
+		     :if (member-if (lambda (elt)
+				      (and (eq (car state) (car elt))
+					   (eq (cadr state) (cadr elt))))
+				    seen)
+		       :do
+			  (restart-case
+			      (error 'ligature-cycle
+				:value first-ligature :characters characters)
+			    (remove-ligature ()
+			      :report "Remove that ligature from the font."
+			      (remhash characters (ligatures font))
+			      (setq ligature nil)))
+		     :else
+		       :do (push state seen)
+		       :and :do (setq ligature
+				      (ligature (car state) (cadr state)))))
+	   (ligatures font)))
 
 
 

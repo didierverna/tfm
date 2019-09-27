@@ -86,6 +86,7 @@
     :invalid-table-start :name
     :no-boundary-character :discard-lig/kern
     :character-list-cycle :break-cycle
+    :ligature-cycle :characters :remove-ligature
     :file-underflow :file-overflow :declared-size :actual-size
     :invalid-header-length
     :invalid-character-range :bc :ec

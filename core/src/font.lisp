@@ -66,6 +66,16 @@ library, the term \"ligature\" denotes an instance of this class."))
     :delete-after delete-after
     :pass-over pass-over))
 
+(defun apply-ligature (ligature state &aux (new-state (cddr state)))
+  "Apply LIGATURE to STATE and return the new state.
+STATE is a list of characters, the first two being subject to LIGATURE."
+  (unless (delete-after ligature) (push (cadr state) new-state))
+  (push (composite ligature) new-state)
+  (unless (delete-before ligature) (push (car state) new-state))
+  (cond ((= (pass-over ligature) 2) (cddr new-state))
+	((= (pass-over ligature) 1) (cdr new-state))
+	((= (pass-over ligature) 0) new-state)))
+
 
 
 ;; ==========================================================================
