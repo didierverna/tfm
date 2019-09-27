@@ -174,15 +174,15 @@ See %make-ligature/kerning-program for more information."
 ;; Extension Recipes
 ;; -----------------
 
-(defun make-extension-recipe (exten font)
-  "Make an extension recipe based on EXTEN and FONT."
-  (let ((recipe (make-array 4 :initial-element nil)))
-    (loop :for code :in (list (top exten) (mid exten) (bot exten))
-	  :for index :from 0
-	  :unless (zerop code)
-	    :do (setf (aref recipe index) (code-character code font)))
-    (setf (aref recipe 3) (code-character (rep exten) font))
-    recipe))
+(defun font-extension-recipe (exten font &aux initargs)
+  "Make an extension recipe based on EXTEN with FONT's characters."
+  (loop :for initarg :in '(:top-character :middle-character :bottom-character)
+	:for code :in (list (top exten) (mid exten) (bot exten))
+	:unless (zerop code)
+	  :do (push (code-character code font) initargs)
+	  :and :do (push initarg initargs))
+  (apply #'make-extension-recipe (code-character (rep exten) font)
+	 initargs))
 
 
 ;; ---------------------
@@ -344,7 +344,7 @@ It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS."))
 		      (code-character (next-char char-info) font))
 	  :when (exten-index char-info)
 	    :do (setf (extension-recipe (code-character code font))
-		      (make-extension-recipe
+		      (font-extension-recipe
 		       (aref extens (exten-index char-info))
 		       font))))
 

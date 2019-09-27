@@ -1,4 +1,4 @@
-;;; character.lisp --- Character Metrics Information
+;;; character.lisp --- Character Information
 
 ;; Copyright (C) 2018, 2019 Didier Verna
 
@@ -30,7 +30,54 @@
 
 
 ;; ==========================================================================
-;; Class
+;; Extension Recipes
+;; ==========================================================================
+
+(defclass extension-recipe ()
+  ((top-character
+    :documentation "The recipe's top character, or NIL."
+    :initform nil
+    :initarg :top-character
+    :accessor top-character)
+   (middle-character
+    :documentation "The recipe's middle character, or NIL."
+    :initform nil
+    :initarg :middle-character
+    :accessor middle-character)
+   (bottom-character
+    :documentation "The recipe's bottom character, or NIL."
+    :initform nil
+    :initarg :bottom-character
+    :accessor bottom-character)
+   (repeated-character
+    :documentation "The recipe's repeated character."
+    :initarg :repeated-character
+    :accessor repeated-character))
+  (:documentation "The Extension Recipe class.
+This class represents decoded information for extensible characters. Within
+the context of this library, the expression \"extension recipe\" denotes an
+instance of this class."))
+
+(defmethod print-object ((extension-recipe extension-recipe) stream)
+  "Print EXTENSION-RECIPE unreadably with its repeated character to STREAM."
+  (print-unreadable-object (extension-recipe stream :type t)
+    (princ (repeated-character extension-recipe) stream)))
+
+;; #### NOTE: we don't bother to check that the repeated character is not NIL
+;; because this class is note exported and I trust my code.
+(defun make-extension-recipe
+    (repeated-character
+     &rest initargs &key top-character middle-character bottom-character)
+  "Make a new EXTENSION-RECIPE with REPEATED-CHARACTER and return it.
+The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
+  (declare (ignore top-character middle-character bottom-character))
+  (apply #'make-instance 'extension-recipe
+	 :repeated-character repeated-character initargs))
+
+
+
+;; ==========================================================================
+;; Character Metrics
 ;; ==========================================================================
 
 (defclass character-metrics ()
@@ -69,13 +116,10 @@ of a ligature or kerning program for this character."
     :initform nil
     :accessor next-character)
    (extension-recipe
-    :documentation "The character's extension recipe.
-This is an array of top, middle, bottom, and repeated characters. Only the
-first 3 may be NIL, meaning that the final character is constructed without
-them. This slot is non-null only if this character is extensible (see TeX: the
-Program [544]). It is mutually exclusive with the NEXT-CHARACTER slot,
-and also with the existence of a ligature or kerning program for this
-character."
+    :documentation "The character's extension recipe, or NIL.
+This slot is non-null only if this character is extensible (see TeX: the
+Program [544]). It is mutually exclusive with the NEXT-CHARACTER slot, and
+also with the existence of a ligature or kerning program for this character."
     :initform nil
     :accessor extension-recipe))
   (:documentation "The Character Metrics class.
@@ -102,14 +146,13 @@ metrics instances are created."
     :italic-correction italic-correction))
 
 
-
-;; ==========================================================================
+;; ---------------------------------
 ;; Extension Recipe Pseudo-Accessors
-;; ==========================================================================
+;; ---------------------------------
 
 (defun extensiblep (character)
   "Return T if CHARACTER has an extension recipe."
-  ;; We don't want to expose the array itself.
+  ;; We don't want to expose the recipe itself.
   (when (extension-recipe character) t))
 
 (define-condition not-extensible (tfm-usage-error)
@@ -118,30 +161,16 @@ metrics instances are created."
 	     (format stream "Character ~A is not extensible."
 	       (value not-extensible))))
   (:documentation "The Not Extensible error.
-It signals an attempt to access a non-extensible character's extension
-recipe."))
+It signals that character VALUE doesn't have an extension recipe."))
 
-(defun safe-extension-recipe-access (character index)
-  "Return CHARACTER's INDEXth extension recipe value.
-If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
-  (if (extensiblep character)
-    (aref (extension-recipe character) index)
-    (error 'not-extensible :value character)))
+(defmacro define-extension-recipe-pseudo-accessor (name)
+  `(defmethod ,name ((character character-metrics))
+     (unless (extensiblep character) (error 'not-extensible :value character))
+     (,name (extension-recipe character))))
 
-(defun top-character (character)
-  "Return the top character in CHARACTER's extension recipe, or NIL."
-  (safe-extension-recipe-access character 0))
-
-(defun middle-character (character)
-  "Return the middle character in CHARACTER's extension recipe, or NIL."
-  (safe-extension-recipe-access character 1))
-
-(defun bottom-character (character)
-  "Return the bottom character in CHARACTER's extension recipe, or NIL."
-  (safe-extension-recipe-access character 2))
-
-(defun repeated-character (character)
-  "Return the repeated character in CHARACTER's extension recipe."
-  (safe-extension-recipe-access character 3))
+(define-extension-recipe-pseudo-accessor top-character)
+(define-extension-recipe-pseudo-accessor middle-character)
+(define-extension-recipe-pseudo-accessor bottom-character)
+(define-extension-recipe-pseudo-accessor repeated-character)
 
 ;;; character.lisp ends here
