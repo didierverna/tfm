@@ -105,6 +105,36 @@ If so, decrease LENGTH by NEEDED afterwards."
 ;; Character Information Tables
 ;; ==========================================================================
 
+(define-condition tfm-table-error (tfm-compliance-error)
+  ((name :initarg :name :accessor name))
+  (:documentation "The TFM table errors root condition.
+This is the root condition for errors related to a NAMEd TFM table."))
+
+(define-condition invalid-table-index (tfm-table-error)
+  ((value :initarg :value :accessor value)
+   (largest :initarg :largest :accessor largest))
+  (:report (lambda (invalid-table-index stream)
+	     (report stream "index ~A in ~A table is invalid (largest is ~A)."
+	       (value invalid-table-index)
+	       (name invalid-table-index)
+	       (largest invalid-table-index))))
+  (:documentation "The Invalid Table Index error.
+It signals that VALUE index is greater than LARGEST in NAMEd table."))
+
+(defun table-aref (name table index)
+  "Access NAMEd TABLE at INDEX, checking for index validity."
+  (unless (< index (length table))
+    (restart-case (error 'invalid-table-index
+		    :value index :largest (1- (length table)) :name name)
+      (set-to-zero () :report "Set index to 0."
+	(setq index 0))))
+  (aref table index))
+
+(defmacro tref (table index)
+  "Call TABLE-AREF, computing the table name from TABLE."
+  `(table-aref ,(string-downcase (symbol-name table)) ,table ,index))
+
+
 ;; -------------------------
 ;; Ligature/Kerning Programs
 ;; -------------------------
@@ -123,7 +153,7 @@ It signals that a ligature opcode is invalid."))
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
   (loop :with continue := t
 	:while continue
-	:for lig/kern := (aref lig/kerns index)
+	:for lig/kern := (tref lig/kerns index)
 	:unless (> (skip lig/kern) 128)
 	  :if (< (op lig/kern) 128)
 	    :do (let ((opcode (op lig/kern)))
@@ -147,7 +177,7 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 				 ((= opcode 11) 2))))))
 	  :else
 	    :do (setf (kerning character (code-character (next lig/kern) font))
-		      (aref kerns (+ (* 256 (- (op lig/kern) 128))
+		      (tref kerns (+ (* 256 (- (op lig/kern) 128))
 				     (remainder lig/kern))))
 	:if (>= (skip lig/kern) 128)
 	  :do (setq continue nil)
@@ -158,7 +188,7 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	  :do (incf index (1+ (skip lig/kern)))))
 
 (defun make-ligature/kerning-program (character index lig/kerns kerns
-				      &aux (lig/kern (aref lig/kerns index)))
+				      &aux (lig/kern (tref lig/kerns index)))
   "Find the real start of a ligature/kerning program and make it.
 See %make-ligature/kerning-program for more information."
   (%make-ligature/kerning-program
@@ -198,11 +228,6 @@ See %make-ligature/kerning-program for more information."
   (:documentation "The Invalid Char Info error.
 It signals that a char-info VALUE with a width-index of 0 is not completely
 zero'ed out."))
-
-(define-condition tfm-table-error (tfm-compliance-error)
-  ((name :initarg :name :accessor name))
-  (:documentation "The TFM table errors root condition.
-This is the root condition for errors related to a NAMEd TFM table."))
 
 (define-condition invalid-table-start (tfm-table-error)
   ((value :initarg :value :accessor value))
@@ -291,10 +316,10 @@ It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS."))
 		      (make-character-metrics
 		       code
 		       font
-		       (aref widths (width-index char-info))
-		       (aref heights (height-index char-info))
-		       (aref depths (depth-index char-info))
-		       (aref italics (italic-index char-info)))))
+		       (tref widths (width-index char-info))
+		       (tref heights (height-index char-info))
+		       (tref depths (depth-index char-info))
+		       (tref italics (italic-index char-info)))))
     ;; #### NOTE: this count doesn't (and shouldn't) include a zero'ed out
     ;; boundary character potentially added below.
     (setf (character-count font) (hash-table-count (characters font)))
@@ -345,7 +370,7 @@ It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS."))
 	  :when (exten-index char-info)
 	    :do (setf (extension-recipe (code-character code font))
 		      (font-extension-recipe
-		       (aref extens (exten-index char-info))
+		       (tref extens (exten-index char-info))
 		       font))))
 
   ;; #### WARNING: the two checks below have not been tested thoroughly. They
