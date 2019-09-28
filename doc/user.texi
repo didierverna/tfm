@@ -437,7 +437,7 @@ Accessors:
 @itemize
 @item
 @clsaindex{extended-tfm,file}@c
-@code{file}: the extended TFM data (a pathname designator).
+@code{file}: the argument to @code{load-font} (a pathname designator).
 @item
 @clsaindex{extended-tfm,value}@c
 @code{value}: currently either @code{"OFM"} or @code{"JFM"}.
@@ -501,8 +501,9 @@ discards what's left of it.
 @code{encoding}: the font's character coding scheme if known (an
 informal BCPL string, that is, plain ASCII and no parentheses). The
 class @tfm{} instantiates when loading a font depends on this string
-(@pxref{TFM Files}), and in particular, on the specific values
-@code{"TeX math symbols"} and @code{"TeX math extension"}.
+(@pxref{TFM Files}), and in particular, on the specific (case
+insensitive) values @code{"TeX math symbols"} and @code{"TeX math
+extension"}.
 @item
 @clsaindex{font,family}@c
 @code{family}: another BCPL string, if known (for example @code{"CMR"}).
@@ -510,7 +511,7 @@ class @tfm{} instantiates when loading a font depends on this string
 @clsaindex{font,7bits-safe}@c
 @code{7bits-safe} 0 or 1 if known. When 1, it means that no character of
 code lesser than 128 can lead to a character of code greater than 128 by
-ways of ligatures or extensible recipes.
+ways of ligatures or extension recipes.
 @item
 @clsaindex{font,face-number}@c
 @code{face-number} a number identifying the font, if known.
@@ -678,7 +679,7 @@ Return @code{T} if @var{CHARACTER} has an extension recipe.
 @clsaindex{character-metrics,middle-character}@c
 @clsaindex{character-metrics,bottom-character}@c
 @clsaindex{character-metrics,repeated-character}@c
-When a character is extensible, the four components of the extensible
+When a character is extensible, the four components of the extension
 recipe may be retrieved with the @code{top-}, @code{middle-},
 @code{bottom-}, and @code{repeated-character} accessors. These functions
 return a character, or @nil{} if the corresponding component isn't used
