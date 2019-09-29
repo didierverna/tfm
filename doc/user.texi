@@ -762,9 +762,9 @@ next one, once the ligature has been made.
 @tindex extended-tfm
 @warnsubindex{extended-tfm}@c
 We already mentioned the @code{extended-tfm} warning in @ref{TFM Files}.
-In fact, @tfm{} comes with a rich ontology of conditons that give you
-full control on the behavior to adopt when facing abnormal situations.
-This chapter describes this ontology.
+In fact, @tfm{} comes with a rich ontology of conditons (and restarts)
+that give you full control on the behavior to adopt when facing abnormal
+situations. This chapter describes this ontology.
 
 @menu
 * Conditions Overview::         The root conditions hierarchy
