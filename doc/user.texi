@@ -774,6 +774,32 @@ situations. This chapter describes this ontology.
 
 @node Conditions Overview, Usage Situations, Abnormal Situations, Abnormal Situations
 @section Conditions Overview
+All @tfm{} conditions are grounded in a root hierarchy that could be
+used, for instance if you want to catch more or less everything without
+too much detail.
+
+@condindex{tfm}@c
+@condindex{tfm-warning}@c
+@condindex{tfm-error}@c
+@condindex{tfm-compliance}@c
+@condindex{tfm-usage}@c
+The root of all @tfm{} conditions is simply called @code{tfm}. Warnings
+and errors are all sub-conditions of @code{tfm-warning} and
+@code{tfm-error} respectively. Then there are two main categories of
+conditions. Conditions related to problems with the TFM format are found
+under the @code{tfm-compliance} condition, while those related to a
+misuse of the library's API are classified under the @code{tfm-usage}
+one.
+
+@condindex{tfm-compliance-warning}@c
+@condindex{tfm-compliance-error}@c
+@condindex{tfm-usage-warning}@c
+@condindex{tfm-usage-error}@c
+Finally, the warning/error and compliance/usage families are mixed
+together (via multiple inheritance) to produce the four last
+``abstract'' conditions from which all other derive:
+@code{tfm-compliance-warning}, @code{tfm-compliance-error},
+@code{tfm-usage-warning}, and @code{tfm-usage-error}.
 
 
 @node Usage Situations, TFM Compliance Situations, Conditions Overview, Abnormal Situations
