@@ -775,11 +775,11 @@ situations. This chapter describes this ontology.
 
 @menu
 * Conditions Overview::         The root conditions hierarchy
-* Usage Situations::            Misuse of the public API
-* TFM Compliance Situations::   Adherence to the TFM format 
+* Erroneous Usage::             Misuse of the public API
+* TFM Compliance Problems::     Adherence to the TFM format 
 @end menu
 
-@node Conditions Overview, Usage Situations, Abnormal Situations, Abnormal Situations
+@node Conditions Overview, Erroneous Usage, Abnormal Situations, Abnormal Situations
 @section Conditions Overview
 All @tfm{} conditions are grounded in a root hierarchy that could be
 used, for instance if you want to catch more or less everything without
@@ -810,8 +810,8 @@ already mentioned @code{extended-tfm} warning):
 @code{tfm-usage-warning}, and @code{tfm-usage-error}.
 
 
-@node Usage Situations, TFM Compliance Situations, Conditions Overview, Abnormal Situations
-@section Usage Situations
+@node Erroneous Usage, TFM Compliance Problems, Conditions Overview, Abnormal Situations
+@section Erroneous Usage
 Because the @tfm{}'s public API is so small, there are only two usage
 conditions, so we'll start with those ones. Neither of these conditions
 is restartable at the level of @tfm{}.
@@ -855,8 +855,8 @@ Accessors:
 @end deftp
 
 
-@node TFM Compliance Situations,  , Usage Situations, Abnormal Situations
-@section TFM Compliance
+@node TFM Compliance Problems,  , Erroneous Usage, Abnormal Situations
+@section TFM Compliance Problems
 
 
 
