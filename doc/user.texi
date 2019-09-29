@@ -194,6 +194,13 @@ Common Lisp
 @tpindex @r{Error, }\cond\
 @end macro
 
+@c Usage Error subindex
+@macro usageerrsubindex{cond}
+@tpindex @r{Usage error, }\cond\
+@tpindex @r{Error, }\cond\
+@tpindex @r{Error, usage, }\cond\
+@end macro
+
 
 
 @c ====================================================================
@@ -805,6 +812,47 @@ already mentioned @code{extended-tfm} warning):
 
 @node Usage Situations, TFM Compliance Situations, Conditions Overview, Abnormal Situations
 @section Usage Situations
+Because the @tfm{}'s public API is so small, there are only two usage
+conditions, so we'll start with those ones. Neither of these conditions
+is restartable at the level of @tfm{}.
+
+@c #### NOTE: we don't currently describe the anonymous-font error
+@c because there's no way to make an anonymous font from the public API
+@c right now.
+
+@clsaindex{character-metrics,top-character}@c
+@clsaindex{character-metrics,middle-character}@c
+@clsaindex{character-metrics,bottom-character}@c
+@clsaindex{character-metrics,repeated-character}@c
+@findex extensiblep
+An attempt at accessing the top, middle, bottom, or repeated character
+of a non extensible character will signal a @code{not-extensible} usage
+error. Remember that you can check a character's extensibility with the
+@code{extensiblep} predicate.
+@deftp {Usage Error} not-extensible
+@usageerrsubindex{not-extensible}
+Accessor:
+@itemize
+@item
+@clsaindex{not-extensible,value}@c
+@code{value}: the character being accessed.
+@end itemize
+@end deftp
+
+@findex ligature
+@findex kerning
+An attempt at retrieving a ligature or kerning for two characters from
+different fonts will signal a @code{different-fonts} usage error.
+@deftp {Usage Error} different-fonts
+@usageerrsubindex{different-fonts}
+Accessors:
+@itemize
+@item
+@clsaindex{different-fonts,character1}@c
+@clsaindex{different-fonts,character2}@c
+@code{character1} and @code{character2}: the two characters involved.
+@end itemize
+@end deftp
 
 
 @node TFM Compliance Situations,  , Usage Situations, Abnormal Situations
