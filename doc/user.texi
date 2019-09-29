@@ -270,10 +270,11 @@ This is the @tfm{} User Manual for @tfm{} version @value{VERSION}.
 * Copying::                     The BSD license
 * Introduction::                TFM at a glance
 * Installation::                Library and documentation
-* Usage::                       All the details
-* Other Considerations::
+* Normal Use::                  When everything goes well
+* Abnormal Situations::         When something doesn't
+* Other Considerations::        Miscellaneous
 * Conclusion::                  That's all folks
-* Supported Platforms::
+* Supported Platforms::         Portability, dependencies, etc.
 * Indexes::                     Concepts, functions, variables and data types
 * Acknowledgments::             Hall of Pride
 @end menu
@@ -332,7 +333,7 @@ This is the @tfm{} User Manual. @tfm{} also has a
 @c ====================================================================
 @c Installation
 @c ====================================================================
-@node Installation, Usage, Introduction, Top
+@node Installation, Normal Use, Introduction, Top
 @chapter Installation
 @xref{Supported Platforms}, for information on portability or
 requirements. See @tfm{}'s
@@ -386,10 +387,10 @@ Type @command{make uninstall} to uninstall the library.
 
 
 @c ====================================================================
-@c Usage
+@c Normal Usage
 @c ====================================================================
-@node Usage, Other Considerations, Installation, Top
-@chapter Usage
+@node Normal Use, Abnormal Situations, Installation, Top
+@chapter Normal Use
 @pkgindex{net.didierverna.tfm}
 @tfm{} itself resides in a package called @t{net.didierverna.tfm}. You
 can automatically nickname this package with the following function.
@@ -406,7 +407,7 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 * Ligatures and Kernings::      For pairs of characters
 @end menu
 
-@node TFM Files, Font Information, Usage, Usage
+@node TFM Files, Font Information, Normal Use, Normal Use
 @section TFM Files
 The main entry point to @tfm{} is @code{load-font}, the function which
 allows you to load a @code{tfm} file in memory.
@@ -445,9 +446,9 @@ Accessors:
 @end deftp
 
 @cindex Font
-@c #### FIXME: point to the future section on TFM compliance.
-Otherwise, the return value is an instance of some font class. In the
-context of this library, the term ``font'' denotes such an instance.
+Otherwise, if everything goes well (but see @ref{Abnormal Situations}),
+the return value is an instance of some font class. In the context of
+this library, the term ``font'' denotes such an instance.
 @clsindex{font}@c
 @clsindex{math-symbols-font}@c
 @clsindex{math-extension-font}@c
@@ -458,7 +459,7 @@ two special font categories for which the corresponding classes are
 classes are subclasses of @code{font}.
 
 
-@node Font Information, Character Information, TFM Files, Usage
+@node Font Information, Character Information, TFM Files, Normal Use
 @section Font Information
 General font information decoded from the TFM data can be individually
 retrieved via a number of font accessors described below.
@@ -593,7 +594,7 @@ Finally, if the font has any parameters left, they are collected in an
 array of numeric values, accessible via the @code{parameters} function.
 
 
-@node Character Information, Ligatures and Kernings, Font Information, Usage
+@node Character Information, Ligatures and Kernings, Font Information, Normal Use
 @section Character Information
 @cindex Character code
 A TFM font contains at most 256 characters, represented by numerical
@@ -688,7 +689,7 @@ an extension recipe (so only the top, middle, and bottom characters may
 be @nil{}).
 
 
-@node Ligatures and Kernings,  , Character Information, Usage
+@node Ligatures and Kernings,  , Character Information, Normal Use
 @section Ligatures and Kernings
 The TFM format encodes so called ``ligature / kerning programs'',
 allowing font designers to specify particular spacing between
@@ -754,9 +755,40 @@ next one, once the ligature has been made.
 
 
 @c ====================================================================
+@c Abnormal Situations
+@c ====================================================================
+@node Abnormal Situations, Other Considerations, Normal Use, Top
+@chapter Abnormal Situations
+@tindex extended-tfm
+@warnsubindex{extended-tfm}@c
+We already mentioned the @code{extended-tfm} warning in @ref{TFM Files}.
+In fact, @tfm{} comes with a rich ontology of conditons that give you
+full control on the behavior to adopt when facing abnormal situations.
+This chapter describes this ontology.
+
+@menu
+* Conditions Overview::         The root conditions hierarchy
+* Usage Situations::            Misuse of the public API
+* TFM Compliance Situations::   Adherence to the TFM format 
+@end menu
+
+@node Conditions Overview, Usage Situations, Abnormal Situations, Abnormal Situations
+@section Conditions Overview
+
+
+@node Usage Situations, TFM Compliance Situations, Conditions Overview, Abnormal Situations
+@section Usage Situations
+
+
+@node TFM Compliance Situations,  , Usage Situations, Abnormal Situations
+@section TFM Compliance
+
+
+
+@c ====================================================================
 @c Other Considerations
 @c ====================================================================
-@node Other Considerations, Conclusion, Usage, Top
+@node Other Considerations, Conclusion, Abnormal Situations, Top
 @chapter Other Considerations
 This section contains marginal or meta-information, orthogonal to the
 library's main purpose.
