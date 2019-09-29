@@ -962,11 +962,13 @@ about portability.
 @c ====================================================================
 @node Acknowledgments,  , Indexes, Top
 @appendix Acknowledgments
-The following people have contributed bug reports or fixes, suggestions,
-compiler support or any other kind of help. You have my gratitude!
+The following people have contributed to @tfm{} in the form of bug
+reports or fixes, suggestions, expertise, or whatever else. Thank you!
 
-@emph{No one yet}.
 @multitable @columnfractions .99
+@item Doug McKenna
+@item Hironobu Yamashita
+@item Karl Berry
 @end multitable
 
 
