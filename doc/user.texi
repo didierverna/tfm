@@ -201,6 +201,12 @@ Common Lisp
 @tpindex @r{Error, usage, }\cond\
 @end macro
 
+@c Restarts
+@macro restartindex{restart}
+@tpindex \restart\@r{ (restart)}
+@tpindex @r{Restart, }\restart\
+@end macro
+
 
 
 @c ====================================================================
@@ -857,6 +863,21 @@ Accessors:
 
 @node TFM Compliance Problems,  , Erroneous Usage, Abnormal Situations
 @section TFM Compliance Problems
+@tfm{} is very thorough in the checks it performs while reading TFM
+data, to the point that it could probably be used as a validation tool.
+Every compliance problem detected will be signalled with a warning or an
+error, depending on the seriousness of the problem. At the same time,
+@tfm{} also tries to offer a way out of problematic situations (in the
+form of restarts), when it sounds reasonable. This means that the font
+@emph{will} be loaded anyway, although it will most probably be broken.
+
+@restartindex{cancel-loading}@c
+@findex load-font
+Whatever happens when loading a file, a restart named
+@code{cancel-loading} is always active. If invoked, @code{load-font}
+will just abort and return nil. The rest of this section describes the
+various situations where conditions are signalled, and the available
+restarts, if any.
 
 
 
