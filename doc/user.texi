@@ -797,7 +797,8 @@ one.
 @condindex{tfm-usage-error}@c
 Finally, the warning/error and compliance/usage families are mixed
 together (via multiple inheritance) to produce the four last
-``abstract'' conditions from which all other derive:
+``abstract'' conditions from which all other derive (except for the
+already mentioned @code{extended-tfm} warning):
 @code{tfm-compliance-warning}, @code{tfm-compliance-error},
 @code{tfm-usage-warning}, and @code{tfm-usage-error}.
 
