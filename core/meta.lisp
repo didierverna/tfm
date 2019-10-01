@@ -81,6 +81,7 @@
     :big-op-spacing5
     ;; From src/file.lisp:
     :invalid-design-size :set-to-ten
+    :invalid-table-index
     :invalid-ligature-opcode :discard-ligature
     :invalid-char-info
     :invalid-table-start :name
