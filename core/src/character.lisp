@@ -64,7 +64,7 @@ instance of this class."))
     (princ (repeated-character extension-recipe) stream)))
 
 ;; #### NOTE: we don't bother to check that the repeated character is not NIL
-;; because this class is note exported and I trust my code.
+;; because this class is not exported and I trust my code.
 (defun make-extension-recipe
     (repeated-character
      &rest initargs &key top-character middle-character bottom-character)

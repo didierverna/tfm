@@ -86,11 +86,6 @@ This is the root condition for errors related to the use of the library."))
 
 (defvar *stream* nil "The stream being read.")
 
-
-;; -----------------------
-;; Miscellaneous utilities
-;; -----------------------
-
 #i(report 2)
 (defun report (stream format-string &rest format-arguments)
   "Like FORMAT, but if *STREAM* is bound, report that we're reading from it."
