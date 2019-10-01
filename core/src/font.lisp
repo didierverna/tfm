@@ -224,7 +224,7 @@ subclasses."))
     (princ (name font) stream)))
 
 ;; #### NOTE: this error is not currently exported, because it cannot in fact
-;; be triggered yet (bythe public API).
+;; be triggered yet (by the public API).
 (define-condition anonymous-font (tfm-usage-error)
   ()
   (:report (lambda (anonymous-font stream)
