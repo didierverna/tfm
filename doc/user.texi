@@ -89,6 +89,47 @@ Common Lisp
 @c --------------------------------
 @c Manuals cross-referencing macros
 @c --------------------------------
+@c The following 3 macros are here to handle the fact that the info file
+@c names are prefixed with "tfm-".
+
+@c #### NOTE: Before 5.2, I could use @ifinfo anywhere. Now, it's only
+@c allowed at the beginning of a line, so I cannot effectively use it
+@c within a macro (even at the beginning of a line) if the macro in
+@c question is to be used in the middle of some text. As a consequence,
+@c I need to duplicate the macro definition code below.
+@ifinfo
+@macro pxrefref{node}
+@pxref{\node\, , , tfm-reference, The TFM Reference Manual}
+@end macro
+@end ifinfo
+@ifnotinfo
+@macro pxrefref{node}
+@pxref{\node\, , , reference, The TFM Reference Manual}
+@end macro
+@end ifnotinfo
+
+@ifinfo
+@macro xrefref{node}
+@xref{\node\, , , tfm-reference, The TFM Reference Manual}
+@end macro
+@end ifinfo
+@ifnotinfo
+@macro xrefref{node}
+@xref{\node\, , , reference, The TFM Reference Manual}
+@end macro
+@end ifnotinfo
+
+@ifinfo
+@macro refref{node}
+@ref{\node\, , , tfm-reference, The TFM Reference Manual}
+@end macro
+@end ifinfo
+@ifnotinfo
+@macro refref{node}
+@ref{\node\, , , reference, The TFM Reference Manual}
+@end macro
+@end ifnotinfo
+
 
 @c #### FIXME: everything defined with @defstuff is indexed
 @c automatically, so I canno't change the way indexing is done. The only
@@ -777,12 +818,12 @@ next one, once the ligature has been made.
 We already mentioned the @code{extended-tfm} warning in @ref{TFM Files}.
 In fact, @tfm{} comes with a rich ontology of conditons (and restarts)
 that give you full control on the behavior to adopt when facing abnormal
-situations. This chapter describes this ontology.
+situations.
 
 @menu
 * Conditions Overview::         The root conditions hierarchy
 * Erroneous Usage::             Misuse of the public API
-* TFM Compliance Problems::     Adherence to the TFM format 
+* TFM Compliance Problems::     Adherence to the TFM format
 @end menu
 
 @node Conditions Overview, Erroneous Usage, Abnormal Situations, Abnormal Situations
@@ -798,22 +839,22 @@ too much detail.
 @condindex{tfm-usage}@c
 The root of all @tfm{} conditions is simply called @code{tfm}. Warnings
 and errors are all sub-conditions of @code{tfm-warning} and
-@code{tfm-error} respectively. Then there are two main categories of
-conditions. Conditions related to problems with the TFM format are found
-under the @code{tfm-compliance} condition, while those related to a
-misuse of the library's API are classified under the @code{tfm-usage}
+@code{tfm-error} respectively. Then, there are two main categories of
+conditions. Conditions related to a misuse of the library's API are
+classified under the @code{tfm-usage} hierarchy, while those related to
+problems with the TFM format are found under the @code{tfm-compliance}
 one.
 
-@condindex{tfm-compliance-warning}@c
-@condindex{tfm-compliance-error}@c
 @condindex{tfm-usage-warning}@c
 @condindex{tfm-usage-error}@c
-Finally, the warning/error and compliance/usage families are mixed
+@condindex{tfm-compliance-warning}@c
+@condindex{tfm-compliance-error}@c
+Finally, the warning/error and usage/compliance families are mixed
 together (via multiple inheritance) to produce the four last
 ``abstract'' conditions from which all other derive (except for the
 already mentioned @code{extended-tfm} warning):
-@code{tfm-compliance-warning}, @code{tfm-compliance-error},
-@code{tfm-usage-warning}, and @code{tfm-usage-error}.
+@code{tfm-usage-warning}, and @code{tfm-usage-error},
+@code{tfm-compliance-warning}, and @code{tfm-compliance-error}.
 
 
 @node Erroneous Usage, TFM Compliance Problems, Conditions Overview, Abnormal Situations
@@ -868,16 +909,16 @@ data, to the point that it could probably be used as a validation tool.
 Every compliance problem detected will be signalled with a warning or an
 error, depending on the seriousness of the problem. At the same time,
 @tfm{} also tries to offer a way out of problematic situations (in the
-form of restarts), when it sounds reasonable. This means that the font
-@emph{will} be loaded anyway, although it will most probably be broken.
+form of restarts), when it sounds reasonable. This means that it is
+almost always possible to load a font, however broken it may be.
 
 @restartindex{cancel-loading}@c
 @findex load-font
-Whatever happens when loading a file, a restart named
-@code{cancel-loading} is always active. If invoked, @code{load-font}
-will just abort and return nil. The rest of this section describes the
-various situations where conditions are signalled, and the available
-restarts, if any.
+When loading a file, a restart named @code{cancel-loading} is always
+active. If invoked, @code{load-font} will just abort and return @nil{}.
+For a finer control over compliance problems, please refer to
+@refref{Exported conditions}. Every condition defined by @tfm{} is
+listed there, along with the available restarts, if any.
 
 
 
