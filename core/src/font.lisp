@@ -312,7 +312,7 @@ Both characters must belong to the same font."
   (gethash (cons character1 character2) (ligatures (font character1))))
 
 (defun kerning (character1 character2)
-  "Return FONT's kerning for CHARACTER1 and CHARACTER2, or NIL.
+  "Return kerning for CHARACTER1 and CHARACTER2, or NIL.
 Both characters must belong to the same font."
   (unless (eq (font character1) (font character2))
     (error 'different-fonts :character1 character1 :character2 character2))
@@ -329,7 +329,7 @@ Both characters must belong to the same font."
 	ligature))
 
 (defun (setf kerning) (kerning character1 character2)
-  "Set FONT's KERNING for CHARACTER1 and CHARACTER2."
+  "Set KERNING for CHARACTER1 and CHARACTER2."
   (setf (gethash (cons character1 character2) (kernings (font character1)))
 	kerning))
 
