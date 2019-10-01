@@ -38,8 +38,9 @@
   (:report (lambda (invalid-design-size stream)
 	     (report stream "~Apt~:P design size is too small (< 1pt)."
 	       (value invalid-design-size))))
-  (:documentation "The Invalid Design Size error.
-It signals that a design size VALUE is too small (< 1pt)."))
+  (:documentation "The Invalid Design Size compliance error.
+It signals that a design size VALUE is too small (< 1pt).
+Restarts: SET-TO-TEN, CANCEL-LOADING."))
 
 (defun parse-header (length font)
   "Parse a header of LENGTH words from *STREAM* into FONT."
@@ -118,8 +119,9 @@ This is the root condition for errors related to a NAMEd TFM table."))
 	       (value invalid-table-index)
 	       (name invalid-table-index)
 	       (largest invalid-table-index))))
-  (:documentation "The Invalid Table Index error.
-It signals that VALUE index is greater than LARGEST in NAMEd table."))
+  (:documentation "The Invalid Table Index compliance error.
+It signals that VALUE index is greater than LARGEST in NAMEd table.
+Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 (defun table-aref (name table index)
   "Access NAMEd TABLE at INDEX, checking for index validity."
@@ -144,8 +146,9 @@ It signals that VALUE index is greater than LARGEST in NAMEd table."))
   (:report (lambda (invalid-ligature-opcode stream)
 	     (report stream "ligature opcode ~A is invalid."
 	       (value invalid-ligature-opcode))))
-  (:documentation "The Invalid Ligature Opcode error.
-It signals that a ligature opcode is invalid."))
+  (:documentation "The Invalid Ligature Opcode compliance error.
+It signals that a ligature opcode is invalid.
+Restarts: SET-TO-ZERO, DISCARD-LIGATURE, CANCEL-LOADING."))
 
 (defun %make-ligature/kerning-program
     (character index lig/kerns kerns &aux (font (font character)))
@@ -225,9 +228,10 @@ See %make-ligature/kerning-program for more information."
 	     (report stream
 		 "~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
 	       (value invalid-char-info))))
-  (:documentation "The Invalid Char Info error.
+  (:documentation "The Invalid Char Info compliance error.
 It signals that a char-info VALUE with a width-index of 0 is not completely
-zero'ed out."))
+zero'ed out.
+Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 (define-condition invalid-table-start (tfm-table-error)
   ((value :initarg :value :accessor value))
@@ -236,8 +240,9 @@ zero'ed out."))
 		 "first value ~A in ~A table is invalid (should be 0)."
 	       (value invalid-table-start)
 	       (name invalid-table-start))))
-  (:documentation "The Invalid Table Start error.
-It signals that the first VALUE in a NAMEd table is not 0."))
+  (:documentation "The Invalid Table Start compliance error.
+It signals that the first VALUE in a NAMEd table is not 0.
+Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 (define-condition no-boundary-character (tfm-compliance-error)
   ()
@@ -246,18 +251,20 @@ It signals that the first VALUE in a NAMEd table is not 0."))
 	     (report stream
 		 "found a boundary character ligature/kerning program,~
 without a boundary character being defined.")))
-  (:documentation "The No Boundary Character error.
+  (:documentation "The No Boundary Character compliance error.
 It signals that a boundary character ligature/kerning program was found,
-without a boundary character being defined."))
+without a boundary character being defined.
+Restarts: DISCARD-LIG/KERN, CANCEL-LOADING."))
 
 (define-condition character-list-cycle (tfm-compliance-error)
   ((value :initarg :value :accessor value))
   (:report (lambda (character-list-cycle stream)
 	     (report stream "found a cycle in character list ~A."
 	       (value character-list-cycle))))
-  (:documentation "The Character List Cycle error.
+  (:documentation "The Character List Cycle compliance error.
 It signals that a cycle was found in a list of ascending character sizes
-VALUE."))
+VALUE.
+Restarts: BREAK-CYCLE, CANCEL-LOADING."))
 
 (define-condition ligature-cycle (tfm-compliance-error)
   ((value :initarg :value :accessor value)
@@ -267,8 +274,9 @@ VALUE."))
 		 "ligature ~A introduces a cycle for characters ~A."
 	       (value ligature-cycle)
 	       (characters ligature-cycle))))
-  (:documentation "The Ligature Cycle error.
-It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS."))
+  (:documentation "The Ligature Cycle compliance error.
+It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS.
+Restarts: REMOVE-LIGATURE, CANCEL-LOADING."))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT."
@@ -507,8 +515,9 @@ ACTUAL-SIZEs."))
 		 "actual file size ~A is lesser than declared one ~A."
 	       (actual-size file-underflow)
 	       (declared-size file-underflow))))
-  (:documentation "The File Underflow error.
-It signals that the file size is shorter than expected."))
+  (:documentation "The File Underflow compliance error.
+It signals that the file size is shorter than expected.
+Restarts: CANCEL-LOADING."))
 
 ;; #### NOTE: this one is a warning instead of an error because TeX silently
 ;; ignores junk at the end of TFM files (see TeX: the Program [575]). We hence
@@ -520,8 +529,9 @@ It signals that the file size is shorter than expected."))
 		 "declared file size ~A is lesser than actual one ~A."
 	       (declared-size file-overflow)
 	       (actual-size file-overflow))))
-  (:documentation "The File Overflow warning.
-It signals that the file size is longer than expected."))
+  (:documentation "The File Overflow compliance warning.
+It signals that the file size is longer than expected.
+Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-header-length (tfm-compliance-error)
   ((value :initarg :value :accessor value))
@@ -529,8 +539,9 @@ It signals that the file size is longer than expected."))
 	     (report stream
 		 "~A word~:P header length is too small (< 2 words)."
 	       (value invalid-header-length))))
-  (:documentation "The Invalid Header Length error.
-It signals that a header length VALUE is too small (< 2 words)."))
+  (:documentation "The Invalid Header Length compliance error.
+It signals that a header length VALUE is too small (< 2 words).
+Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-character-range (tfm-compliance-error)
   ((bc :initarg :bc :accessor bc)
@@ -540,8 +551,9 @@ It signals that a header length VALUE is too small (< 2 words)."))
 character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
 	       (bc invalid-character-range)
 	       (ec invalid-character-range))))
-  (:documentation "The Invalid Character Range error.
-It signals that BC-1 > EC, or that EC > 255."))
+  (:documentation "The Invalid Character Range compliance error.
+It signals that BC-1 > EC, or that EC > 255.
+Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-section-lengths (tfm-compliance-error)
   ((lf :initarg :lf :accessor lf)
@@ -571,8 +583,9 @@ section lengths don't satisfy ~
 	       (nk section-lengths)
 	       (ne section-lengths)
 	       (np section-lengths))))
-  (:documentation "The Section Lengths error.
-It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
+  (:documentation "The Section Lengths compliance error.
+It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP.
+Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-table-length (tfm-table-error)
   ((smallest :initarg :smallest :accessor smallest)
@@ -585,9 +598,10 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 	       (value invalid-table-length)
 	       (smallest invalid-table-length)
 	       (largest invalid-table-length))))
-  (:documentation "The Invalid Table Length error.
+  (:documentation "The Invalid Table Length compliance error.
 It signals that the NAMEd table's length VALUE is less than SMALLEST, or
-greater than LARGEST."))
+greater than LARGEST.
+Restarts: CANCEL-LOADING."))
 
 (defun load-tfm-font (lf
 		      &key (file (when (typep *stream* 'file-stream)
@@ -666,7 +680,8 @@ the FILE's base name, if any."
 	       (value extended-tfm))))
   (:documentation "The Extended TFM warning.
 It signals that FILE contains VALUE extension data (OFM or JFM) rather than
-plain TFM data."))
+plain TFM data.
+This warning is not restartable."))
 
 (defun load-font (file)
   "Load FILE into a new font, and return it.

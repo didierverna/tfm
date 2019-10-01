@@ -160,8 +160,9 @@ metrics instances are created."
   (:report (lambda (not-extensible stream)
 	     (format stream "Character ~A is not extensible."
 	       (value not-extensible))))
-  (:documentation "The Not Extensible error.
-It signals that character VALUE doesn't have an extension recipe."))
+  (:documentation "The Not Extensible usage error.
+It signals that character VALUE doesn't have an extension recipe.
+This error is not restartable."))
 
 (defmacro define-extension-recipe-pseudo-accessor (name)
   `(defmethod ,name ((character character-metrics))

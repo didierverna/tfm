@@ -223,13 +223,16 @@ subclasses."))
   (print-unreadable-object (font stream :type t)
     (princ (name font) stream)))
 
+;; #### NOTE: this error is not currently exported, because it cannot in fact
+;; be triggered yet (bythe public API).
 (define-condition anonymous-font (tfm-usage-error)
   ()
   (:report (lambda (anonymous-font stream)
 	     (declare (ignore anonymous-font))
 	     (princ "All fonts must be named." stream)))
-  (:documentation "The Anonymous Font error.
-It signals an attempt at creating a font with no name."))
+  (:documentation "The Anonymous Font usage error.
+It signals an attempt at creating a font with no name.
+This error is not restartable."))
 
 (defmethod initialize-instance :before ((font font) &key name)
   "Check that FONT has a name."
@@ -254,10 +257,12 @@ If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
   (:report (lambda (invalid-character-code stream)
 	     (report stream "character code ~A is invalid."
 		     (value invalid-character-code))))
-  (:documentation "The Invalid Character Code error.
-It signals an invalid code VALUE for this font."))
+  (:documentation "The Invalid Character Code compliance error.
+It signals an invalid code VALUE for this font.
+Restarts: CANCEL-LOADING."))
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
+;; #### FIXME: add another restart to use an existing character instead.
 (defun code-character (code font &optional (errorp t))
   "Return FONT's CODE character.
 If ERRORP (the default), signal an error if CODE is invalid. Note that even a
@@ -283,8 +288,9 @@ fake boundary character may be retrieved by this function"
 		 "Characters ~A and ~A don't belong to the same font."
 	       (character1 different-fonts)
 	       (character2 different-fonts))))
-  (:documentation "The Different Fonts error.
-It signals that CHARACTER1 and CHARACTER2 don't belong to the same font."))
+  (:documentation "The Different Fonts usage error.
+It signals that CHARACTER1 and CHARACTER2 don't belong to the same font.
+This error is not restartable."))
 
 (defun ligature (character1 character2)
   "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
