@@ -34,12 +34,15 @@
 ;; ==========================================================================
 
 (define-condition invalid-design-size (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The invalid design size."
+    :initarg :value
+    :accessor value))
   (:report (lambda (invalid-design-size stream)
 	     (report stream "~Apt~:P design size is too small (< 1pt)."
 	       (value invalid-design-size))))
   (:documentation "The Invalid Design Size compliance error.
-It signals that a design size VALUE is too small (< 1pt).
+It signals that a design size is too small (< 1pt).
 Restarts: SET-TO-TEN, CANCEL-LOADING."))
 
 (defun parse-header (length font)
@@ -107,20 +110,26 @@ If so, decrease LENGTH by NEEDED afterwards."
 ;; ==========================================================================
 
 (define-condition tfm-table-error (tfm-compliance-error)
-  ((name :initarg :name :accessor name))
+  ((name :documentation "The table's name." :initarg :name :accessor name))
   (:documentation "The TFM table errors root condition.
-This is the root condition for errors related to a NAMEd TFM table."))
+This is the root condition for errors related to TFM tables."))
 
 (define-condition invalid-table-index (tfm-table-error)
-  ((value :initarg :value :accessor value)
-   (largest :initarg :largest :accessor largest))
+  ((value
+    :documentation "The invalid index."
+    :initarg :value
+    :accessor value)
+   (largest
+    :documentation "The largest index."
+    :initarg :largest
+    :accessor largest))
   (:report (lambda (invalid-table-index stream)
 	     (report stream "index ~A in ~A table is invalid (largest is ~A)."
 	       (value invalid-table-index)
 	       (name invalid-table-index)
 	       (largest invalid-table-index))))
   (:documentation "The Invalid Table Index compliance error.
-It signals that VALUE index is greater than LARGEST in NAMEd table.
+It signals that a table index is greater than its largest value.
 Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 (defun table-aref (name table index)
@@ -142,7 +151,10 @@ Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 ;; -------------------------
 
 (define-condition invalid-ligature-opcode (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The invalid ligature opcode."
+    :initarg :value
+    :accessor value))
   (:report (lambda (invalid-ligature-opcode stream)
 	     (report stream "ligature opcode ~A is invalid."
 	       (value invalid-ligature-opcode))))
@@ -223,25 +235,31 @@ See %make-ligature/kerning-program for more information."
 ;; ---------------------
 
 (define-condition invalid-char-info (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The invalid char-info structure."
+    :initarg :value
+    :accessor value))
   (:report (lambda (invalid-char-info stream)
 	     (report stream
 		 "~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
 	       (value invalid-char-info))))
   (:documentation "The Invalid Char Info compliance error.
-It signals that a char-info VALUE with a width-index of 0 is not completely
+It signals that a char-info with a width-index of 0 is not completely
 zero'ed out.
 Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 (define-condition invalid-table-start (tfm-table-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The invalid first table value."
+    :initarg :value
+    :accessor value))
   (:report (lambda (invalid-table-start stream)
 	     (report stream
 		 "first value ~A in ~A table is invalid (should be 0)."
 	       (value invalid-table-start)
 	       (name invalid-table-start))))
   (:documentation "The Invalid Table Start compliance error.
-It signals that the first VALUE in a NAMEd table is not 0.
+It signals that the first value in a TFM table is not 0.
 Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 (define-condition no-boundary-character (tfm-compliance-error)
@@ -257,25 +275,33 @@ without a boundary character being defined.
 Restarts: DISCARD-LIG/KERN, CANCEL-LOADING."))
 
 (define-condition character-list-cycle (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The cyclic character list."
+    :initarg :value
+    :accessor value))
   (:report (lambda (character-list-cycle stream)
 	     (report stream "found a cycle in character list ~A."
 	       (value character-list-cycle))))
   (:documentation "The Character List Cycle compliance error.
-It signals that a cycle was found in a list of ascending character sizes
-VALUE.
+It signals that a cycle was found in a list of ascending character sizes.
 Restarts: BREAK-CYCLE, CANCEL-LOADING."))
 
 (define-condition ligature-cycle (tfm-compliance-error)
-  ((value :initarg :value :accessor value)
-   (characters :initarg :characters :accessor characters))
+  ((value
+    :documentation "The ligature introducing a cycle."
+    :initarg :value
+    :accessor value)
+   (characters
+    :documentation "The cons of characters involved in the ligature."
+    :initarg :characters
+    :accessor characters))
   (:report (lambda (ligature-cycle stream)
 	     (report stream
 		 "ligature ~A introduces a cycle for characters ~A."
 	       (value ligature-cycle)
 	       (characters ligature-cycle))))
   (:documentation "The Ligature Cycle compliance error.
-It signals that ligature VALUE introduces a cycle for a cons of CHARACTERS.
+It signals that a ligature introduces a cycle for a cons of characters.
 Restarts: REMOVE-LIGATURE, CANCEL-LOADING."))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
@@ -502,11 +528,17 @@ Return remaining LENGTH.")
 ;; ==========================================================================
 
 (define-condition file-size-mixin ()
-  ((declared-size :initarg :declared-size :accessor declared-size)
-   (actual-size :initarg :actual-size :accessor actual-size))
+  ((declared-size
+    :documentation "The declared file size."
+    :initarg :declared-size
+    :accessor declared-size)
+   (actual-size
+    :documentation "The actual file size."
+    :initarg :actual-size
+    :accessor actual-size))
   (:documentation "The File Size Mixin condition.
-It is used in both errors and warnings to report different DECLARED- and
-ACTUAL-SIZEs."))
+It is used in both errors and warnings to report different declared and
+actual file sizes."))
 
 (define-condition file-underflow (file-size-mixin tfm-compliance-error)
   ()
@@ -534,18 +566,21 @@ It signals that the file size is longer than expected.
 Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-header-length (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The invalid header length."
+    :initarg :value
+    :accessor value))
   (:report (lambda (invalid-header-length stream)
 	     (report stream
 		 "~A word~:P header length is too small (< 2 words)."
 	       (value invalid-header-length))))
   (:documentation "The Invalid Header Length compliance error.
-It signals that a header length VALUE is too small (< 2 words).
+It signals that a header length is too small (< 2 words).
 Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-character-range (tfm-compliance-error)
-  ((bc :initarg :bc :accessor bc)
-   (ec :initarg :ec :accessor ec))
+  ((bc :documentation "The smallest character code." :initarg :bc :accessor bc)
+   (ec :documentation "The largest character code." :initarg :ec :accessor ec))
   (:report (lambda (invalid-character-range stream)
 	     (report stream "~
 character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
@@ -556,17 +591,50 @@ It signals that BC-1 > EC, or that EC > 255.
 Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-section-lengths (tfm-compliance-error)
-  ((lf :initarg :lf :accessor lf)
-   (lh :initarg :lh :accessor lh)
-   (nc :initarg :nc :accessor nc)
-   (nw :initarg :nw :accessor nw)
-   (nh :initarg :nh :accessor nh)
-   (nd :initarg :nd :accessor nd)
-   (ni :initarg :ni :accessor ni)
-   (nl :initarg :nl :accessor nl)
-   (nk :initarg :nk :accessor nk)
-   (ne :initarg :ne :accessor ne)
-   (np :initarg :np :accessor np))
+  ((lf
+    :documentation "The declared length of the file."
+    :initarg :lf
+    :accessor lf)
+   (lh
+    :documentation "The declared length of the file header."
+    :initarg :lh
+    :accessor lh)
+   (nc
+    :documentation "EC - BC + 1."
+    :initarg :nc
+    :accessor nc)
+   (nw
+    :documentation "The declared length of the width table."
+    :initarg :nw
+    :accessor nw)
+   (nh
+    :documentation "The declared length of the height table."
+    :initarg :nh
+    :accessor nh)
+   (nd
+    :documentation "The declared length of the depth table."
+    :initarg :nd
+    :accessor nd)
+   (ni
+    :documentation "The declared length of the italic correction table."
+    :initarg :ni
+    :accessor ni)
+   (nl
+    :documentation "The declared length of the lig/kern table."
+    :initarg :nl
+    :accessor nl)
+   (nk
+    :documentation "The declared length of the kern table."
+    :initarg :nk
+    :accessor nk)
+   (ne
+    :documentation "The declared length of the extensible character table."
+    :initarg :ne
+    :accessor ne)
+   (np
+    :documentation "The declared length of the parameters section."
+    :initarg :np
+    :accessor np))
   (:report (lambda (section-lengths stream)
 	     (report stream "~
 section lengths don't satisfy ~
@@ -588,9 +656,18 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP.
 Restarts: CANCEL-LOADING."))
 
 (define-condition invalid-table-length (tfm-table-error)
-  ((smallest :initarg :smallest :accessor smallest)
-   (largest :initarg :largest :accessor largest)
-   (value :initarg :value :accessor value))
+  ((value
+    :documentation "The invalid table length."
+    :initarg :value
+    :accessor value)
+   (smallest
+    :documentation "The smallest table length."
+    :initarg :smallest
+    :accessor smallest)
+   (largest
+    :documentation "The largest table length."
+    :initarg :largest
+    :accessor largest))
   (:report (lambda (invalid-table-length stream)
 	     (report stream "~
 ~A table length ~A is invalid (should be in [~A,~A])."
@@ -599,8 +676,7 @@ Restarts: CANCEL-LOADING."))
 	       (smallest invalid-table-length)
 	       (largest invalid-table-length))))
   (:documentation "The Invalid Table Length compliance error.
-It signals that the NAMEd table's length VALUE is less than SMALLEST, or
-greater than LARGEST.
+It signals that a declared TFM table's length is out of range.
 Restarts: CANCEL-LOADING."))
 
 (defun load-tfm-font (lf
@@ -672,14 +748,14 @@ the FILE's base name, if any."
 ;; ==========================================================================
 
 (define-condition extended-tfm (tfm-warning)
-  ((file :initarg :file :accessor file)
-   (value :initarg :value :accessor value))
+  ((file :documentation "The extended TFM file." :initarg :file :accessor file)
+   (value :documentation "The TFM extension." :initarg :value :accessor value))
   (:report (lambda (extended-tfm stream)
 	     (format stream "File ~A contains ~A data (not supported yet)."
 	       (file extended-tfm)
 	       (value extended-tfm))))
   (:documentation "The Extended TFM warning.
-It signals that FILE contains VALUE extension data (OFM or JFM) rather than
+It signals that a file contains extended TFM data (OFM or JFM) rather than
 plain TFM data.
 This warning is not restartable."))
 

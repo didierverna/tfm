@@ -156,13 +156,16 @@ metrics instances are created."
   (when (extension-recipe character) t))
 
 (define-condition not-extensible (tfm-usage-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The non extensible character."
+    :initarg :value
+    :accessor value))
   (:report (lambda (not-extensible stream)
 	     (format stream "Character ~A is not extensible."
 	       (value not-extensible))))
   (:documentation "The Not Extensible usage error.
-It signals that character VALUE doesn't have an extension recipe.
-This error is not restartable."))
+It signals an attempt at accessing the extension recipe of a non extensible
+character. This error is not restartable."))
 
 (defmacro define-extension-recipe-pseudo-accessor (name)
   `(defmethod ,name ((character character-metrics))

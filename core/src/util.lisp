@@ -103,12 +103,12 @@ This is the root condition for errors related to the use of the library."))
 ;; ----------------
 
 (define-condition u16-overflow (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value :documentation "The faulty value." :initarg :value :accessor value))
   (:report (lambda (u16-overflow stream)
 	     (report stream "unsigned 16 bits integer ~A is greater than 2^15."
 	       (value u16-overflow))))
   (:documentation "The U16 Overflow compliance error.
-It signals that an unsigned 16 bits integer VALUE is greater than 2^15.
+It signals that an unsigned 16 bits integer is greater than 2^15.
 Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 
@@ -135,12 +135,12 @@ Check that the integer is less than 2^15."
 
 
 (define-condition fix-word-overflow (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value :documentation "The faulty value." :initarg :value :accessor value))
   (:report (lambda (fix-word-overflow stream)
 	     (report stream "fix word ~A is outside ]-16,+16[."
 	       (value fix-word-overflow))))
   (:documentation "The Fix Word Overflow compliance error.
-It signals that a fix word VALUE is outside ]-16,+16[.
+It signals that a fix word is outside ]-16,+16[.
 Restarts: SET-TO-ZERO, CANCEL-LOADING."))
 
 (defun read-fix-word (&optional (limit t))
@@ -166,28 +166,33 @@ If LIMIT (the default), check that the number lies within ]-16,+16[."
 ;; -------
 
 (define-condition invalid-string-length (tfm-compliance-error)
-  ((value :initarg :value :accessor value)
-   (padding :initarg :padding :accessor padding))
+  ((value
+    :documentation "The invalid length."
+    :initarg :value
+    :accessor value)
+   (padding
+    :documentation "The maximum length."
+    :initarg :padding
+    :accessor padding))
   (:report (lambda (invalid-string-length stream)
 	     (report stream "~
 declared padded string length ~A is greater than its maximum ~A."
 	       (value invalid-string-length)
 	       (1- (padding invalid-string-length)))))
   (:documentation "The Invalid String Length compliance error.
-It signals that the declared length VALUE of a padded string is greater than
-its maximum PADDING.
+It signals that the declared length of a padded string is greater than its
+maximum.
 Restarts: READ-MAXIMUM-LENGTH, DISCARD-STRING, CANCEL-LOADING."))
 
 (define-condition invalid-bcpl-string (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value :documentation "The invalid string." :initarg :value :accessor value))
   (:report (lambda (invalid-bcpl-string stream)
 	     (report stream "~
 BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
 characters)."
 	       (value invalid-bcpl-string))))
   (:documentation "The Invalid BCPL String compliance error.
-It signals that a BCPL string VALUE contains parentheses or non-ASCII
-characters.
+It signals that a BCPL string contains parentheses or non-ASCII characters.
 Restarts: KEEP-STRING, FIX-STRING, DISCARD-STRING, CANCEL-LOADING."))
 
 (defun read-padded-string

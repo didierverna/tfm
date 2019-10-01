@@ -253,12 +253,17 @@ If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
 ;; characters that don't exist in the font (remember that we do add a fake
 ;; boundary character if needed, so even this one can be retrieved).
 (define-condition invalid-character-code (tfm-compliance-error)
-  ((value :initarg :value :accessor value))
+  ((value
+    :documentation "The invalid character code."
+    :initarg :value
+    :accessor value))
   (:report (lambda (invalid-character-code stream)
-	     (report stream "character code ~A is invalid."
-		     (value invalid-character-code))))
+	     (report stream "character code ~A is invalid in font ~A."
+	       (value invalid-character-code)
+	       (font invalid-character-code))))
   (:documentation "The Invalid Character Code compliance error.
-It signals an invalid code VALUE for this font.
+It signals a reference to a character code which does not exist in the font
+being loaded.
 Restarts: CANCEL-LOADING."))
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
@@ -281,15 +286,22 @@ fake boundary character may be retrieved by this function"
 
 
 (define-condition different-fonts (tfm-usage-error)
-  ((character1 :initarg :character1 :accessor character1)
-   (character2 :initarg :character2 :accessor character2))
+  ((character1
+    :documentation "The first character."
+    :initarg :character1
+    :accessor character1)
+   (character2
+    :documentation "The second character."
+    :initarg :character2
+    :accessor character2))
   (:report (lambda (different-fonts stream)
 	     (format stream
 		 "Characters ~A and ~A don't belong to the same font."
 	       (character1 different-fonts)
 	       (character2 different-fonts))))
   (:documentation "The Different Fonts usage error.
-It signals that CHARACTER1 and CHARACTER2 don't belong to the same font.
+It signals an attempt at retrieving a ligature or kerning for two characters
+from different fonts.
 This error is not restartable."))
 
 (defun ligature (character1 character2)
