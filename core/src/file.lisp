@@ -353,12 +353,13 @@ is immediately restartable with REMOVE-LIGATURE."
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
-	  :do (vector-push (read-fix-word) array)
-	  :unless (zerop (aref array 0))
-	    :do (restart-case
-		    (error 'invalid-table-start
-		      :value (aref array 0) :name name)
-		  (set-to-zero () :report "Set to 0." (setf (aref array 0) 0)))
+	  :do (let ((start (read-fix-word)))
+		(unless (zerop start)
+		  (restart-case
+		      (error 'invalid-table-start :value start :name name)
+		    (set-to-zero () :report "Set to 0."
+		      (setq start 0))))
+		(vector-push start array))
 	  :do (loop :repeat (1- length)
 		    :do (vector-push (read-fix-word) array)))
     (loop :repeat nl

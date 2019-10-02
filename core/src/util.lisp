@@ -139,11 +139,11 @@ If >= 2^15, signal a U16-OVERFLOW error."
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
 
-;; #### FIXME: this is probably too low level to deserve a restart.
 (defun read-fix-word (&optional (limit t))
   "Read a fix word from *STREAM* and return it.
 If LIMIT (the default), check that the number lies within ]-16,+16[, or
-signal a FIX-WORD-OVERFLOW error."
+signal a FIX-WORD-OVERFLOW error. This error is immediately restartable with
+SET-TO-ZERO."
   (let* ((bytes (read-u32))
 	 (neg (= (ldb (byte 1 31) bytes) 1))
 	 fix-word)
