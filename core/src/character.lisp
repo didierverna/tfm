@@ -169,6 +169,9 @@ character."))
 
 (defmacro define-extension-recipe-pseudo-accessor (name)
   `(defmethod ,name ((character character-metrics))
+     ,(format nil "Return extensible CHARACTER's ~A.
+If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
+	name)
      (unless (extensiblep character) (error 'not-extensible :value character))
      (,name (extension-recipe character))))
 
