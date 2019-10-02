@@ -265,12 +265,13 @@ It signals a reference to a character code which does not exist in the font
 being loaded."))
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
-;; #### FIXME: add another restart to use an existing character instead.
 (defun code-character (code font &optional (errorp t))
   "Return FONT's CODE character.
 If ERRORP (the default), signal an error if CODE is invalid. Note that even a
 fake boundary character may be retrieved by this function"
   (or (gethash code (characters font))
+      ;; #### NOTE: recovering from here directly would make little sense, so
+      ;; it's rather the job of the callers to provide sensible restarts.
       (when errorp (error 'invalid-character-code :value code))))
 
 (defun (setf code-character) (character font)
