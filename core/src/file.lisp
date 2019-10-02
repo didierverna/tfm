@@ -167,8 +167,9 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	:while continue
 	:for lig/kern := (tref lig/kerns index)
 	:unless (> (skip lig/kern) 128)
-	  :if (< (op lig/kern) 128)
-	    :do (let ((opcode (op lig/kern)))
+	  :do (if (< (op lig/kern) 128)
+		;; ligature instruction
+		(let ((opcode (op lig/kern)))
 		  (when (or (= opcode 4)
 			    (and (> opcode 7) (not (= opcode 11))))
 		    (restart-case
@@ -187,17 +188,16 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 			   (cond ((member opcode '(0 1 2 3)) 0)
 				 ((member opcode '(5 6 7)) 1)
 				 ((= opcode 11) 2))))))
-	  :else
-	    :do (setf (kerning character (code-character (next lig/kern) font))
+		;; kerning instruction
+		(setf (kerning character (code-character (next lig/kern) font))
 		      (tref kerns (+ (* 256 (- (op lig/kern) 128))
-				     (remainder lig/kern))))
-	:if (>= (skip lig/kern) 128)
-	  :do (setq continue nil)
-	:else
-	  ;; #### NOTE: because of the way the next instruction is computed
-	  ;; below, it is inherently impossible to have a cycle in a lig/kern
-	  ;; program.
-	  :do (incf index (1+ (skip lig/kern)))))
+				     (remainder lig/kern)))))
+	:do (if (>= (skip lig/kern) 128)
+	      (setq continue nil)
+	      ;; #### NOTE: because of the way the next instruction is
+	      ;; computed below, it is inherently impossible to have a cycle
+	      ;; in a lig/kern program.
+	      (incf index (1+ (skip lig/kern))))))
 
 (defun make-ligature/kerning-program (character index lig/kerns kerns
 				      &aux (lig/kern (tref lig/kerns index)))
@@ -384,20 +384,20 @@ It signals that a ligature introduces a cycle for a cons of characters."))
     ;; recipes, character by character.
     (loop :for char-info :across char-infos
 	  :for code :from (min-code font)
-	  :when (lig/kern-index char-info)
-	    :do (make-ligature/kerning-program
-		 (code-character code font)
-		 (lig/kern-index char-info)
-		 lig/kerns
-		 kerns)
-	  :when (next-char char-info)
-	    :do (setf (next-character (code-character code font))
-		      (code-character (next-char char-info) font))
-	  :when (exten-index char-info)
-	    :do (setf (extension-recipe (code-character code font))
-		      (font-extension-recipe
-		       (tref extens (exten-index char-info))
-		       font))))
+	  :do (cond ((lig/kern-index char-info)
+		     (make-ligature/kerning-program
+		      (code-character code font)
+		      (lig/kern-index char-info)
+		      lig/kerns
+		      kerns))
+		    ((next-char char-info)
+		     (setf (next-character (code-character code font))
+			   (code-character (next-char char-info) font)))
+		    ((exten-index char-info)
+		     (setf (extension-recipe (code-character code font))
+			   (font-extension-recipe
+			    (tref extens (exten-index char-info))
+			    font))))))
 
   ;; #### WARNING: the two checks below have not been tested thoroughly. They
   ;; #### have been applied to all fonts in TeX Live, but not on fonts made
@@ -433,25 +433,24 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 		   :with ligature := first-ligature
 		   :while ligature
 		   :do (setq state (apply-ligature ligature state))
-		   :if (= (length state) 1)
-		     :do (setq ligature nil)
-		   :else
-		     :if (member-if (lambda (elt)
-				      (and (eq (car state) (car elt))
-					   (eq (cadr state) (cadr elt))))
-				    seen)
-		       :do
-			  (restart-case
-			      (error 'ligature-cycle
-				:value first-ligature :characters characters)
-			    (remove-ligature ()
-			      :report "Remove that ligature from the font."
-			      (remhash characters (ligatures font))
-			      (setq ligature nil)))
-		     :else
-		       :do (push state seen)
-		       :and :do (setq ligature
-				      (ligature (car state) (cadr state)))))
+		   :do (cond ((= (length state) 1)
+			      (setq ligature nil))
+			     ((member-if (lambda (elt)
+					   (and (eq (car state) (car elt))
+						(eq (cadr state) (cadr elt))))
+					 seen)
+			      (restart-case
+				  (error 'ligature-cycle
+				    :value first-ligature
+				    :characters characters)
+				(remove-ligature ()
+				  :report "Remove that ligature from the font."
+				  (remhash characters (ligatures font))
+				  (setq ligature nil))))
+			     (t
+			      (push state seen)
+			      (setq ligature
+				    (ligature (car state) (cadr state)))))))
 	   (ligatures font)))
 
 

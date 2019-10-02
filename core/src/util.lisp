@@ -217,12 +217,12 @@ The remaining bytes are ignored. The string should not contain parentheses."
 	(keep-string () :report "Keep it anyway.")
 	(fix-string () :report "Fix it using /'s and ?'s."
 	  (loop :for i :from 0 :upto (1- (length string))
-		:when (or (char= (aref string i) #\()
-			  (char= (aref string i) #\)))
-		  :do (setf (aref string i) #\/)
-		:when (or (< (char-code (aref string i)) 32)
-			  (> (char-code (aref string i)) 126))
-		  :do (setf (aref string i) #\?)))
+		:do (cond ((or (char= (aref string i) #\()
+			       (char= (aref string i) #\)))
+			   (setf (aref string i) #\/))
+			  ((or (< (char-code (aref string i)) 32)
+			       (> (char-code (aref string i)) 126))
+			   (setf (aref string i) #\?)))))
 	(discard-string () :report "Discard it."
 	  (setq string nil)))))
 
