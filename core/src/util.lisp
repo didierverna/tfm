@@ -110,9 +110,10 @@ This is the root condition for errors related to the use of the library."))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
 
+;; #### FIXME: this is probably too low level to deserve a restart.
 (defun read-u16 ()
-  "Read an unsigned 16 bits Big Endian integer from *STREAM*.
-Check that the integer is less than 2^15."
+  "Read an unsigned 16 bits Big Endian integer from *STREAM* and return it.
+If >= 2^15, signal a U16-OVERFLOW error."
   (let ((u16 0))
     (setf (ldb (byte 8 8) u16) (read-byte *stream*)
 	  (ldb (byte 8 0) u16) (read-byte *stream*))
@@ -140,9 +141,11 @@ Check that the integer is less than 2^15."
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
 
+;; #### FIXME: this is probably too low level to deserve a restart.
 (defun read-fix-word (&optional (limit t))
-  "Read a fix word from *STREAM*.
-If LIMIT (the default), check that the number lies within ]-16,+16[."
+  "Read a fix word from *STREAM* and return it.
+If LIMIT (the default), check that the number lies within ]-16,+16[, and
+signal a FIX-WORD-OVERFLOW error otherwise."
   (let* ((bytes (read-u32))
 	 (neg (= (ldb (byte 1 31) bytes) 1))
 	 fix-word)
@@ -194,7 +197,17 @@ It signals that a BCPL string contains parentheses or non-ASCII characters."))
     (padding &aux (length (read-byte *stream*)) string)
   "Read a BCPL string out of PADDING bytes from *STREAM*.
 The first byte in *STREAM* indicates the actual length of the string.
-The remaining bytes are ignored. The string should not contain parentheses."
+The remaining bytes are ignored.
+
+If the declared string length is too large, signal an INVALID-STRING-LENGTH
+error. This error is immediately restartable with READ-MAXIMUM-LENGTH or
+DISCARD-STRING.
+
+If the string is not in BCPL format (it contains parentheses or non plain
+ASCII characters, signal an INVALID-BCPL-STRING error. This error is
+immediately restartable with KEEP-STRING, FIX-STRING (replacing parentheses
+with slashes, and non plain ASCII characters with question marks), or
+DISCARD-STRING."
   (unless (< length padding)
     (restart-case (error 'invalid-string-length :value length :padding padding)
       (read-maximum-length () :report "Read the maximum possible length."
