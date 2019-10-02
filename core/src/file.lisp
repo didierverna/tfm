@@ -730,6 +730,8 @@ Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-SECTION-LENGTHS error."
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
+  ;; #### NOTE: the errors signalled below (directly, or by READ-U16) are
+  ;; really too early to attempt any clever recovery.
   (let ((lh (read-u16))
 	(bc (read-u16))
 	(ec (read-u16))
@@ -809,12 +811,13 @@ While loading TFM data, any signalled condition is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
-    (let ((lf (read-u16)))
+    (let ((lf (with-simple-restart (cancel-loading "Cancel loading this font.")
+		(read-u16))))
       (cond ((zerop lf)
 	     (warn 'extended-tfm :value "OFM" :file file))
 	    ((or (= lf 9) (= lf 11))
 	     (warn 'extended-tfm :value "JFM" :file file))
-	    (t
+	    ((numberp lf)
 	     (with-simple-restart (cancel-loading "Cancel loading this font.")
 	       (load-tfm-font lf)))))))
 

@@ -110,7 +110,6 @@ This is the root condition for errors related to the use of the library."))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
 
-;; #### FIXME: this is probably too low level to deserve a restart.
 (defun read-u16 ()
   "Read an unsigned 16 bits Big Endian integer from *STREAM* and return it.
 If >= 2^15, signal a U16-OVERFLOW error."
@@ -118,8 +117,7 @@ If >= 2^15, signal a U16-OVERFLOW error."
     (setf (ldb (byte 8 8) u16) (read-byte *stream*)
 	  (ldb (byte 8 0) u16) (read-byte *stream*))
     (unless (zerop (ldb (byte 1 15) u16))
-      (restart-case (error 'u16-overflow :value u16)
-	(set-to-zero () :report "Set it to 0." (setq u16 0))))
+      (error 'u16-overflow :value u16))
     u16))
 
 
