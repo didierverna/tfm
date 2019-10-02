@@ -108,9 +108,7 @@ This is the root condition for errors related to the use of the library."))
 	     (report stream "unsigned 16 bits integer ~A is greater than 2^15."
 	       (value u16-overflow))))
   (:documentation "The U16 Overflow compliance error.
-It signals that an unsigned 16 bits integer is greater than 2^15.
-Restarts: SET-TO-ZERO, CANCEL-LOADING."))
-
+It signals that an unsigned 16 bits integer is greater than 2^15."))
 
 (defun read-u16 ()
   "Read an unsigned 16 bits Big Endian integer from *STREAM*.
@@ -140,8 +138,7 @@ Check that the integer is less than 2^15."
 	     (report stream "fix word ~A is outside ]-16,+16[."
 	       (value fix-word-overflow))))
   (:documentation "The Fix Word Overflow compliance error.
-It signals that a fix word is outside ]-16,+16[.
-Restarts: SET-TO-ZERO, CANCEL-LOADING."))
+It signals that a fix word is outside ]-16,+16[."))
 
 (defun read-fix-word (&optional (limit t))
   "Read a fix word from *STREAM*.
@@ -181,8 +178,7 @@ declared padded string length ~A is greater than its maximum ~A."
 	       (1- (padding invalid-string-length)))))
   (:documentation "The Invalid String Length compliance error.
 It signals that the declared length of a padded string is greater than its
-maximum.
-Restarts: READ-MAXIMUM-LENGTH, DISCARD-STRING, CANCEL-LOADING."))
+maximum."))
 
 (define-condition invalid-bcpl-string (tfm-compliance-error)
   ((value :documentation "The invalid string." :initarg :value :accessor value))
@@ -192,8 +188,7 @@ BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
 characters)."
 	       (value invalid-bcpl-string))))
   (:documentation "The Invalid BCPL String compliance error.
-It signals that a BCPL string contains parentheses or non-ASCII characters.
-Restarts: KEEP-STRING, FIX-STRING, DISCARD-STRING, CANCEL-LOADING."))
+It signals that a BCPL string contains parentheses or non-ASCII characters."))
 
 (defun read-padded-string
     (padding &aux (length (read-byte *stream*)) string)

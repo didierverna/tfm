@@ -165,7 +165,7 @@ metrics instances are created."
 	       (value not-extensible))))
   (:documentation "The Not Extensible usage error.
 It signals an attempt at accessing the extension recipe of a non extensible
-character. This error is not restartable."))
+character."))
 
 (defmacro define-extension-recipe-pseudo-accessor (name)
   `(defmethod ,name ((character character-metrics))

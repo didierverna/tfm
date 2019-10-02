@@ -231,8 +231,7 @@ subclasses."))
 	     (declare (ignore anonymous-font))
 	     (princ "All fonts must be named." stream)))
   (:documentation "The Anonymous Font usage error.
-It signals an attempt at creating a font with no name.
-This error is not restartable."))
+It signals an attempt at creating a font with no name."))
 
 (defmethod initialize-instance :before ((font font) &key name)
   "Check that FONT has a name."
@@ -263,8 +262,7 @@ If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
 	       (font invalid-character-code))))
   (:documentation "The Invalid Character Code compliance error.
 It signals a reference to a character code which does not exist in the font
-being loaded.
-Restarts: CANCEL-LOADING."))
+being loaded."))
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
 ;; #### FIXME: add another restart to use an existing character instead.
@@ -301,8 +299,7 @@ fake boundary character may be retrieved by this function"
 	       (character2 different-fonts))))
   (:documentation "The Different Fonts usage error.
 It signals an attempt at retrieving a ligature or kerning for two characters
-from different fonts.
-This error is not restartable."))
+from different fonts."))
 
 (defun ligature (character1 character2)
   "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
