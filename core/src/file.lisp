@@ -159,10 +159,12 @@ It signals that a table index is greater than its largest value."))
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
 
-(defun %make-ligature/kerning-program
+(defun %run-ligature/kerning-program
     (character index lig/kerns kerns &aux (font (font character)))
-  "Make a ligature/kerning program for CHARACTER.
-The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
+  "Run a ligature/kerning program for CHARACTER.
+The program starts at LIG/KERNS[INDEX] and uses the KERNS array. Running the
+program eventually creates ligatures or kernings for CHARACTER and some other
+character."
   (loop :with continue := t
 	:while continue
 	:for lig/kern := (tref lig/kerns index)
@@ -199,11 +201,11 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array."
 	      ;; in a lig/kern program.
 	      (incf index (1+ (skip lig/kern))))))
 
-(defun make-ligature/kerning-program (character index lig/kerns kerns
-				      &aux (lig/kern (tref lig/kerns index)))
-  "Find the real start of a ligature/kerning program and make it.
-See %make-ligature/kerning-program for more information."
-  (%make-ligature/kerning-program
+(defun run-ligature/kerning-program (character index lig/kerns kerns
+				     &aux (lig/kern (tref lig/kerns index)))
+  "Find the real start of a ligature/kerning program and run it.
+See %run-ligature/kerning-program for more information."
+  (%run-ligature/kerning-program
    character
    (if (> (skip lig/kern) 128)
      (+ (* 256 (op lig/kern)) (remainder lig/kern))
@@ -369,9 +371,9 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 	(when (= (skip lig/kern) 255)
 	  ;; #### NOTE: since we need to access the last instruction in the
 	  ;; lig/kern table, we may as well bypass
-	  ;; MAKE-LIGATURE/KERNING-PROGRAM.
+	  ;; RUN-LIGATURE/KERNING-PROGRAM.
 	  (if (boundary-character font)
-	    (%make-ligature/kerning-program
+	    (%run-ligature/kerning-program
 	     (boundary-character font)
 	     (+ (* 256 (op lig/kern)) (remainder lig/kern))
 	     lig/kerns
@@ -385,7 +387,7 @@ It signals that a ligature introduces a cycle for a cons of characters."))
     (loop :for char-info :across char-infos
 	  :for code :from (min-code font)
 	  :do (cond ((lig/kern-index char-info)
-		     (make-ligature/kerning-program
+		     (run-ligature/kerning-program
 		      (code-character code font)
 		      (lig/kern-index char-info)
 		      lig/kerns
