@@ -45,7 +45,9 @@
 It signals that a design size is too small (< 1pt)."))
 
 (defun parse-header (length font)
-  "Parse a header of LENGTH words from *STREAM* into FONT."
+  "Parse a header of LENGTH words from *STREAM* into FONT.
+If FONT's design size is less than 1pt, signal an INVALID-DESIGN-ERROR. This
+error is immediately restartable with SET-TO-TEN."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
   ;; LOAD-TFM-FONT.
   (setf (checksum font) (read-u32)
@@ -130,8 +132,10 @@ This is the root condition for errors related to TFM tables."))
   (:documentation "The Invalid Table Index compliance error.
 It signals that a table index is greater than its largest value."))
 
+;; #### FIXME: this is probably too low level to deserve a restart.
 (defun table-aref (name table index)
-  "Access NAMEd TABLE at INDEX, checking for index validity."
+  "Access NAMEd TABLE at INDEX.
+If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
   (unless (< index (length table))
     (restart-case (error 'invalid-table-index
 		    :value index :largest (1- (length table)) :name name)
@@ -159,12 +163,18 @@ It signals that a table index is greater than its largest value."))
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
 
+;; #### FIXME: restarting an invalid ligature opcode with set-to-zero is
+;; probably silly. Better only discard the ligature.
 (defun %run-ligature/kerning-program
     (character index lig/kerns kerns &aux (font (font character)))
   "Run a ligature/kerning program for CHARACTER.
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array. Running the
 program eventually creates ligatures or kernings for CHARACTER and some other
-character."
+character.
+
+If an invalid ligature opcode is encountered, signal an
+INVALID-LIGATURE-OPCODE error. This error is immediately restartable with
+DISCARD-LIGATURE."
   (loop :with continue := t
 	:while continue
 	:for lig/kern := (tref lig/kerns index)
@@ -299,7 +309,29 @@ It signals that a cycle was found in a list of ascending character sizes."))
 It signals that a ligature introduces a cycle for a cons of characters."))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
-  "Parse the 8 character information tables from *STREAM* into FONT."
+  "Parse the 8 character information tables from *STREAM* into FONT.
+NC (EC - BC + 1), NW, NH, ND, NI, NL, NK, and NE are the declared lengths of
+the 8 tables, that is, the char infos, widths, heights, depths, italic
+corrections, lig/kern instructions, kerns, and extens respectively.
+
+If a char info structure with a width index of 0 is not completely zero'ed
+out, signal an INVALID-CHAR-INFO error. This error is immediately restartable
+with SET-TO-ZERO.
+
+If the first entry in the widths, heights, depths, or italic corrections table
+is not 0, signal an INVALID-TABLE-START error. This error is immediately
+restartable with SET-TO-ZERO.
+
+If a lig/kern program is found for a boundary character, but there is no such
+character in the font, signal a NO-BOUNDARY-CHARACTER error. This error is
+immediately restartable with DISCARD-LIG/KERN.
+
+If a cycle is found in a list of characters of ascending size, signal a
+CHARACTER-LIST-CYCLE error. This error is immediately restartable with
+BREAK-CYCLE.
+
+If a ligature is found to be cyclic, signal a LIGATURE-CYCLE error. This error
+is immediately restartable with REMOVE-LIGATURE."
   (let ((char-infos (make-array nc :fill-pointer 0))
 	(widths (make-array nw :fill-pointer 0))
 	(heights (make-array nh :fill-pointer 0))
@@ -318,7 +350,7 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 		  (set-to-zero () :report "Zero it out."
 		    (setq char-info (decode-char-info 0))))
 	  :do (vector-push char-info char-infos))
-    (loop :for name :in (list "width" "height" "depth" "italic correction")
+    (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
 	  :do (vector-push (read-fix-word) array)
@@ -681,7 +713,21 @@ It signals that a declared TFM table's length is out of range."))
 		      &aux (font (make-font name :file file)))
   "Parse *STREAM* of declared length LF into a new font, and return it.
 FILE defaults to *STREAM*'s associated file if any, and NAME defaults to
-the FILE's base name, if any."
+the FILE's base name, if any.
+
+If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
+If *STREAM* is longer than expected, signal a FILE-OVERFLOW warning.
+
+If the declared header length is less than 2, signal an INVALID-HEADER-LENGTH
+error.
+
+If BC and EC don't make sense, signal an INVALID-CHARACTER-RANGE error.
+
+If the widths, heights, depths, italic corrections, or extens tables lengths
+are not within the expected range, signal an INVALID-TABLE-LENGTH error.
+
+Finally, if the declared sections lengths don't add up to the declared file
+length, signal an INVALID-SECTION-LENGTHS error."
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   (let ((lh (read-u16))
@@ -715,8 +761,8 @@ the FILE's base name, if any."
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(256 16 16 64 256)
-	  :for name :in '("width" "height" "depth" "italic correction"
-			  "exten")
+	  :for name :in '("widths" "heights" "depths" "italic corrections"
+			  "extens")
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
 		       :value length :smallest min :largest max :name name))
@@ -754,8 +800,12 @@ plain TFM data."))
 
 (defun load-font (file)
   "Load FILE into a new font, and return it.
-Only actual TFM data is currently supported. This function warns and returns
-NIL if FILE contains OFM or JFM data."
+
+Only actual TFM data is currently supported. If OFM or JFM data is detected,
+this function signals an EXTENDED-TFM warning and returns NIL.
+
+While loading TFM data, any signalled condition is restartable with
+CANCEL-LOADING, in which case this function simply returns NIL."
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
     (let ((lf (read-u16)))
