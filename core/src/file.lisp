@@ -386,20 +386,25 @@ It signals that a ligature introduces a cycle for a cons of characters."))
     ;; recipes, character by character.
     (loop :for char-info :across char-infos
 	  :for code :from (min-code font)
-	  :do (cond ((lig/kern-index char-info)
-		     (run-ligature/kerning-program
-		      (code-character code font)
-		      (lig/kern-index char-info)
-		      lig/kerns
-		      kerns))
-		    ((next-char char-info)
-		     (setf (next-character (code-character code font))
-			   (code-character (next-char char-info) font)))
-		    ((exten-index char-info)
-		     (setf (extension-recipe (code-character code font))
-			   (font-extension-recipe
-			    (tref extens (exten-index char-info))
-			    font))))))
+	  ;; #### NOTE: technically, this check is not needed because Step 2
+	  ;; made sure that such an (inexistent) character is completely
+	  ;; zero'ed out. But it's cleaner and more explicit to keep it, plus
+	  ;; it avoids the 3 useless COND checks below.
+	  :unless (zerop (width-index char-info))
+	    :do (cond ((lig/kern-index char-info)
+		       (run-ligature/kerning-program
+			(code-character code font)
+			(lig/kern-index char-info)
+			lig/kerns
+			kerns))
+		      ((next-char char-info)
+		       (setf (next-character (code-character code font))
+			     (code-character (next-char char-info) font)))
+		      ((exten-index char-info)
+		       (setf (extension-recipe (code-character code font))
+			     (font-extension-recipe
+			      (tref extens (exten-index char-info))
+			      font))))))
 
   ;; #### WARNING: the two checks below have not been tested thoroughly. They
   ;; #### have been applied to all fonts in TeX Live, but not on fonts made
