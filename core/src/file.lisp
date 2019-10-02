@@ -744,14 +744,15 @@ length, signal an INVALID-SECTION-LENGTHS error."
 	nc)
     (let ((actual-size (file-length *stream*))
 	  (declared-size (* 4 lf)))
-      (cond ((< actual-size declared-size)
-	     (error 'file-underflow
-		    :actual-size actual-size
-		    :declared-size declared-size))
-	    ((> actual-size declared-size)
-	     (warn 'file-overflow
-		   :actual-size actual-size
-		   :declared-size declared-size))))
+      (when actual-size
+	(cond ((< actual-size declared-size)
+	       (error 'file-underflow
+		 :actual-size actual-size
+		 :declared-size declared-size))
+	      ((> actual-size declared-size)
+	       (warn 'file-overflow
+		     :actual-size actual-size
+		     :declared-size declared-size)))))
     (unless (>= lh 2) (error 'invalid-header-length :value lh))
     (unless (and (<= (1- bc) ec) (<= ec 255))
       (error 'invalid-character-range :bc bc :ec ec))
