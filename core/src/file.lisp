@@ -406,6 +406,8 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 			      (tref extens (exten-index char-info))
 			      font))))))
 
+  ;; #### NOTE: we're done with the tables now.
+
   ;; #### WARNING: the two checks below have not been tested thoroughly. They
   ;; #### have been applied to all fonts in TeX Live, but not on fonts made
   ;; #### explicitly to contain cycles, so we're not really sure that they
