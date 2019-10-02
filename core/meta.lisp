@@ -83,9 +83,12 @@
     :invalid-design-size :set-to-ten
     :invalid-table-index
     :invalid-ligature-opcode :discard-ligature
+    :abort-lig/kern-program
+    :discard-kerning
     :invalid-char-info
     :invalid-table-start :name
-    :no-boundary-character :discard-lig/kern
+    :no-boundary-character
+    :discard-extension-recipe
     :character-list-cycle :break-cycle
     :ligature-cycle :characters :remove-ligature
     :file-underflow :file-overflow :declared-size :actual-size

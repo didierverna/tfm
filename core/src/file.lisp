@@ -132,15 +132,12 @@ This is the root condition for errors related to TFM tables."))
   (:documentation "The Invalid Table Index compliance error.
 It signals that a table index is greater than its largest value."))
 
-;; #### FIXME: this is probably too low level to deserve a restart.
 (defun table-aref (name table index)
   "Access NAMEd TABLE at INDEX.
 If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
   (unless (< index (length table))
-    (restart-case (error 'invalid-table-index
-		    :value index :largest (1- (length table)) :name name)
-      (set-to-zero () :report "Set index to 0."
-	(setq index 0))))
+    (error 'invalid-table-index
+      :value index :largest (1- (length table)) :name name))
   (aref table index))
 
 (defmacro tref (table index)
@@ -163,8 +160,6 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
 
-;; #### FIXME: restarting an invalid ligature opcode with set-to-zero is
-;; probably silly. Better only discard the ligature.
 (defun %run-ligature/kerning-program
     (character index lig/kerns kerns &aux (font (font character)))
   "Run a ligature/kerning program for CHARACTER.
@@ -172,56 +167,70 @@ The program starts at LIG/KERNS[INDEX] and uses the KERNS array. Running the
 program eventually creates ligatures or kernings for CHARACTER and some other
 character.
 
+If an invalid index into LIG/KERNS is encountered, signal an
+INVALID-TABLE-INDEX error. This error is immediately restartable with
+ABORT-LIG/KERN-PROGRAM.
+
 If an invalid ligature opcode is encountered, signal an
 INVALID-LIGATURE-OPCODE error. This error is immediately restartable with
-DISCARD-LIGATURE."
-  (loop :with continue := t
-	:while continue
-	:for lig/kern := (tref lig/kerns index)
-	:unless (> (skip lig/kern) 128)
-	  :do (if (< (op lig/kern) 128)
-		;; ligature instruction
-		(let ((opcode (op lig/kern)))
-		  (when (or (= opcode 4)
-			    (and (> opcode 7) (not (= opcode 11))))
-		    (restart-case
-			(error 'invalid-ligature-opcode :value opcode)
-		      (set-to-zero () :report "Set opcode to 0."
-			(setq opcode 0))
-		      (discard-ligature () :report "Discard this ligature."
-			(setq opcode nil))))
-		  (when opcode
-		    (setf (ligature character
-				    (code-character (next lig/kern) font))
-			  (make-ligature
-			   (code-character (remainder lig/kern) font)
-			   (when (member opcode '(0 1 5)) t)
-			   (when (member opcode '(0 2 6)) t)
-			   (cond ((member opcode '(0 1 2 3)) 0)
-				 ((member opcode '(5 6 7)) 1)
-				 ((= opcode 11) 2))))))
-		;; kerning instruction
-		(setf (kerning character (code-character (next lig/kern) font))
-		      (tref kerns (+ (* 256 (- (op lig/kern) 128))
-				     (remainder lig/kern)))))
-	:do (if (>= (skip lig/kern) 128)
-	      (setq continue nil)
-	      ;; #### NOTE: because of the way the next instruction is
-	      ;; computed below, it is inherently impossible to have a cycle
-	      ;; in a lig/kern program.
-	      (incf index (1+ (skip lig/kern))))))
+DISCARD-LIGATURE.
 
-(defun run-ligature/kerning-program (character index lig/kerns kerns
-				     &aux (lig/kern (tref lig/kerns index)))
+If an invalid index into KERNS is encountered, signal an INVALID-TABLE-INDEX
+error. This error is immediately restartable with DISCARD-KERNING."
+  (loop
+    :for lig/kern
+      := (with-simple-restart
+	     (abort-lig/kern-program "Abort the ligature/kerning program.")
+	   (tref lig/kerns index))
+    :while lig/kern
+    :unless (> (skip lig/kern) 128)
+      :do (if (< (op lig/kern) 128)
+	    ;; ligature instruction
+	    (let ((opcode (op lig/kern)))
+	      (if (or (= opcode 4) (and (> opcode 7) (not (= opcode 11))))
+		(with-simple-restart
+		    (discard-ligature "Discard this ligature instruction.")
+		  (error 'invalid-ligature-opcode :value opcode))
+		(setf (ligature character (code-character (next lig/kern) font))
+		      (make-ligature
+		       (code-character (remainder lig/kern) font)
+		       (when (member opcode '(0 1 5)) t)
+		       (when (member opcode '(0 2 6)) t)
+		       (cond ((member opcode '(0 1 2 3)) 0)
+			     ((member opcode '(5 6 7)) 1)
+			     ((= opcode 11) 2))))))
+	    ;; kerning instruction
+	    (with-simple-restart
+		(discard-kerning "Discard this kerning instruction.")
+	      (setf (kerning character (code-character (next lig/kern) font))
+		    (tref kerns (+ (* 256 (- (op lig/kern) 128))
+				   (remainder lig/kern))))))
+    :if (>= (skip lig/kern) 128)
+      :return t
+    ;; #### NOTE: because of the way the next instruction is computed below,
+    ;; it is inherently impossible to have a cycle in a lig/kern program.
+    :else
+      :do (incf index (1+ (skip lig/kern)))))
+
+(defun run-ligature/kerning-program
+    (character index lig/kerns kerns
+     &aux (lig/kern
+	   (with-simple-restart
+	       (abort-lig/kern-program "Abort the ligature/kerning program.")
+	     (tref lig/kerns index))))
   "Find the real start of a ligature/kerning program and run it.
-See %run-ligature/kerning-program for more information."
-  (%run-ligature/kerning-program
-   character
-   (if (> (skip lig/kern) 128)
-     (+ (* 256 (op lig/kern)) (remainder lig/kern))
-     index)
-   lig/kerns
-   kerns))
+See %run-ligature/kerning-program for more information.
+
+If INDEX is invalid, signal an INVALID-TABLE-INDEX error. This error is
+immediately restartable with ABORT-LIG/KERN-PROGRAM."
+  (when lig/kern
+    (%run-ligature/kerning-program
+     character
+     (if (> (skip lig/kern) 128)
+       (+ (* 256 (op lig/kern)) (remainder lig/kern))
+       index)
+     lig/kerns
+     kerns)))
 
 
 ;; -----------------
@@ -322,9 +331,16 @@ If the first entry in the widths, heights, depths, or italic corrections table
 is not 0, signal an INVALID-TABLE-START error. This error is immediately
 restartable with SET-TO-ZERO.
 
+If an index into the widths, heights, depths, or italic corrections tables is
+invalid, signal an INVALID-TABLE-INDEX error. This error is immediately
+restartable with SET-TO-ZERO.
+
 If a lig/kern program is found for a boundary character, but there is no such
 character in the font, signal a NO-BOUNDARY-CHARACTER error. This error is
-immediately restartable with DISCARD-LIG/KERN.
+immediately restartable with ABORT-LIG/KERN-PROGRAM.
+
+If an index into the extens table is invalid, signal an INVALID-TABLE-INDEX
+error. This error is immediately restartable with DISCARD-EXTENSION-RECIPE.
 
 If a cycle is found in a list of characters of ascending size, signal a
 CHARACTER-LIST-CYCLE error. This error is immediately restartable with
@@ -377,10 +393,19 @@ is immediately restartable with REMOVE-LIGATURE."
 		      (make-character-metrics
 		       code
 		       font
-		       (tref widths (width-index char-info))
-		       (tref heights (height-index char-info))
-		       (tref depths (depth-index char-info))
-		       (tref italics (italic-index char-info)))))
+		       (restart-case (tref widths (width-index char-info))
+			 (set-to-zero () :report "Use a width of 0."
+			   0))
+		       (restart-case (tref heights (height-index char-info))
+			 (set-to-zero () :report "Use an height of 0."
+			   0))
+		       (restart-case (tref depths (depth-index char-info))
+			 (set-to-zero () :report "Use a depth of 0."
+			   0))
+		       (restart-case (tref italics (italic-index char-info))
+			 (set-to-zero ()
+			   :report "Use an italic correction of 0."
+			   0)))))
     ;; #### NOTE: this count doesn't (and shouldn't) include a zero'ed out
     ;; boundary character potentially added below.
     (setf (character-count font) (hash-table-count (characters font)))
@@ -412,7 +437,7 @@ is immediately restartable with REMOVE-LIGATURE."
 	     lig/kerns
 	     kerns)
 	    (with-simple-restart
-		(discard-lig/kern "Discard the ligature/kerning program.")
+		(abort-lig/kern-program "Abort the ligature/kerning program.")
 	      (error 'no-boundary-character))))))
 
     ;; 4. Process ligature / kerning programs, character lists, and extension
@@ -434,10 +459,13 @@ is immediately restartable with REMOVE-LIGATURE."
 		       (setf (next-character (code-character code font))
 			     (code-character (next-char char-info) font)))
 		      ((exten-index char-info)
-		       (setf (extension-recipe (code-character code font))
-			     (font-extension-recipe
-			      (tref extens (exten-index char-info))
-			      font))))))
+		       (with-simple-restart
+			   (discard-extension-recipe
+			    "Discard this extension recipe.")
+			 (setf (extension-recipe (code-character code font))
+			       (font-extension-recipe
+				(tref extens (exten-index char-info))
+				font)))))))
 
   ;; #### NOTE: we're done with the tables now.
 
