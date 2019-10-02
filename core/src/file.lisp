@@ -176,7 +176,11 @@ INVALID-LIGATURE-OPCODE error. This error is immediately restartable with
 DISCARD-LIGATURE.
 
 If an invalid index into KERNS is encountered, signal an INVALID-TABLE-INDEX
-error. This error is immediately restartable with DISCARD-KERNING."
+error. This error is immediately restartable with DISCARD-KERNING.
+
+Finally, if an invalid character code is encountered, signal an
+INVALID-CHARACTER-CODE error. Depending on the context, this error is
+immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
   (loop
     :for lig/kern
       := (with-simple-restart
@@ -187,18 +191,19 @@ error. This error is immediately restartable with DISCARD-KERNING."
       :do (if (< (op lig/kern) 128)
 	    ;; ligature instruction
 	    (let ((opcode (op lig/kern)))
-	      (if (or (= opcode 4) (and (> opcode 7) (not (= opcode 11))))
-		(with-simple-restart
-		    (discard-ligature "Discard this ligature instruction.")
-		  (error 'invalid-ligature-opcode :value opcode))
-		(setf (ligature character (code-character (next lig/kern) font))
-		      (make-ligature
-		       (code-character (remainder lig/kern) font)
-		       (when (member opcode '(0 1 5)) t)
-		       (when (member opcode '(0 2 6)) t)
-		       (cond ((member opcode '(0 1 2 3)) 0)
-			     ((member opcode '(5 6 7)) 1)
-			     ((= opcode 11) 2))))))
+	      (with-simple-restart
+		  (discard-ligature "Discard this ligature instruction.")
+		(if (or (= opcode 4) (and (> opcode 7) (not (= opcode 11))))
+		  (error 'invalid-ligature-opcode :value opcode)
+		  (setf (ligature character
+				  (code-character (next lig/kern) font))
+			(make-ligature
+			 (code-character (remainder lig/kern) font)
+			 (when (member opcode '(0 1 5)) t)
+			 (when (member opcode '(0 2 6)) t)
+			 (cond ((member opcode '(0 1 2 3)) 0)
+			       ((member opcode '(5 6 7)) 1)
+			       ((= opcode 11) 2)))))))
 	    ;; kerning instruction
 	    (with-simple-restart
 		(discard-kerning "Discard this kerning instruction.")
@@ -237,6 +242,8 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
 ;; Extension Recipes
 ;; -----------------
 
+;; #### NOTE: the only caller of this function already wraps it into a
+;; restart, so we don't need to add one here.
 (defun font-extension-recipe (exten font &aux initargs)
   "Make an extension recipe based on EXTEN with FONT's characters."
   (loop :for initarg :in '(:top-character :middle-character :bottom-character)
@@ -347,7 +354,12 @@ CHARACTER-LIST-CYCLE error. This error is immediately restartable with
 BREAK-CYCLE.
 
 If a ligature is found to be cyclic, signal a LIGATURE-CYCLE error. This error
-is immediately restartable with REMOVE-LIGATURE."
+is immediately restartable with REMOVE-LIGATURE.
+
+Finally, if an invalid character code is encountered, signal an
+INVALID-CHARACTER-CODE error. Depending on the context, this error is
+immediately restartable with DISCARD-NEXT-CHARACTER, or
+DISCARD-EXTENSION-RECIPE."
   (let ((char-infos (make-array nc :fill-pointer 0))
 	(widths (make-array nw :fill-pointer 0))
 	(heights (make-array nh :fill-pointer 0))
@@ -450,15 +462,24 @@ is immediately restartable with REMOVE-LIGATURE."
 	  ;; it avoids the 3 useless COND checks below.
 	  :unless (zerop (width-index char-info))
 	    :do (cond ((lig/kern-index char-info)
+		       ;; No need to protect anything here. We know accessing
+		       ;; the character of CODE is ok because of Step 2.
 		       (run-ligature/kerning-program
 			(code-character code font)
 			(lig/kern-index char-info)
 			lig/kerns
 			kerns))
 		      ((next-char char-info)
-		       (setf (next-character (code-character code font))
-			     (code-character (next-char char-info) font)))
+		       ;; We're not sure about the next character below,
+		       ;; however.
+		       (with-simple-restart
+			   (discard-next-character
+			    "Discard the next character.")
+			 (setf (next-character (code-character code font))
+			       (code-character (next-char char-info) font))))
 		      ((exten-index char-info)
+		       ;; And neither about those in the extension recipe
+		       ;; below.
 		       (with-simple-restart
 			   (discard-extension-recipe
 			    "Discard this extension recipe.")

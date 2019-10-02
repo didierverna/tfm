@@ -88,6 +88,7 @@
     :invalid-char-info
     :invalid-table-start :name
     :no-boundary-character
+    :discard-next-character
     :discard-extension-recipe
     :character-list-cycle :break-cycle
     :ligature-cycle :characters :remove-ligature
