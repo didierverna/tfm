@@ -234,7 +234,7 @@ subclasses."))
 It signals an attempt at creating a font with no name."))
 
 (defmethod initialize-instance :before ((font font) &key name)
-  "Check that FONT has a name."
+  "Check that FONT has a name, or signal an ANONYMOUS-FONT error."
   (unless name (error 'anonymous-font)))
 
 (defun make-font (name &rest initargs)
@@ -267,8 +267,9 @@ being loaded."))
 ;; #### NOTE: this is the internal API, used while loading TFM data.
 (defun code-character (code font &optional (errorp t))
   "Return FONT's CODE character.
-If ERRORP (the default), signal an error if CODE is invalid. Note that even a
-fake boundary character may be retrieved by this function"
+If ERRORP (the default), check that the character exists, or signal an
+INVALID-CHARACTER-CODE error. Note that a fake boundary character may be
+retrieved by this function."
   (or (gethash code (characters font))
       ;; #### NOTE: recovering from here directly would make little sense, so
       ;; it's rather the job of the callers to provide sensible restarts.
@@ -304,14 +305,16 @@ from different fonts."))
 
 (defun ligature (character1 character2)
   "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
-Both characters must belong to the same font."
+If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
+DIFFERENT-FONTS error."
   (unless (eq (font character1) (font character2))
     (error 'different-fonts :character1 character1 :character2 character2))
   (gethash (cons character1 character2) (ligatures (font character1))))
 
 (defun kerning (character1 character2)
   "Return kerning for CHARACTER1 and CHARACTER2, or NIL.
-Both characters must belong to the same font."
+If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
+DIFFERENT-FONTS error."
   (unless (eq (font character1) (font character2))
     (error 'different-fonts :character1 character1 :character2 character2))
   (gethash (cons character1 character2) (kernings (font character1))))
