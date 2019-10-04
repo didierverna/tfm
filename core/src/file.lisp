@@ -841,8 +841,8 @@ length, signal an INVALID-SECTION-LENGTHS error."
 ;; ==========================================================================
 
 (define-condition extended-tfm (tfm-warning)
-  ((file :documentation "The extended TFM file." :initarg :file :accessor file)
-   (value :documentation "The TFM extension." :initarg :value :accessor value))
+  ((value :documentation "The TFM extension." :initarg :value :accessor value)
+   (file :documentation "The extended TFM file." :initarg :file :accessor file))
   (:report (lambda (extended-tfm stream)
 	     (format stream "File ~A contains ~A data (not supported yet)."
 	       (file extended-tfm)

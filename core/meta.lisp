@@ -32,6 +32,7 @@
   (:use :cl :net.didierverna.tfm.setup)
   (:shadow :*readtable*)
   (:export
+
     ;; From the :net.didierverna.tfm.setup package:
     :*release-major-level*
     :*release-minor-level*
@@ -39,65 +40,65 @@
     :*release-status-level*
     :*release-name*
     :version
+
     ;; From meta.lisp (this file):
     :nickname-package
+
     ;; From src/util.lisp
     :tfm :tfm-warning :tfm-error :tfm-compliance :tfm-usage
     :tfm-compliance-warning :tfm-compliance-error
     :tfm-usage-warning :tfm-usage-error
-    :u16-overflow :fix-word-overflow :value :set-to-zero
-    :invalid-string-length :invalid-bcpl-string :padding
-    :read-maximum-length :discard-string :keep-string :fix-string
-    ;; From src/character-metrics.lisp:
-    :code :width :height :depth :italic-correction
-    :next-character
-    :extensiblep :not-extensible
+    :u16-overflow :value
+    :fix-word-overflow :value :set-to-zero
+    :invalid-string-length :value :padding
+    :invalid-bcpl-string :value
+    :read-maximum-length :keep-string :fix-string :discard-string
+
+    ;; From src/character.lisp:
+    :code :width :height :depth :italic-correction :next-character
+    :extensiblep :not-extensible :value
     :top-character :middle-character :bottom-character :repeated-character
+
     ;; Font src/font.lisp:
     :composite :delete-before :delete-after :pass-over
-    :anonymous-font
-    :font :name :file :checksum
-    :encoding :family
-    :7bits-safe :face-number :face-code :weight :slope :expansion
-    :design-size :slant
-    :interword-space :interword-stretch :interword-shrink :ex :em :extra-space
-    :min-code :max-code :character-count
+    :font :name :file :checksum :design-size :encoding :family :7bits-safe
+    :face-number :weight :slope :expansion :face-code
+    :slant :interword-space :interword-stretch :interword-shrink :ex :em
+    :extra-space :parameters :min-code :max-code :character-count
     :boundary-character
-    :parameters
-    :invalid-character-code
+    :invalid-character-code :value
     :get-character
-    :ligature :kerning :different-fonts
+    :different-fonts :character1 :character2
+    :ligature :kerning
     :math-symbols-font
-    :num1 :num2 :num3
-    :denom1 :denom2
-    :sup1 :sup2 :sup3
-    :sub1 :sub2
-    :supdrop :subdrop
-    :delim1 :delim2
-    :axis-height
-    :math-extension-font
-    :default-rule-thickness
+    :num1 :num2 :num3 :denom1 :denom2 :sup1 :sup2 :sup3 :sub1 :sub2
+    :supdrop :subdrop :delim1 :delim2 :axis-height
+    :math-extension-font :default-rule-thickness
     :big-op-spacing1 :big-op-spacing2 :big-op-spacing3 :big-op-spacing4
     :big-op-spacing5
+
     ;; From src/file.lisp:
-    :invalid-design-size :set-to-ten
-    :invalid-table-index
-    :invalid-ligature-opcode :discard-ligature
+    :invalid-design-size :value :set-to-ten
+    :name
+    :invalid-table-index :value :largest
+    :invalid-ligature-opcode :value
+    :abort-lig/kern-program :discard-ligature :discard-kerning
     :abort-lig/kern-program
-    :discard-kerning
-    :invalid-char-info
-    :invalid-table-start :name
+    :invalid-char-info :value
+    :invalid-table-start :value
     :no-boundary-character
-    :discard-next-character
-    :discard-extension-recipe
-    :character-list-cycle :break-cycle
-    :ligature-cycle :characters :remove-ligature
-    :file-underflow :file-overflow :declared-size :actual-size
-    :invalid-header-length
+    :character-list-cycle :value
+    :ligature-cycle :value :characters
+    :set-to-zero :abort-lig/kern-program
+    :discard-next-character :discard-extension-recipe
+    :break-cycle :remove-ligature
+    :declared-size :actual-size
+    :file-underflow :file-overflow
+    :invalid-header-length :value
     :invalid-character-range :bc :ec
     :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
-    :invalid-table-length :smallest :largest
-    :extended-tfm
+    :invalid-table-length :value :smallest :largest
+    :extended-tfm :value :file
     :load-font :cancel-loading))
 
 (in-package :net.didierverna.tfm)
