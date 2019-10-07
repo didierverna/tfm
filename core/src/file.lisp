@@ -536,7 +536,7 @@ DISCARD-EXTENSION-RECIPE."
 				    :value first-ligature
 				    :characters characters)
 				(discard-ligature ()
-				  :report "Remove that ligature from the font."
+				  :report "Discard the ligature."
 				  (remhash characters (ligatures font))
 				  (setq ligature nil))))
 			     (t
