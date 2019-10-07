@@ -91,7 +91,7 @@
     :ligature-cycle :value :characters
     :set-to-zero :abort-lig/kern-program
     :discard-next-character :discard-extension-recipe
-    :break-cycle :discard-ligature
+    :discard-next-character :discard-ligature
     :declared-size :actual-size
     :file-underflow :file-overflow
     :invalid-header-length :value

@@ -351,7 +351,7 @@ error. This error is immediately restartable with DISCARD-EXTENSION-RECIPE.
 
 If a cycle is found in a list of characters of ascending size, signal a
 CHARACTER-LIST-CYCLE error. This error is immediately restartable with
-BREAK-CYCLE.
+DISCARD-NEXT-CHARACTER.
 
 If a ligature is found to be cyclic, signal a LIGATURE-CYCLE error. This error
 is immediately restartable with DISCARD-LIGATURE.
@@ -507,7 +507,8 @@ DISCARD-EXTENSION-RECIPE."
 		     :if (member (next-character character) seen)
 		       :do (restart-case
 			       (error 'character-list-cycle :value seen)
-			     (break-cycle () :report "Break the cycle."
+			     (discard-next-character ()
+			       :report "Discard the cyclic next character."
 			       (setf (next-character character) nil)))
 		     :else
 		       :do (push (next-character character) seen)
