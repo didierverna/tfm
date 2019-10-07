@@ -354,7 +354,7 @@ CHARACTER-LIST-CYCLE error. This error is immediately restartable with
 BREAK-CYCLE.
 
 If a ligature is found to be cyclic, signal a LIGATURE-CYCLE error. This error
-is immediately restartable with REMOVE-LIGATURE.
+is immediately restartable with DISCARD-LIGATURE.
 
 Finally, if an invalid character code is encountered, signal an
 INVALID-CHARACTER-CODE error. Depending on the context, this error is
@@ -534,7 +534,7 @@ DISCARD-EXTENSION-RECIPE."
 				  (error 'ligature-cycle
 				    :value first-ligature
 				    :characters characters)
-				(remove-ligature ()
+				(discard-ligature ()
 				  :report "Remove that ligature from the font."
 				  (remhash characters (ligatures font))
 				  (setq ligature nil))))
