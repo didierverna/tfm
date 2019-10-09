@@ -36,7 +36,7 @@ manual won’t be generated.
 Some aspects of TFM’s behavior can be configured _before_ the library
 system is actually loaded.  TFM stores its user-level configuration
 (along with some other setup parameters) in another ASDF system called
-‘net.didierverna.tfm.setup’ (and the eponym package).  In order to
+‘net.didierverna.tfm.setup’ (and the eponymous package).  In order to
 configure the library (I repeat, prior to loading it), you will
 typically do something like this:
 (require "asdf")

@@ -21,5 +21,5 @@ TFM comes with both a
 and a
 [reference manual](https://www.lrde.epita.fr/~didier/software/lisp/tfm/reference/).
 Please see the projet's
-[homepage](https://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm)
+[homepage](https://www.lrde.epita.fr/~didier/software/lisp/typesetting.php#tfm)
 for more information.

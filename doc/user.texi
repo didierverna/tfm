@@ -391,7 +391,7 @@ This is the @tfm{} User Manual. @tfm{} also has a
 @chapter Installation
 @xref{Supported Platforms}, for information on portability or
 requirements. See @tfm{}'s
-@uref{http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm,,homepage}
+@uref{http://www.lrde.epita.fr/~didier/software/lisp/typesetting.php#tfm,,homepage}
 for tarballs, Git repository and online documentation. @tfm{} is also
 available via @uref{http://www.quicklisp.org,,Quicklisp}.
 
@@ -433,7 +433,7 @@ compiled the documentation in DVI and PostScript format, those will be
 installed as well.
 @end enumerate
 Note that if
-@uref{http://www.lrde.epita.fr/~didier/software/lisp/misc.php#declt,,Declt}
+@uref{http://www.lrde.epita.fr/~didier/software/lisp/typesetting.php#declt,,Declt}
 is not installed on your system, the reference manual won't be generated.
 
 Type @command{make uninstall} to uninstall the library.

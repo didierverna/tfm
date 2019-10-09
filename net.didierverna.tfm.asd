@@ -37,7 +37,7 @@ structure, providing easy access to the corresponding font information in
 Common Lisp."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"
-  :homepage "http://www.lrde.epita.fr/~didier/software/lisp/misc.php#tfm"
+  :homepage "http://www.lrde.epita.fr/~didier/software/lisp/typesetting.php#tfm"
   :source-control "https://github.com/didierverna/tfm"
   :license "BSD"
   :version #.(net.didierverna.tfm.setup:version :short)
