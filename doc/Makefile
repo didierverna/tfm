@@ -75,6 +75,7 @@ install: $(INFO_FILES)
 	for i in $(INFO_FILES); do					\
 	  install-info --info-dir="$(INFO_DIR)" $$i;			\
 	done
+	cp -R $(TEXI_MAN:%.texi=$(PROJECT)-%)-data "$(INFO_DIR)/"
 	$(MAKE) install-at LOCATION="$(PROJECT_DOC_DIR)"
 	-for i in $(DVI_FILES) $(PS_FILES); do				\
 	  test -f $$i && install -m 644 $$i "$(PROJECT_DOC_DIR)";	\
@@ -99,7 +100,9 @@ uninstall:
 	for i in $(INFO_FILES) $(INFO_REF); do				\
 	  install-info --remove --info-dir="$(INFO_DIR)" $$i;		\
 	done
-	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES) $(INFO_REF)*
+	cd "$(INFO_DIR)"						\
+	  && rm -fr $(ALL_INFO_FILES) $(INFO_REF)*			\
+		    $(TEXI_MAN:%.texi=$(PROJECT)-%)-data
 
 info: $(INFO_FILES)
 
@@ -129,21 +132,44 @@ webreference.texi: generate.cl
 	$(SBCL_PATH) $(EVAL_CONFIG) $(SBCL_LOAD) ./generate.cl --web
 #	$(PERL) -pi -e $(SPLASH_INSERT) $@
 
-$(PROJECT)-%.info: %.texi
+$(TEXI_MAN:%.texi=$(PROJECT)-%.info): conditions.png
+$(TEXI_MAN:%.texi=$(PROJECT)-%.info): $(TEXI_MAN)
+	$(MAKEINFO) $<
+	test -d $(@:%.info=%)-data/ || mkdir $(@:%.info=%)-data/
+	cp conditions.png $(@:%.info=%)-data/
+
+$(TEXI_REF:%.texi=$(PROJECT)-%.info): $(TEXI_REF)
 	$(MAKEINFO) $<
 
+$(TEXI_MAN:%.texi=%.pdf): conditions.pdf
 %.pdf: %.texi
 	$(TEXI2DVI) -p $<
 
-$(HTML_DIRS) webreference: %: %.texi
+$(TEXI_MAN:%.texi=%): conditions.png
+$(TEXI_MAN:%.texi=%): %: %.texi
+	$(MAKEINFO) --css-ref=$(CSS) --html -o $@ $<
+	cp conditions.png $@/
+	touch $@
+
+$(TEXI_REF:%.texi=%) webreference: %: %.texi
 	$(MAKEINFO) --css-ref=$(CSS) --html -o $@ $<
 	touch $@
 
+$(TEXI_MAN:%.dvi=%): conditions.eps
 %.dvi: %.texi
 	$(TEXI2DVI) $<
 
 %.ps: %.dvi
 	$(DVIPS) -o $@ $<
+
+conditions.pdf: conditions.dot
+	dot -Tpdf -o $@ $<
+
+conditions.png: conditions.dot
+	dot -Tpng -o $@ $<
+
+conditions.eps: conditions.dot
+	dot -Teps -o $@ $<
 
 %.eps: %.jpg
 	$(CONVERT) $< $@
@@ -154,7 +180,9 @@ clean:
 distclean: clean
 	-rm -fr declt.make webreference* $(TEXI_REF)			\
 		$(HTML_DIRS)						\
-		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
+		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES) \
+		conditions.pdf conditions.png conditions.eps		\
+		$(TEXI_MAN:%.texi=$(PROJECT)-%)-data/
 #               splash.eps
 
 $(TEXI_MAN): $(TOP_DIR)/make/version.make

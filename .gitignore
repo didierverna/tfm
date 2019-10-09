@@ -6,6 +6,10 @@ openmcl-*/
 
 doc/declt.make
 
+doc/conditions.eps
+doc/conditions.pdf
+doc/conditions.png
+doc/tfm-user-data
 doc/user.pdf
 doc/user.pdf
 doc/user.ps

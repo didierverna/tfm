@@ -1,0 +1,54 @@
+strict digraph {
+  rankdir=LR;
+  node [shape=ellipse color=blue]
+
+  { rank=same "file-overflow" "file-underflow" "u16-overflow"
+    "invalid-header-length" "invalid-character-range"  "invalid-table-length"
+    "invalid-section-lengths" "invalid-design-size"
+    "fix-word-overflow" "invalid-bcpl-string" "invalid-char-info"
+    "invalid-character-code" "invalid-ligature-opcode" "invalid-string-length"
+    "invalid-table-index" "invalid-table-start" "ligature-cycle"
+    "character-list-cycle" }
+
+  { rank=same "set-to-zero" "set-to-ten" }
+
+  { rank=same "discard-string" "discard-extension-recipe" "discard-kerning"
+    "discard-ligature" "discard-next-character" }
+
+
+  "file-overflow" [shape=box color=green fixedsize=true width=1.9]
+
+  "character-list-cycle", "file-underflow", "u16-overflow",
+  "fix-word-overflow", "invalid-bcpl-string", "invalid-char-info",
+  "invalid-character-code", "invalid-character-range", "invalid-design-size",
+  "invalid-header-length", "invalid-ligature-opcode",
+  "invalid-section-lengths", "invalid-string-length", "invalid-table-index",
+  "invalid-table-length", "invalid-table-start", "ligature-cycle"
+  [shape=box color=red fixedsize=true width=1.9]
+
+  "file-overflow" -> "cancel-loading";
+  "file-underflow" -> "cancel-loading";
+  "u16-overflow" -> "cancel-loading";
+  "invalid-header-length" -> "cancel-loading";
+  "invalid-section-lengths" -> "cancel-loading";
+  "invalid-table-length" -> "cancel-loading";
+  "invalid-character-range" -> "cancel-loading";
+  "character-list-cycle" -> "discard-next-character" -> "cancel-loading";
+  "fix-word-overflow" -> "set-to-zero" -> "cancel-loading";
+  "invalid-bcpl-string" -> "keep-string" -> "fix-string" -> "discard-string" -> "cancel-loading";
+  "invalid-char-info" -> "set-to-zero" -> "cancel-loading";
+  "invalid-character-code" -> "cancel-loading";
+  "invalid-character-code" -> "discard-extension-recipe" -> "cancel-loading";
+  "invalid-character-code" -> "discard-kerning" -> "cancel-loading";
+  "invalid-character-code" -> "discard-ligature" -> "cancel-loading";
+  "invalid-character-code" -> "discard-next-character" -> "cancel-loading";
+  "invalid-design-size" -> "set-to-ten" -> "cancel-loading";
+  "invalid-ligature-opcode" -> "discard-ligature" -> "cancel-loading";
+  "invalid-string-length" -> "read-maximum-length" -> "discard-string" -> "cancel-loading";
+  "invalid-table-index" -> "abort-lig/kern-program" -> "cancel-loading";
+  "invalid-table-index" -> "discard-extension-recipe" -> "cancel-loading";
+  "invalid-table-index" -> "discard-kerning" -> "cancel-loading";
+  "invalid-table-index" -> "set-to-zero" -> "cancel-loading";
+  "invalid-table-start" -> "set-to-zero" -> "cancel-loading";
+  "ligature-cycle" -> "discard-ligature" -> "cancel-loading";
+}
