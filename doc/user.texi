@@ -609,7 +609,7 @@ sentences.
 @end itemize
 
 @TeX{} math symbols and extension fonts have respectively 15 and 6
-additionnal parameters which are also accessible.
+additional parameters which are also accessible.
 @itemize
 @item
 @clsindex{math-symbols-font}@c
@@ -717,7 +717,7 @@ the command @code{\/}, and also in math mode for superscript placement.
 @code{next-character}: the next character in a character list, or
 @nil{}. If non-@nil{}, this character is part of a chain of characters
 of ascending size, and not the last one (see @TeX{}: the Program [544]).
-It is mutually exclusive with the exsitence of an extension recipe (see
+It is mutually exclusive with the existence of an extension recipe (see
 below), and also with the existence of a ligature or kerning program for
 this character (@pxref{Ligatures and Kernings}).
 @end itemize
@@ -816,7 +816,7 @@ next one, once the ligature has been made.
 @tindex extended-tfm
 @warnsubindex{extended-tfm}@c
 We already mentioned the @code{extended-tfm} warning in @ref{TFM Files}.
-In fact, @tfm{} comes with a rich ontology of conditons (and restarts)
+In fact, @tfm{} comes with a rich ontology of conditions (and restarts)
 that give you full control on the behavior to adopt when facing abnormal
 situations.
 
@@ -935,7 +935,7 @@ described precisely in @refref{Exported conditions}. The restarts, on
 the other hand, are not, but their names should be self-explanatory.
 Note that a branch in this graph does not necessarily correspond to a
 specific code path in the library. Different code paths may have
-different restarts with the same name when it makes sense, but eponym
+different restarts with the same name when it makes sense, but eponymous
 restarts are ``merged'' into a single node in the graph.
 
 @ifinfo
@@ -971,7 +971,7 @@ library's main purpose.
 Some aspects of @tfm{}'s behavior can be configured @emph{before} the
 library system is actually loaded. @tfm{} stores its user-level
 configuration (along with some other setup parameters) in another ASDF
-system called @samp{net.didierverna.tfm.setup} (and the eponym
+system called @samp{net.didierverna.tfm.setup} (and the eponymous
 package). In order to configure the library (I repeat, prior to loading
 it), you will typically do something like this:
 @verbatim
@@ -1072,7 +1072,7 @@ ignored in the output. So for instance, version 4.3.2 will appear as-is,
 while version 1.3.0 will appear as just 1.3.
 @item
 A @code{:long} version is expanded from the short one, and includes the
-release name. For instance, 1.3 alpha 4 "Artifical Uncial", 2.5 beta 8
+release name. For instance, 1.3 alpha 4 "Artificial Uncial", 2.5 beta 8
 "Rotunda", 4.2 release candidate 1 "Romantic Rustic" or 4.3.2 "Square
 Capitals". As for the short version, a patchlevel of 0 is ignored in the
 output: 1.3 "Artificial Uncial".
