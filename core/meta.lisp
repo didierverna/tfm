@@ -55,12 +55,13 @@
     :read-maximum-length :keep-string :fix-string :discard-string
 
     ;; From src/character.lisp:
-    :code :width :height :depth :italic-correction :next-character
+    :character-metrics
+    :code :font :width :height :depth :italic-correction :next-character
     :extensiblep :not-extensible :value
     :top-character :middle-character :bottom-character :repeated-character
 
     ;; Font src/font.lisp:
-    :composite :delete-before :delete-after :pass-over
+    :ligature :composite :delete-before :delete-after :pass-over
     :font :name :file :checksum :design-size :encoding :family :7bits-safe
     :face-number :weight :slope :expansion :face-code
     :slant :interword-space :interword-stretch :interword-shrink :ex :em
