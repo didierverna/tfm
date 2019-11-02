@@ -748,9 +748,8 @@ be @nil{}).
 The TFM format encodes so called ``ligature / kerning programs'',
 allowing font designers to specify particular spacing between
 characters, or character replacements. Ligatures and kernings depend on
-@emph{pairs} of characters (and a pair of characters cannot have both
-kerning and ligature specifications). @tfm{} decodes this information
-and stores it in a more accessible fashion.
+@emph{pairs} of characters. @tfm{} decodes this information and stores
+it in a more accessible fashion.
 
 @menu
 * Kernings::                    Specific spacing
@@ -768,9 +767,7 @@ Return kerning for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.@*
 Both characters must belong to the same font.
 @end defun
 
-The kerning, if it exists, is in design size units. Otherwise, the two
-characters may have a ligature, or their boxes should just be put next
-to each other.
+The kerning, if it exists, is in design size units.
 
 @node Ligatures,  , Kernings, Ligatures and Kernings
 @subsection Ligatures
@@ -784,11 +781,9 @@ Both characters must belong to the same font.
 @end defun
 
 @clsindex{ligature}@c
-Unless there's no such ligature (meaning that the two characters should
-be left alone, possibly with some particular kerning), the value
-returned by this function is an instance of a class called
-@code{ligature}. In the context of this library, the term ``ligature''
-denotes an instance of this class.
+Unless there's no such ligature, the value returned by this function is
+an instance of a class called @code{ligature}. In the context of this
+library, the term ``ligature'' denotes an instance of this class.
 
 A ligature contains four bits of information accessible as described below.
 @itemize
