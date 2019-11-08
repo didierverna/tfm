@@ -804,6 +804,9 @@ Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-SECTION-LENGTHS error."
 
   ;; 0. Handle early, user-provided information.
+  ;; #### NOTE: we don't keep track of the design size history (whether it was
+  ;; overridden). Only the font's name will reflect that. This could be
+  ;; discussed.
   (when design-size
     (check-type design-size (real 1))
     (setf (design-size font) design-size)
