@@ -44,17 +44,35 @@
   (:documentation "The Invalid Design Size compliance error.
 It signals that a design size is too small (< 1pt)."))
 
+(define-condition invalid-original-design-size (tfm-compliance-warning)
+  ((value
+    :documentation "The invalid original design size."
+    :initarg :value
+    :accessor value))
+  (:report (lambda (invalid-original-design-size stream)
+	     (report stream
+		 "~Apt~:P original design size was too small (< 1pt)."
+	       (value invalid-original-design-size))))
+  (:documentation "The Invalid Original Design Size compliance warning.
+It signals that, although overridden explicitly, an original design size was
+too small (< 1pt)."))
+
 (defun parse-header (length font)
   "Parse a header of LENGTH words from *STREAM* into FONT.
 If FONT's design size is less than 1pt, signal an INVALID-DESIGN-SIZE error.
-This error is immediately restartable with SET-TO-TEN."
+This error is immediately restartable with SET-TO-TEN.
+However, if FONT's design size was explicitly overridden, only signal an
+INVALID-ORIGINAL-DESIGN-SIZE warning."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
   ;; LOAD-TFM-FONT.
-  (setf (checksum font) (read-u32)
-	(design-size font) (read-fix-word nil))
-  (unless (>= (design-size font) 1)
-    (restart-case (error 'invalid-design-size :value (design-size font))
-      (set-to-ten () :report "Set it to 10pt." (setf (design-size font) 10))))
+  (setf (checksum font) (read-u32))
+  (let ((design-size (read-fix-word nil)))
+    (unless (>= design-size 1)
+      (if (design-size font)
+	(warn 'invalid-original-design-size :value design-size)
+	(restart-case (error 'invalid-design-size :value design-size)
+	  (set-to-ten () :report "Set it to 10pt." (setq design-size 10)))))
+    (unless (design-size font) (setf (design-size font) design-size)))
   (decf length 2)
   ;; #### NOTE: we silently assume Xerox PARC headers below. Not sure if
   ;; anything else could be in use, but it's impossible to tell from the files
@@ -761,10 +779,15 @@ It signals that a declared TFM table's length is out of range."))
 				   (pathname *stream*)))
 			   (name (when file
 				   (pathname-name file)))
+			   design-size
 		      &aux (font (make-font name :file file)))
   "Parse *STREAM* of declared length LF into a new font, and return it.
 FILE defaults to *STREAM*'s associated file if any, and NAME defaults to
 the FILE's base name, if any.
+
+If DESIGN-SIZE is provided, it must be a real greater or equal to 1.
+Otherwise, a type error is signalled. This will value override the original
+design size.
 
 If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
 If *STREAM* is longer than expected, signal a FILE-OVERFLOW warning.
@@ -779,6 +802,11 @@ are not within the expected range, signal an INVALID-TABLE-LENGTH error.
 
 Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-SECTION-LENGTHS error."
+
+  ;; 0. Handle early, user-provided information.
+  (when design-size
+    (check-type design-size (real 1))
+    (setf (design-size font) design-size))
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   ;; #### NOTE: the errors signalled below (directly, or by READ-U16) are
@@ -852,14 +880,17 @@ length, signal an INVALID-SECTION-LENGTHS error."
 It signals that a file contains extended TFM data (OFM or JFM) rather than
 plain TFM data."))
 
-(defun load-font (file)
+(defun load-font (file &rest arguments &key design-size)
   "Load FILE into a new font, and return it.
+If provided, override the original DESIGN-SIZE with a real that must be
+greater or equal to 1.
 
 Only actual TFM data is currently supported. If OFM or JFM data is detected,
 this function signals an EXTENDED-TFM warning and returns NIL.
 
 While loading TFM data, any signalled condition is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
+  (declare (ignore design-size))
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
     (let ((lf (with-simple-restart (cancel-loading "Cancel loading this font.")
@@ -870,6 +901,6 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 	     (warn 'extended-tfm :value "JFM" :file file))
 	    ((numberp lf)
 	     (with-simple-restart (cancel-loading "Cancel loading this font.")
-	       (load-tfm-font lf)))))))
+	       (apply #'load-tfm-font lf arguments)))))))
 
 ;;; file.lisp ends here

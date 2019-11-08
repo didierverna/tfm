@@ -102,6 +102,7 @@ When the font is loaded from a file, it defaults to the file's base name."
     :accessor checksum)
    (design-size
     :documentation "The font's design size, in units of TeX points."
+    :initform nil
     :accessor design-size)
    (encoding
     :documentation "The font's character coding scheme (a BCPL string), or NIL."
