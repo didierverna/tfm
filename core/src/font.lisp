@@ -89,9 +89,10 @@ STATE is a list of characters, the first two being subject to LIGATURE."
 (defclass font ()
   ((name
     :documentation "The font's name.
-When the font is loaded from a file, it defaults to the file's base name."
+When the font is loaded from a file, it defaults to the file's base name,
+along with potential scaling information."
     :initarg :name
-    :reader name)
+    :accessor name)
    (file
     :documentation "The file from which the font was loaded, or NIL."
     :initform nil
