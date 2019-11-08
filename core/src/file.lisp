@@ -39,7 +39,7 @@
     :initarg :value
     :accessor value))
   (:report (lambda (invalid-design-size stream)
-	     (report stream "~Apt~:P design size is too small (< 1pt)."
+	     (report stream "~Apt design size is too small (< 1pt)."
 	       (value invalid-design-size))))
   (:documentation "The Invalid Design Size compliance error.
 It signals that a design size is too small (< 1pt)."))
