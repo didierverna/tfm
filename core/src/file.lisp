@@ -46,8 +46,8 @@ It signals that a design size is too small (< 1pt)."))
 
 (defun parse-header (length font)
   "Parse a header of LENGTH words from *STREAM* into FONT.
-If FONT's design size is less than 1pt, signal an INVALID-DESIGN-ERROR. This
-error is immediately restartable with SET-TO-TEN."
+If FONT's design size is less than 1pt, signal an INVALID-DESIGN error.
+This error is immediately restartable with SET-TO-TEN."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
   ;; LOAD-TFM-FONT.
   (setf (checksum font) (read-u32)
