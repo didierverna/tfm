@@ -51,7 +51,7 @@ It signals that a design size is too small (< 1pt)."))
     :accessor value))
   (:report (lambda (invalid-original-design-size stream)
 	     (report stream
-		 "~Apt~:P original design size was too small (< 1pt)."
+		 "~Apt original design size was too small (< 1pt)."
 	       (value invalid-original-design-size))))
   (:documentation "The Invalid Original Design Size compliance warning.
 It signals that, although overridden explicitly, an original design size was
