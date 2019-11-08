@@ -51,7 +51,7 @@
 (defparameter *release-status* :patchlevel
   "The status of this release.")
 
-(defparameter *release-status-level* 2
+(defparameter *release-status-level* 3
   "The status level of this release.")
 
 (defparameter *release-name* "Artificial Uncial"
