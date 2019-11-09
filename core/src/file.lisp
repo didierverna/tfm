@@ -774,20 +774,18 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
   (:documentation "The Invalid Table Length compliance error.
 It signals that a declared TFM table's length is out of range."))
 
-(defun load-tfm-font (lf
-		      &key (file (when (typep *stream* 'file-stream)
-				   (pathname *stream*)))
-			   (name (when file
-				   (pathname-name file)))
-			   design-size
-		      &aux (font (make-font name :file file)))
+(defun load-tfm-font
+    (lf &key (file (when (typep *stream* 'file-stream) (pathname *stream*)))
+	     (name (when file (pathname-name file)))
+	     design-size freeze
+	&aux (font (make-font name :file file)))
   "Parse *STREAM* of declared length LF into a new font, and return it.
-FILE defaults to *STREAM*'s associated file if any, and NAME defaults to
-the FILE's base name, if any.
-
-If DESIGN-SIZE is provided and not a real greater or equal to 1, signal a type
-error. Otherwise, override the original design size with it and adapt the
-font's name accordingly.
+- FILE defaults to *STREAM*'s associated file if any.
+- NAME defaults to the FILE's base name, if any.
+- If DESIGN-SIZE is provided and not a real greater or equal to 1, signal a
+  type error. Otherwise, override the original design size with it and adapt
+  the font's name accordingly.
+- When FREEZE (NIL by default), freeze the font immediately after creation.
 
 If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
 If *STREAM* is longer than expected, signal a FILE-OVERFLOW warning.
@@ -865,6 +863,10 @@ length, signal an INVALID-SECTION-LENGTHS error."
 
     ;; 4. Parse the parameters section.
     (parse-parameters np font))
+
+  ;; 5. Maybe freeze the font
+  (when freeze (freeze font))
+
   font)
 
 
@@ -884,17 +886,19 @@ length, signal an INVALID-SECTION-LENGTHS error."
 It signals that a file contains extended TFM data (OFM or JFM) rather than
 plain TFM data."))
 
-(defun load-font (file &rest arguments &key design-size)
+(defun load-font (file &rest arguments &key design-size freeze)
   "Load FILE into a new font, and return it.
-If provided, override the original DESIGN-SIZE with a real that must be
-greater or equal to 1.
+- If provided, DESIGN-SIZE overrides the font's original value. It must be a
+  real greater or equal to 1.
+- When FREEZE (NIL by default), freeze the font immediately after creation.
+  See the eponymous function for more information.
 
 Only actual TFM data is currently supported. If OFM or JFM data is detected,
 this function signals an EXTENDED-TFM warning and returns NIL.
 
 While loading TFM data, any signalled condition is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
-  (declare (ignore design-size))
+  (declare (ignore design-size freeze))
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
     (let ((lf (with-simple-restart (cancel-loading "Cancel loading this font.")

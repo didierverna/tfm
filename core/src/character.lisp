@@ -92,21 +92,21 @@ The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
    (width
     :documentation "The character's width, in design size units."
     :initarg :width
-    :reader width)
+    :accessor width)
    (height
     :documentation "The character's height, in design size units."
     :initarg :height
-    :reader height)
+    :accessor height)
    (depth
     :documentation "The character's depth, in design size units."
     :initarg :depth
-    :reader depth)
+    :accessor depth)
    (italic-correction
     :documentation "The character's italic correction, in design size units.
 TeX uses this value for regular characters followed by the command \/, and
 also in math mode for superscript placement."
     :initarg :italic-correction
-    :reader italic-correction)
+    :accessor italic-correction)
    (next-character
     :documentation "The next character in a character list.
 This slot is non-null only if the character is part of a chain of characters

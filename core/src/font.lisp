@@ -98,6 +98,10 @@ along with potential scaling information."
     :initform nil
     :initarg :file
     :accessor file)
+   (frozen
+    :documentation "Whether the font is frozen."
+    :initform nil
+    :accessor frozen)
    (checksum
     :documentation "The font's checksum, as provided by Metafont."
     :accessor checksum)
@@ -223,7 +227,8 @@ subclasses."))
 (defmethod print-object ((font font) stream)
   "Print FONT unreadably with its name to STREAM."
   (print-unreadable-object (font stream :type t)
-    (princ (name font) stream)))
+    (princ (name font) stream)
+    (when (frozen font) (princ " (frozen)" stream))))
 
 ;; #### NOTE: this error is not currently exported, because it cannot in fact
 ;; be triggered yet (by the public API).
@@ -337,6 +342,60 @@ DIFFERENT-FONTS error."
 	kerning))
 
 
+;; --------
+;; Freezing
+;; --------
+
+(define-condition already-frozen (tfm-usage-error)
+  ((font :documentation "The frozen font." :initarg :font :accessor font))
+  (:report (lambda (already-frozen stream)
+	     (format stream "Font ~A is already frozen."
+	       (font already-frozen))))
+  (:documentation "The Already Frozen usage error.
+It signals an attempt at freezing an already frozen font."))
+
+(defmacro freeze-dimension (name object design-size)
+  "Multiply NAMEd dimension in OBJECT by DESIGN-SIZE."
+  `(setf (,name ,object) (* (,name ,object) ,design-size)))
+
+#i(freeze-dimensions 2)
+(defmacro freeze-dimensions (object design-size &rest dimensions)
+  "Multiply all DIMENSIONS in OBJECT by DESIGN-SIZE."
+  `(progn ,@(mapcar (lambda (dimension)
+		      (list 'freeze-dimension dimension object design-size))
+	      dimensions)))
+
+(defgeneric freeze (font)
+  (:documentation "Freeze FONT.
+If FONT is already frozen, signal an ALREADY-FROZEN error.
+
+Freezing a font means that all dimensions normally expressed in design size
+units are multiplied by it, so as to lead values in TeX point units.")
+  (:method :before (font)
+    "Make sure that FONT isn't already frozen."
+    (when (frozen font) (error 'already-frozen :font font)))
+  (:method (font &aux (design-size (design-size font)))
+"Multiply all FONT dimensions normally expressed in design size units by it."
+    (freeze-dimensions font design-size
+      interword-space interword-stretch interword-shrink ex em extra-space)
+    (when (parameters font)
+      (loop :for i :from 0 :upto (1- (length (parameters font)))
+	    :do (setf (aref (parameters font) i)
+		      (* (aref (parameters font) i) design-size))))
+    (maphash (lambda (code character)
+	       (declare (ignore code))
+	       (freeze-dimensions character design-size
+		 width height depth italic-correction))
+	     (characters font))
+    (maphash (lambda (pair kern)
+	       (setf (kerning (car pair) (cdr pair)) (* kern design-size)))
+	     (kernings font))
+    (values))
+  (:method :after (font)
+    "Mark FONT as frozen."
+    (setf (frozen font) t)))
+
+
 
 ;; ==========================================================================
 ;; Math Symbols Font
@@ -407,6 +466,14 @@ DIFFERENT-FONTS error."
 This class represents fonts with the \"TeX math symbols\" character coding
 scheme."))
 
+(defmethod freeze :around
+    ((font math-symbols-font) &aux (design-size (design-size font)))
+  "Multiply all FONT dimensions normally expressed in design size units by it."
+  (freeze-dimensions font design-size
+    num1 num2 num3 denom1 denom2 sup1 sup2 sup3 sub1 sub2 supdrop subdrop
+    delim1 delim2 axis-height)
+  (call-next-method))
+
 
 
 ;; ==========================================================================
@@ -441,5 +508,13 @@ scheme."))
   (:documentation "The Math Extension Font class.
 This class represents fonts with the \"TeX math extension\" character coding
 scheme."))
+
+(defmethod freeze :around
+    ((font math-extension-font) &aux (design-size (design-size font)))
+  "Multiply all FONT dimensions normally expressed in design size units by it."
+  (freeze-dimensions font design-size
+    default-rule-thickness big-op-spacing1 big-op-spacing2 big-op-spacing3
+    big-op-spacing4 big-op-spacing5)
+  (call-next-method))
 
 ;;; font.lisp ends here
