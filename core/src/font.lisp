@@ -165,31 +165,46 @@ font's weight, slope, and expansion."
     :initform 0
     :accessor slant)
    (interword-space
-    :documentation "The font's normal interword space, in design size units."
+    :documentation "The font's normal interword space.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor interword-space)
    (interword-stretch
-    :documentation "The font's interword stretchability, in design size units."
+    :documentation "The font's interword stretchability.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor interword-stretch)
    (interword-shrink
-    :documentation "The font's interword shrinkability, in design size units."
+    :documentation "The font's interword shrinkability.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor interword-shrink)
    (ex
-    :documentation "The font's ex size, in design size units."
+    :documentation "The font's ex size.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor ex)
    (em
-    :documentation "The font's em size, in design size units."
+    :documentation "The font's em size.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor em)
    (extra-space
-    :documentation "The font's extra space, in design size units.
+    :documentation "The font's extra space.
+It is expressed in design size units, or in TeX point units if the font is
+frozen.
+
 This is the additional space to put at the end of sentences."
     :initform 0 :accessor extra-space)
    (parameters
-    :documentation "The font's additional parameters array, or NIL."
+    :documentation "The font's additional parameters array, or NIL.
+Parameters are expressed in design size units, or in TeX point units if the
+font is frozen."
     :initform nil
     :accessor parameters)
    (min-code
@@ -217,7 +232,8 @@ ligature."
    (kernings
     :documentation "The font's kernings.
 This is a hash table associating conses of characters with the corresponding
-kerning, in design size units."
+kerning. They are expressed in design size units, or in TeX point units if
+the font is frozen."
     :initform (make-hash-table :test #'equal)
     :accessor kernings)
    (boundary-character
@@ -366,10 +382,10 @@ It signals an attempt at freezing an already frozen font."))
 
 (defgeneric freeze (font)
   (:documentation "Freeze FONT.
-If FONT is already frozen, signal an ALREADY-FROZEN error.
-
 Freezing a font means that all dimensions normally expressed in design size
-units are multiplied by it, so as to lead values in TeX point units.")
+units are multiplied by it, so as to lead values in TeX point units.
+
+If FONT is already frozen, signal an ALREADY-FROZEN error.")
   (:method :before (font)
     "Make sure that FONT isn't already frozen."
     (when (frozen font) (error 'already-frozen :font font)))
@@ -418,63 +434,93 @@ units are multiplied by it, so as to lead values in TeX point units.")
 
 (defclass math-symbols-font (font)
   ((num1
-    :documentation "The font's NUM1 parameter."
+    :documentation "The font's NUM1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor num1)
    (num2
-    :documentation "The font's NUM2 parameter."
+    :documentation "The font's NUM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor num2)
    (num3
-    :documentation "The font's NUM2 parameter."
+    :documentation "The font's NUM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor num3)
    (denom1
-    :documentation "The font's DENOM1 parameter."
+    :documentation "The font's DENOM1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor denom1)
    (denom2
-    :documentation "The font's DENOM2 parameter."
+    :documentation "The font's DENOM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor denom2)
    (sup1
-    :documentation "The font's SUP1 parameter."
+    :documentation "The font's SUP1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor sup1)
    (sup2
-    :documentation "The font's SUP2 parameter."
+    :documentation "The font's SUP2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor sup2)
    (sup3
-    :documentation "The font's SUP2 parameter."
+    :documentation "The font's SUP2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor sup3)
    (sub1
-    :documentation "The font's SUB1 parameter."
+    :documentation "The font's SUB1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor sub1)
    (sub2
-    :documentation "The font's SUB2 parameter."
+    :documentation "The font's SUB2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor sub2)
    (supdrop
-    :documentation "The font's SUPDROP parameter."
+    :documentation "The font's SUPDROP parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor supdrop)
    (subdrop
-    :documentation "The font's SUBDROP parameter."
+    :documentation "The font's SUBDROP parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor subdrop)
    (delim1
-    :documentation "The font's DELIM1 parameter."
+    :documentation "The font's DELIM1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor delim1)
    (delim2
-    :documentation "The font's DELIM2 parameter."
+    :documentation "The font's DELIM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor delim2)
    (axis-height
-    :documentation "The font's AXIS-HEIGHT parameter."
+    :documentation "The font's AXIS-HEIGHT parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor axis-height))
   (:documentation "The Math Symbols Font class.
@@ -508,27 +554,39 @@ scheme."))
 
 (defclass math-extension-font (font)
   ((default-rule-thickness
-    :documentation "The font's default rule thickness."
+    :documentation "The font's default rule thickness.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor default-rule-thickness)
    (big-op-spacing1
-    :documentation "The font's BIG-OP-SPACING1 parameter."
+    :documentation "The font's BIG-OP-SPACING1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor big-op-spacing1)
    (big-op-spacing2
-    :documentation "The font's BIG-OP-SPACING2 parameter."
+    :documentation "The font's BIG-OP-SPACING2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor big-op-spacing2)
    (big-op-spacing3
-    :documentation "The font's BIG-OP-SPACING3 parameter."
+    :documentation "The font's BIG-OP-SPACING3 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor big-op-spacing3)
    (big-op-spacing4
-    :documentation "The font's BIG-OP-SPACING4 parameter."
+    :documentation "The font's BIG-OP-SPACING4 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor big-op-spacing4)
    (big-op-spacing5
-    :documentation "The font's BIG-OP-SPACING5 parameter."
+    :documentation "The font's BIG-OP-SPACING5 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initform 0
     :accessor big-op-spacing5))
   (:documentation "The Math Extension Font class.

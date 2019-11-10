@@ -100,21 +100,29 @@ The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
     :initarg :font
     :reader font)
    (width
-    :documentation "The character's width, in design size units."
+    :documentation "The character's width.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initarg :width
     :accessor width)
    (height
-    :documentation "The character's height, in design size units."
+    :documentation "The character's height.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initarg :height
     :accessor height)
    (depth
-    :documentation "The character's depth, in design size units."
+    :documentation "The character's depth.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
     :initarg :depth
     :accessor depth)
    (italic-correction
-    :documentation "The character's italic correction, in design size units.
+    :documentation
+    "The character's italic correction.
 TeX uses this value for regular characters followed by the command \/, and
-also in math mode for superscript placement."
+also in math mode for superscript placement. It is expressed in design size
+units, or in TeX point units if the font is frozen."
     :initarg :italic-correction
     :accessor italic-correction)
    (next-character
