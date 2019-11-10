@@ -569,19 +569,11 @@ DISCARD-EXTENSION-RECIPE."
 ;; Parameters Section
 ;; ==========================================================================
 
-;; #### WARNING: this local macro intentionally captures LENGTH and FONT!
-(macrolet ((read-parameter (parameter)
-	     "Read a fix word into font's PARAMETER if length >= 1.
-If so, decrement length afterwards."
-	     `(when (>= length 1)
-		(setf (,parameter font) (read-fix-word))
-		(decf length)))
-	   (read-parameters (&rest parameters)
-	     "Read fix words into font's PARAMETERS, length permitting.
-Decrement length accordingly afterwards."
-	     `(progn ,@(mapcar (lambda (parameter)
-				 (list 'read-parameter parameter))
-			 parameters))))
+;; #### WARNING: this symbol-macro intentionally captures LENGTH and SLOT!
+(symbol-macrolet ((read-parameter
+		    (when (>= length 1)
+		      (setf slot (read-fix-word))
+		      (decf length))))
   (defgeneric parse-parameters (length font)
     (:documentation
      "Parse a parameters section of LENGTH words from *STREAM* into FONT.
@@ -591,27 +583,17 @@ Return remaining LENGTH.")
       (when (>= length 1)
 	(setf (slant font) (read-fix-word nil))
 	(decf length))
-      (read-parameters interword-space interword-stretch interword-shrink
-		       ex em
-		       extra-space)
+      (map-font-dimension-accessors slot font read-parameter)
       length)
     (:method (length (font math-symbols-font))
       "Parse the 15 additional TeX math symbols FONT parameters."
       (setq length (call-next-method))
-      (read-parameters num1 num2 num3
-		       denom1 denom2
-		       sup1 sup2 sup3
-		       sub1 sub2
-		       subdrop supdrop
-		       delim1 delim2
-		       axis-height)
+      (map-math-symbols-font-dimension-accessors slot font read-parameter)
       length)
     (:method (length (font math-extension-font))
       "Parse the 6 additional TeX math extension FONT parameters."
       (setq length (call-next-method))
-      (read-parameters default-rule-thickness
-		       big-op-spacing1 big-op-spacing2 big-op-spacing3
-		       big-op-spacing4 big-op-spacing5)
+      (map-math-extension-font-dimension-accessors slot font read-parameter)
       length)
     (:method :around (length font)
       "Read remaining parameters into a parameters array."
