@@ -80,6 +80,16 @@ The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
 ;; Character Metrics
 ;; ==========================================================================
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +character-metrics-dimension-accessors+
+      '(width height depth italic-correction)
+    "The list of dimension accessor names in the CHARACTER-METRICS class."))
+
+(defmacro map-character-metrics-dimension-accessors (var character &body body)
+  "Map BODY on CHARACTER metrics dimension accessors available as VAR."
+  `(map-accessors ,var ,character ,+character-metrics-dimension-accessors+
+     ,@body))
+
 (defclass character-metrics ()
   ((code
     :documentation "The character's numerical code."

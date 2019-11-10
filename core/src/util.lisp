@@ -255,4 +255,22 @@ DISCARD-STRING."
   (loop :repeat (- padding 1 length) :do (read-byte *stream*))
   string)
 
+
+
+;; ==========================================================================
+;; Miscellaneous
+;; ==========================================================================
+
+(defmacro define-constant (name value &optional documentation)
+  "Like DEFCONSTANT, but reuse existing value if any."
+  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
+     ,@(when documentation (list documentation))))
+
+(defmacro map-accessors (var object accessors &body body)
+  "Map BODY on OBJECT ACCESSORS, each in turn available as VAR."
+  `(progn ,@(mapcar (lambda (accessor)
+		      `(with-accessors ((,var ,accessor)) ,object
+			   ,@body))
+	      accessors)))
+
 ;;; util.lisp ends here

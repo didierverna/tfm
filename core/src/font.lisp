@@ -86,6 +86,16 @@ STATE is a list of characters, the first two being subject to LIGATURE."
 ;; Class
 ;; -----
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +font-dimension-accessors+
+      '(interword-space interword-stretch interword-shrink ex em extra-space)
+    "The list of dimension accessor names in the FONT class."))
+
+(defmacro map-font-dimension-accessors (var font &body body)
+  "Map BODY on FONT dimension accessors available as VAR."
+  `(map-accessors ,var ,font ,+font-dimension-accessors+
+     ,@body))
+
 (defclass font ()
   ((name
     :documentation "The font's name.
@@ -354,17 +364,6 @@ DIFFERENT-FONTS error."
   (:documentation "The Already Frozen usage error.
 It signals an attempt at freezing an already frozen font."))
 
-(defmacro freeze-dimension (name object design-size)
-  "Multiply NAMEd dimension in OBJECT by DESIGN-SIZE."
-  `(setf (,name ,object) (* (,name ,object) ,design-size)))
-
-#i(freeze-dimensions 2)
-(defmacro freeze-dimensions (object design-size &rest dimensions)
-  "Multiply all DIMENSIONS in OBJECT by DESIGN-SIZE."
-  `(progn ,@(mapcar (lambda (dimension)
-		      (list 'freeze-dimension dimension object design-size))
-	      dimensions)))
-
 (defgeneric freeze (font)
   (:documentation "Freeze FONT.
 If FONT is already frozen, signal an ALREADY-FROZEN error.
@@ -376,16 +375,16 @@ units are multiplied by it, so as to lead values in TeX point units.")
     (when (frozen font) (error 'already-frozen :font font)))
   (:method (font &aux (design-size (design-size font)))
 "Multiply all FONT dimensions normally expressed in design size units by it."
-    (freeze-dimensions font design-size
-      interword-space interword-stretch interword-shrink ex em extra-space)
+    (map-font-dimension-accessors slot font
+      (setf slot (* design-size slot)))
     (when (parameters font)
       (loop :for i :from 0 :upto (1- (length (parameters font)))
 	    :do (setf (aref (parameters font) i)
 		      (* (aref (parameters font) i) design-size))))
     (maphash (lambda (code character)
 	       (declare (ignore code))
-	       (freeze-dimensions character design-size
-		 width height depth italic-correction))
+	       (map-character-metrics-dimension-accessors slot character
+		 (setf slot (* design-size slot))))
 	     (characters font))
     (maphash (lambda (pair kern)
 	       (setf (kerning (car pair) (cdr pair)) (* kern design-size)))
@@ -400,6 +399,22 @@ units are multiplied by it, so as to lead values in TeX point units.")
 ;; ==========================================================================
 ;; Math Symbols Font
 ;; ==========================================================================
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +math-symbols-font-dimension-accessors+
+      '(num1 num2 num3
+	denom1 denom2
+	sup1 sup2 sup3
+	sub1 sub2
+	supdrop subdrop
+	delim1 delim2
+	axis-height)
+    "The list of dimension accessor names in the MATH-SYMBOLS-FONT class."))
+
+(defmacro map-math-symbols-font-dimension-accessors (var font &body body)
+  "Map BODY on FONT dimension accessors available as VAR."
+  `(map-accessors ,var ,font ,+math-symbols-font-dimension-accessors+
+     ,@body))
 
 (defclass math-symbols-font (font)
   ((num1
@@ -469,9 +484,8 @@ scheme."))
 (defmethod freeze :around
     ((font math-symbols-font) &aux (design-size (design-size font)))
   "Multiply all FONT dimensions normally expressed in design size units by it."
-  (freeze-dimensions font design-size
-    num1 num2 num3 denom1 denom2 sup1 sup2 sup3 sub1 sub2 supdrop subdrop
-    delim1 delim2 axis-height)
+  (map-math-symbols-font-dimension-accessors slot font
+    (setf slot (* design-size slot)))
   (call-next-method))
 
 
@@ -479,6 +493,18 @@ scheme."))
 ;; ==========================================================================
 ;; Math Symbols Font
 ;; ==========================================================================
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +math-extension-font-dimension-accessors+
+      '(default-rule-thickness
+	big-op-spacing1 big-op-spacing2 big-op-spacing3 big-op-spacing4
+	big-op-spacing5)
+    "The list of dimension accessor names in the MATH-EXTENSION-FONT class."))
+
+(defmacro map-math-extension-font-dimension-accessors (var font &body body)
+  "Map BODY on math extension FONT dimension accessors available as VAR."
+  `(map-accessors ,var ,font ,+math-extension-font-dimension-accessors+
+     ,@body))
 
 (defclass math-extension-font (font)
   ((default-rule-thickness
@@ -512,9 +538,8 @@ scheme."))
 (defmethod freeze :around
     ((font math-extension-font) &aux (design-size (design-size font)))
   "Multiply all FONT dimensions normally expressed in design size units by it."
-  (freeze-dimensions font design-size
-    default-rule-thickness big-op-spacing1 big-op-spacing2 big-op-spacing3
-    big-op-spacing4 big-op-spacing5)
+  (map-math-extension-font-dimension-accessors slot font
+    (setf slot (* design-size slot)))
   (call-next-method))
 
 ;;; font.lisp ends here
