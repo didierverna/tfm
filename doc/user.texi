@@ -459,6 +459,7 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 * Font Information::            Global properties
 * Character Information::       Code, box dimensions, etc.
 * Ligatures and Kernings::      For pairs of characters
+* Scaling and Freezing::        Limiting the cost of arithmetics
 @end menu
 
 @node TFM Files, Font Information, Normal Use, Normal Use
@@ -743,7 +744,7 @@ an extension recipe (so only the top, middle, and bottom characters may
 be @nil{}).
 
 
-@node Ligatures and Kernings,  , Character Information, Normal Use
+@node Ligatures and Kernings, Scaling and Freezing, Character Information, Normal Use
 @section Ligatures and Kernings
 The TFM format encodes so called ``ligature / kerning programs'',
 allowing font designers to specify particular spacing between
@@ -800,6 +801,75 @@ characters before and after the composite.
 @code{pass-over}: the number of characters to skip in order to reach the
 next one, once the ligature has been made.
 @end itemize
+
+
+@node Scaling and Freezing,  , Ligatures and Kernings, Normal Use
+@section Scaling and Freezing
+As we have seen, all dimensions in a TFM file are expressed in design
+size units. The idea is to make it simple for @TeX{} to scale a font.
+Indeed, when a @TeX{} user does @code{\font\foo=cmr10 at 12pt} or
+@code{\font\foo=cmr10 scaled 1200}, all @TeX{} has to do is change the
+font's design size. The drawback, on the other hand, is that in order to
+actually use the various font dimensions, they need to be multiplied by
+the design size in question every time.
+
+@menu
+* Scaling::                     Changing the design size
+* Freezing::                    Converting dimensions in TeX point units
+@end menu
+
+@node Scaling, Freezing, Scaling and Freezing, Scaling and Freezing
+@subsection Scaling
+@cindex Font scaling
+@cindex Scaling
+@fkindex{load-font,design-size}@c
+@tfm{} allows you to modify the design size of a font in two different
+ways. The first option is to override the original design size at
+load-time, by calling @code{load-font} with the @kwd{design-size} key.
+For example, @code{(load-font "cmr10.tfm" :design-size 12)} will load
+the 10pt Computer Modern roman font at a design size of 12pt.
+
+@clsaindex{font,design-size}@c
+The other option is to change the design size of a font later on, simply
+by using the @code{design-size} writer, for example like this:
+@code{(setf (design-size font) 12)}. Note however that the design size
+of a frozen font cannot be changed anymore (@pxref{Freezing}).
+
+In any case, the design size must in principle be expressed in @TeX{}
+point units, and must be greater or equal to 1. One exception to this
+rule is if you are @emph{not} working with @TeX{} points. In such a
+situation, you could probably hack your own custom design size in, to
+express the font's various metrics in another unit of measurement.
+
+
+@node Freezing,  , Scaling, Scaling and Freezing
+@subsection Freezing
+@cindex Font freezing
+@cindex Freezing
+If you don't plan on changing the design size of a font, or if you want
+to save some arithmetic operations, you may want to @emph{freeze} the
+font. Freezing means that all dimensions normally expressed in design
+size units will be converted to @TeX{} point units once and for all (by
+multiplying them by the design size in question). This includes
+character metrics, kerns, interword space @etc{} Everything. That way,
+you won't have to do the multiplication by yourself every time a
+dimension is accessed.
+
+@fkindex{load-font,freeze}@c
+Again, there are two ways to freeze a font. The first option is to do it
+at load-time, by calling @code{load-font} with the @kwd{freeze} key (a
+Boolean). For instance, after calling @code{(load-font "cmr10.tfm"
+:design-size 12 :freeze t)}, @code{(em font)} will return 12.000034
+instead of 1.0000029.
+
+The other way to freeze a font is to do it later on, by using the
+@code{freeze} function.
+@defun freeze FONT
+Freeze @var{FONT}.
+Freezing a font means that all dimensions normally expressed in design size
+units are multiplied by it, so as to lead values in @TeX{} point units.
+Note that it is an error to attempt to freeze an already frozen font.
+@end defun
 
 
 
