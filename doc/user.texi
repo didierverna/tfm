@@ -877,8 +877,22 @@ Freeze @var{FONT}.
 
 Freezing a font means that all dimensions normally expressed in design size
 units are multiplied by it, so as to lead values in @TeX{} point units.
-If @var{FONT} is already frozen, this function does nothing.
+If @var{FONT} is already frozen, this function does nothing and returns
+@nil{}. Otherwise, it returns @code{t}.
 @end defun
+
+You can unfreeze a font at any time with the following function.
+@defun unfreeze FONT
+Unfreeze @var{FONT}.
+
+Unfreezing means performing the inverse of what @code{freeze} does.
+If @var{FONT} is not frozen, this function does nothing and returns
+@nil{}. Otherwise, it returns @code{t}.
+@end defun
+
+Finally, note that if you change the design size of a frozen font, the
+font remains frozen and all concerned dimensions are updated to reflect
+the change.
 
 
 
