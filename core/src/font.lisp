@@ -108,20 +108,20 @@ along with potential scaling information."
     :initform nil
     :initarg :file
     :accessor file)
+   (checksum
+    :documentation "The font's checksum, as provided by Metafont."
+    :accessor checksum)
    (frozen
     :documentation "Whether the font is frozen."
     :initform nil
     :accessor frozen)
-   (checksum
-    :documentation "The font's checksum, as provided by Metafont."
-    :accessor checksum)
-   (original-design-size
-    :documentation "The font's original design size, in units of TeX points."
-    :accessor original-design-size)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :initform nil
     :accessor design-size)
+   (original-design-size
+    :documentation "The font's original design size, in units of TeX points."
+    :accessor original-design-size)
    (encoding
     :documentation "The font's character coding scheme (a BCPL string), or NIL."
     :initform nil
