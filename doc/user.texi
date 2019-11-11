@@ -850,7 +850,6 @@ rule is if you are @emph{not} working with @TeX{} points. In such a
 situation, you could probably hack your own custom design size in, to
 express the font's various metrics in another unit of measurement.
 
-
 @node Freezing,  , Scaling, Scaling and Freezing
 @subsection Freezing
 @cindex Font freezing
@@ -988,6 +987,9 @@ Accessors:
 @code{character1} and @code{character2}: the two characters involved.
 @end itemize
 @end deftp
+
+Finally, an attempt at changing the design size of a font to something
+that is not a real greater or equal to 1 will just signal a type error.
 
 
 @node TFM Compliance Problems,  , Erroneous Usage, Abnormal Situations
