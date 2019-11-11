@@ -377,35 +377,44 @@ DIFFERENT-FONTS error."
 ;; Freezing
 ;; --------
 
-(defgeneric %freeze (font)
-  (:documentation "Perform FONT freezing.")
-  (:method (font &aux (design-size (design-size font)))
-"Multiply all FONT dimensions normally expressed in design size units by it."
+(defgeneric scale (font factor)
+  (:documentation "Scale all FONT dimensions by FACTOR.")
+  (:method (font factor)
+    "Scaling method for regular FONTs."
     (map-font-dimension-accessors slot font
-      (setf slot (* design-size slot)))
+      (setf slot (* slot factor)))
     (when (parameters font)
       (loop :for i :from 0 :upto (1- (length (parameters font)))
 	    :do (setf (aref (parameters font) i)
-		      (* (aref (parameters font) i) design-size))))
+		      (* (aref (parameters font) i) factor))))
     (maphash (lambda (code character)
 	       (declare (ignore code))
 	       (map-character-metrics-dimension-accessors slot character
-		 (setf slot (* design-size slot))))
+		 (setf slot (* slot factor))))
 	     (characters font))
     (maphash (lambda (pair kern)
-	       (setf (kerning (car pair) (cdr pair)) (* kern design-size)))
-	     (kernings font))
-    (values))
-  (:method :after (font)
-    "Mark FONT as frozen."
-    (setf (frozen font) t)))
+	       (setf (kerning (car pair) (cdr pair)) (* kern factor)))
+	     (kernings font))))
 
 (defun freeze (font)
   "Freeze FONT.
 Freezing a font means that all dimensions normally expressed in design size
-units are multiplied by it, so as to lead values in TeX point units. If FONT
-is already frozen, this function does nothing."
-  (unless (frozen font) (%freeze font)))
+units are multiplied by it, so as to lead values in TeX point units.
+If FONT is already frozen, this function does nothing and returns NIL.
+Otherwise, it returns T."
+  (unless (frozen font)
+    (scale font (design-size font))
+    (setf (frozen font) t)))
+
+(defun unfreeze (font)
+  "Unfreeze FONT.
+Unfreezing means performing the inverse of what FREEZE does.
+If FONT is not frozen, this function does nothing and returns NIL. Otherwise,
+it returns T."
+  (when (frozen font)
+    (scale font (/ 1 (design-size font)))
+    (setf (frozen font) nil)
+    t))
 
 
 
@@ -524,11 +533,10 @@ frozen."
 This class represents fonts with the \"TeX math symbols\" character coding
 scheme."))
 
-(defmethod %freeze :around
-    ((font math-symbols-font) &aux (design-size (design-size font)))
-  "Multiply all FONT dimensions normally expressed in design size units by it."
+(defmethod scale :around ((font math-symbols-font) factor)
+  "Scaling method for MATH-SYMBOL-FONTs."
   (map-math-symbols-font-dimension-accessors slot font
-    (setf slot (* design-size slot)))
+    (setf slot (* slot factor)))
   (call-next-method))
 
 
@@ -590,11 +598,10 @@ frozen."
 This class represents fonts with the \"TeX math extension\" character coding
 scheme."))
 
-(defmethod %freeze :around
-    ((font math-extension-font) &aux (design-size (design-size font)))
-  "Multiply all FONT dimensions normally expressed in design size units by it."
+(defmethod scale :around ((font math-extension-font) factor)
+  "Scaling method for MATH-EXTENSION-FONTs."
   (map-math-extension-font-dimension-accessors slot font
-    (setf slot (* design-size slot)))
+    (setf slot (* slot factor)))
   (call-next-method))
 
 ;;; font.lisp ends here

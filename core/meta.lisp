@@ -72,7 +72,7 @@
     :get-character
     :different-fonts :character1 :character2
     :ligature :kerning
-    :already-frozen :font :freeze
+    :freeze :unfreeze
     :math-symbols-font
     :num1 :num2 :num3 :denom1 :denom2 :sup1 :sup2 :sup3 :sub1 :sub2
     :supdrop :subdrop :delim1 :delim2 :axis-height
