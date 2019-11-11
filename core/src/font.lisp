@@ -261,6 +261,11 @@ subclasses."))
   "Rescale FONT if frozen."
   (when (frozen font) (scale font (design-size font))))
 
+(defmethod (setf design-size) :around (design-size font)
+  "Check that DESIGN-SIZE is a real greater or equal to 1."
+  (check-type design-size (real 1))
+  (call-next-method design-size font))
+
 (defmethod print-object ((font font) stream)
   "Print FONT unreadably with its name to STREAM."
   (print-unreadable-object (font stream :type t)

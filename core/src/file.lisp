@@ -787,9 +787,7 @@ Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-SECTION-LENGTHS error."
 
   ;; 0. Handle early, user-provided information.
-  (when design-size
-    (check-type design-size (real 1))
-    (setf (design-size font) design-size))
+  (when design-size (setf (design-size font) design-size))
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   ;; #### NOTE: the errors signalled below (directly, or by READ-U16) are
