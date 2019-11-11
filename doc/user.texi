@@ -997,8 +997,8 @@ that is not a real greater or equal to 1 will just signal a type error.
 @tfm{} is very thorough in the checks it performs while reading TFM
 data, to the point that it could probably be used as a validation tool.
 Every compliance problem detected will be signalled with a warning or an
-error, depending on the seriousness of the problem (in fact, only one
-compliance condition is a warning currently; all others being errors).
+error, depending on the seriousness of the problem (in fact, only two
+compliance conditions are warnings currently; all others being errors).
 At the same time, @tfm{} also tries to offer a way out of problematic
 situations (in the form of restarts, currently non-interactive), when it
 sounds reasonable. This means that it is almost always possible to load
@@ -1009,13 +1009,13 @@ a font, however broken it may be.
 When loading a file, a restart named @code{cancel-loading} is always
 active. If invoked, @code{load-font} will just abort and return @nil{}.
 Otherwise, the available restarts depend on the dynamic context and the
-particular condition being signalled. The following graph depicts the
-conditions / restarts ontology related to compliance problems@c
+particular condition being signalled. The graph on the next page depicts
+the conditions / restarts ontology related to compliance problems@c
 @ifinfo
  (warning: depending on your info reader, the graph may or may not be
 actually visible)@c
 @end ifinfo
-. Green squares denote warnings, red ones denote errors, and blue
+. Green boxes denote warnings, red ones denote errors, and blue
 ellipses denote restarts. By following a branch from left to right in
 this graph, you get an idea of which restarts are available when a
 specific condition is signalled. They are ordered by decreasing
@@ -1028,6 +1028,19 @@ specific code path in the library. Different code paths may have
 different restarts with the same name when it makes sense, but eponymous
 restarts are ``merged'' into a single node in the graph.
 
+@fkindex{load-font,design-size}@c
+One particular case deserves some additional bits of information though.
+You will notice the existence of both an @code{invalid-design-size}
+@emph{error}, and an @code{invalid-original-design-size} @emph{warning}.
+Remember that these do not concern user-provided design sizes, which may
+only trigger a type error (@pxref{Erroneous Usage}). In the default
+case, the @code{invalid-design-size} error is signalled when a TFM file
+is not compliant. If, however, you have call @code{load-font} with an
+alternative @kwd{design-size}, you are effectively overriding the
+original value, which will never be used. In that case, only a warning
+is signalled: the @code{invalid-original-design-size} warning.
+
+@page
 @ifinfo
 @center @image{tfm-user-data/conditions}
 @end ifinfo
