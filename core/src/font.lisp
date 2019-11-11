@@ -377,23 +377,8 @@ DIFFERENT-FONTS error."
 ;; Freezing
 ;; --------
 
-(define-condition already-frozen (tfm-usage-error)
-  ((font :documentation "The frozen font." :initarg :font :accessor font))
-  (:report (lambda (already-frozen stream)
-	     (format stream "Font ~A is already frozen."
-	       (font already-frozen))))
-  (:documentation "The Already Frozen usage error.
-It signals an attempt at freezing an already frozen font."))
-
-(defgeneric freeze (font)
-  (:documentation "Freeze FONT.
-Freezing a font means that all dimensions normally expressed in design size
-units are multiplied by it, so as to lead values in TeX point units.
-
-If FONT is already frozen, signal an ALREADY-FROZEN error.")
-  (:method :before (font)
-    "Make sure that FONT isn't already frozen."
-    (when (frozen font) (error 'already-frozen :font font)))
+(defgeneric %freeze (font)
+  (:documentation "Perform FONT freezing.")
   (:method (font &aux (design-size (design-size font)))
 "Multiply all FONT dimensions normally expressed in design size units by it."
     (map-font-dimension-accessors slot font
@@ -414,6 +399,13 @@ If FONT is already frozen, signal an ALREADY-FROZEN error.")
   (:method :after (font)
     "Mark FONT as frozen."
     (setf (frozen font) t)))
+
+(defun freeze (font)
+  "Freeze FONT.
+Freezing a font means that all dimensions normally expressed in design size
+units are multiplied by it, so as to lead values in TeX point units. If FONT
+is already frozen, this function does nothing."
+  (unless (frozen font) (%freeze font)))
 
 
 
@@ -532,7 +524,7 @@ frozen."
 This class represents fonts with the \"TeX math symbols\" character coding
 scheme."))
 
-(defmethod freeze :around
+(defmethod %freeze :around
     ((font math-symbols-font) &aux (design-size (design-size font)))
   "Multiply all FONT dimensions normally expressed in design size units by it."
   (map-math-symbols-font-dimension-accessors slot font
@@ -598,7 +590,7 @@ frozen."
 This class represents fonts with the \"TeX math extension\" character coding
 scheme."))
 
-(defmethod freeze :around
+(defmethod %freeze :around
     ((font math-extension-font) &aux (design-size (design-size font)))
   "Multiply all FONT dimensions normally expressed in design size units by it."
   (map-math-extension-font-dimension-accessors slot font
