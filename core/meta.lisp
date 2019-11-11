@@ -62,8 +62,9 @@
 
     ;; Font src/font.lisp:
     :ligature :composite :delete-before :delete-after :pass-over
-    :font :name :file :checksum :design-size :encoding :family :7bits-safe
-    :face-number :weight :slope :expansion :face-code
+    :font :name :file :checksum :frozen :design-size :original-design-size
+    :encoding :family :7bits-safe :face-number :weight :slope :expansion
+    :face-code
     :slant :interword-space :interword-stretch :interword-shrink :ex :em
     :extra-space :parameters :min-code :max-code :character-count
     :boundary-character
