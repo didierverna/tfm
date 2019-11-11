@@ -842,8 +842,7 @@ the 10pt Computer Modern roman font at a design size of 12pt.
 @clsaindex{font,design-size}@c
 The other option is to change the design size of a font later on, simply
 by using the @code{design-size} writer, for example like this:
-@code{(setf (design-size font) 12)}. Note however that the design size
-of a frozen font cannot be changed anymore (@pxref{Freezing}).
+@code{(setf (design-size font) 12)}.
 
 In any case, the design size must in principle be expressed in @TeX{}
 point units, and must be greater or equal to 1. One exception to this
@@ -856,14 +855,13 @@ express the font's various metrics in another unit of measurement.
 @subsection Freezing
 @cindex Font freezing
 @cindex Freezing
-If you don't plan on changing the design size of a font, or if you want
-to save some arithmetic operations, you may want to @emph{freeze} the
-font. Freezing means that all dimensions normally expressed in design
-size units will be converted to @TeX{} point units once and for all (by
-multiplying them by the design size in question). This includes
-character metrics, kerns, interword space @etc{} Everything. That way,
-you won't have to do the multiplication by yourself every time a
-dimension is accessed.
+If you want to save some arithmetic operations, you may want to
+@emph{freeze} the font. Freezing means that all dimensions normally
+expressed in design size units will be converted to @TeX{} point units
+once and for all (by multiplying them by the design size in question).
+This includes character metrics, kerns, interword space @etc{}
+Everything. That way, you won't have to do the multiplication by
+yourself every time a dimension is accessed.
 
 @fkindex{load-font,freeze}@c
 Again, there are two ways to freeze a font. The first option is to do it
@@ -876,9 +874,10 @@ The other way to freeze a font is to do it later on, by using the
 @code{freeze} function.
 @defun freeze FONT
 Freeze @var{FONT}.
+
 Freezing a font means that all dimensions normally expressed in design size
 units are multiplied by it, so as to lead values in @TeX{} point units.
-Note that it is an error to attempt to freeze an already frozen font.
+If @var{FONT} is already frozen, this function does nothing.
 @end defun
 
 
