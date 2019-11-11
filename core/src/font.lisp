@@ -253,6 +253,14 @@ This class represents decoded font information. Within the context of this
 library, the term \"font\" denotes an instance of this class, or of one of its
 subclasses."))
 
+(defmethod (setf design-size) :before (design-size font)
+  "Unscale FONT if frozen."
+  (when (frozen font) (scale font (/ 1 (design-size font)))))
+
+(defmethod (setf design-size) :after (design-size font)
+  "Rescale FONT if frozen."
+  (when (frozen font) (scale font (design-size font))))
+
 (defmethod print-object ((font font) stream)
   "Print FONT unreadably with its name to STREAM."
   (print-unreadable-object (font stream :type t)
