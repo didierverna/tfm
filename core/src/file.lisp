@@ -66,14 +66,18 @@ INVALID-ORIGINAL-DESIGN-SIZE warning."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
   ;; LOAD-TFM-FONT.
   (setf (checksum font) (read-u32))
-  (let ((design-size (read-fix-word nil)))
-    (unless (>= design-size 1)
-      (if (design-size font)
-	(warn 'invalid-original-design-size :value design-size)
-	(restart-case (error 'invalid-design-size :value design-size)
-	  (set-to-ten () :report "Set it to 10pt." (setq design-size 10)))))
-    (unless (design-size font) (setf (design-size font) design-size)))
-  (decf length 2)
+  (decf length)
+  (setf (original-design-size font) (read-fix-word nil))
+  (unless (>= (original-design-size font) 1)
+    (if (design-size font)
+      (warn 'invalid-original-design-size :value (original-design-size font))
+      (restart-case
+	  (error 'invalid-design-size :value (original-design-size font))
+	(set-to-ten () :report "Set it to 10pt."
+	  (setf (original-design-size font) 10)))))
+  (unless (design-size font)
+    (setf (design-size font) (original-design-size font)))
+  (decf length)
   ;; #### NOTE: we silently assume Xerox PARC headers below. Not sure if
   ;; anything else could be in use, but it's impossible to tell from the files
   ;; themselves. TeX Live 2019 doesn't seem to have anything else.
@@ -765,8 +769,7 @@ It signals that a declared TFM table's length is out of range."))
 - FILE defaults to *STREAM*'s associated file if any.
 - NAME defaults to the FILE's base name, if any.
 - If DESIGN-SIZE is provided and not a real greater or equal to 1, signal a
-  type error. Otherwise, override the original design size with it and adapt
-  the font's name accordingly.
+  type error. Otherwise, override the original design size with it.
 - When FREEZE (NIL by default), freeze the font immediately after creation.
 
 If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
@@ -784,13 +787,9 @@ Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-SECTION-LENGTHS error."
 
   ;; 0. Handle early, user-provided information.
-  ;; #### NOTE: we don't keep track of the design size history (whether it was
-  ;; overridden). Only the font's name will reflect that. This could be
-  ;; discussed.
   (when design-size
     (check-type design-size (real 1))
-    (setf (design-size font) design-size)
-    (setf (name font) (format nil "~A at ~Apt" (name font) design-size)))
+    (setf (design-size font) design-size))
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   ;; #### NOTE: the errors signalled below (directly, or by READ-U16) are

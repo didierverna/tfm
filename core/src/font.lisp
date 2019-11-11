@@ -115,6 +115,9 @@ along with potential scaling information."
    (checksum
     :documentation "The font's checksum, as provided by Metafont."
     :accessor checksum)
+   (original-design-size
+    :documentation "The font's original design size, in units of TeX points."
+    :accessor original-design-size)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :initform nil
@@ -254,6 +257,8 @@ subclasses."))
   "Print FONT unreadably with its name to STREAM."
   (print-unreadable-object (font stream :type t)
     (princ (name font) stream)
+    (unless (= (design-size font) (original-design-size font))
+      (format stream " at ~Apt" (design-size font)))
     (when (frozen font) (princ " (frozen)" stream))))
 
 ;; #### NOTE: this error is not currently exported, because it cannot in fact
