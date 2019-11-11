@@ -527,6 +527,9 @@ loaded from (for example @code{"cmr10"}).
 @clsaindex{font,file}@c
 @code{file}: the argument to @code{load-font}.
 @item
+@clsaindex{font,frozen}@c
+@code{frozen}: whether the font is frozen (@pxref{Freezing}).
+@item
 @clsaindex{font,checksum}@c
 @code{checksum}: part of the TFM format, provided by Metafont.
 @item
@@ -536,9 +539,11 @@ loaded from (for example @code{"cmr10"}).
 @cindex Unit, design size
 @clsaindex{font,design-size}@c
 @code{design-size}: in units of @TeX{} point. For example, the design
-size of @t{cmr10} (the Computer Modern 10pt font) is 10. Apart from the
-@emph{slant} (see below), all other dimensions are given in design size
-units (not @TeX{} point units!).
+size of @t{cmr10} (the Computer Modern 10pt roman font) is 10. Apart
+from the @emph{slant} (see below), all other dimensions are given in
+design size units, not @TeX{} point units (unless the font has been
+frozen; @xref{Freezing}). See also @ref{Scaling} for ways to override
+the font's original design size.
 @end itemize
 
 @tfm{} is able to decode Xerox PARC headers when provided (see @TeX{}
@@ -706,12 +711,13 @@ the font instance (see the function @code{get-character}).
 @clsaindex{character-metrics,height}@c
 @clsaindex{character-metrics,depth}@c
 @code{width}, @code{height}, and @code{depth}: the character box
-dimensions, in design size units.
+dimensions, in design size units (but see @ref{Freezing}).
 @item
 @clsaindex{character-metrics,italic-correction}@c
 @code{italic-correction}: the character's italic correction, in design
-size units. @TeX{} uses this value for regular characters followed by
-the command @code{\/}, and also in math mode for superscript placement.
+size units (but see @ref{Freezing}). @TeX{} uses this value for regular
+characters followed by the command @code{\/}, and also in math mode for
+superscript placement.
 @item
 @cindex Character list
 @clsaindex{character-metrics,next-character}@c
@@ -768,7 +774,8 @@ Return kerning for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.@*
 Both characters must belong to the same font.
 @end defun
 
-The kerning, if it exists, is in design size units.
+The kerning, if it exists, is in design size units (but see
+@ref{Freezing}).
 
 @node Ligatures,  , Kernings, Ligatures and Kernings
 @subsection Ligatures
