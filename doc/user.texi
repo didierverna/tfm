@@ -833,16 +833,19 @@ the design size in question every time.
 @cindex Font scaling
 @cindex Scaling
 @fkindex{load-font,design-size}@c
+@clsaindex{font,design-size}@c
 @tfm{} allows you to modify the design size of a font in two different
 ways. The first option is to override the original design size at
 load-time, by calling @code{load-font} with the @kwd{design-size} key.
 For example, @code{(load-font "cmr10.tfm" :design-size 12)} will load
-the 10pt Computer Modern roman font at a design size of 12pt.
+the 10pt Computer Modern roman font at a design size of 12pt. The other
+option is to change the design size of a font later on, simply by using
+the @code{design-size} writer, for example like this: @code{(setf
+(design-size font) 12)}.
 
-@clsaindex{font,design-size}@c
-The other option is to change the design size of a font later on, simply
-by using the @code{design-size} writer, for example like this:
-@code{(setf (design-size font) 12)}.
+@clsaindex{font,original-design-size}@c
+Note that you can always revert the font to the original design size,
+since that value is remembered (@pxref{Font Information}).
 
 In any case, the design size must in principle be expressed in @TeX{}
 point units, and must be greater or equal to 1. One exception to this
@@ -1037,8 +1040,11 @@ only trigger a type error (@pxref{Erroneous Usage}). In the default
 case, the @code{invalid-design-size} error is signalled when a TFM file
 is not compliant. If, however, you have call @code{load-font} with an
 alternative @kwd{design-size}, you are effectively overriding the
-original value, which will never be used. In that case, only a warning
-is signalled: the @code{invalid-original-design-size} warning.
+original value, which will not be used. In that case, only a warning
+is signalled: the @code{invalid-original-design-size} warning. Finally,
+please consider that leaving that warning alone means that an invalid
+original design size will be kept around in the font, so if you plan on
+using it later on, you're looking for trouble.
 
 @page
 @ifinfo
