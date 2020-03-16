@@ -2,7 +2,7 @@
 
 @c user.texi --- User manual
 
-@c Copyright (C) 2019 Didier Verna
+@c Copyright (C) 2019, 2020 Didier Verna
 
 @c Author: Didier Verna <didier@didierverna.net>
 
@@ -41,7 +41,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.1 "Carolingan Miniscules"
-@set COPYRIGHT_DATE 2018, 2019
+@set COPYRIGHT_DATE 2018-2020
 @setchapternewpage odd
 @documentdescription
 The TFM User Manual for version @value{VERSION}.

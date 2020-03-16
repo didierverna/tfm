@@ -1,6 +1,6 @@
 ;;; setup.lisp --- TFM setup
 
-;; Copyright (C) 2019 Didier Verna
+;; Copyright (C) 2019, 2020 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
