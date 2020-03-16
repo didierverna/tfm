@@ -1,2 +1,2 @@
-LONG_VERSION  := 1.0 patchlevel 4 "Artificial Uncial"
-SHORT_VERSION := 1.0.4
+LONG_VERSION  := 1.1 "Carolingan Miniscules"
+SHORT_VERSION := 1.1

@@ -45,16 +45,16 @@
 (defparameter *release-major-level* 1
   "The major level of this release.")
 
-(defparameter *release-minor-level* 0
+(defparameter *release-minor-level* 1
   "The minor level of this release.")
 
 (defparameter *release-status* :patchlevel
   "The status of this release.")
 
-(defparameter *release-status-level* 4
+(defparameter *release-status-level* 0
   "The status level of this release.")
 
-(defparameter *release-name* "Artificial Uncial"
+(defparameter *release-name* "Carolingan Miniscules"
   "The name of this release.
 The general naming theme for TFM is \"Uncial Fonts\", from the LaTeX Font
 Catalogue (https://www.tug.org/FontCatalogue/uncialfonts.html).")

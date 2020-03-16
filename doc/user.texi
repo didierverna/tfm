@@ -40,7 +40,7 @@
 @c ====================================================================
 @c Settings
 @c ====================================================================
-@set VERSION 1.0 patchlevel 4 "Artificial Uncial"
+@set VERSION 1.1 "Carolingan Miniscules"
 @set COPYRIGHT_DATE 2018, 2019
 @setchapternewpage odd
 @documentdescription
