@@ -1,6 +1,6 @@
 ;;; net.didierverna.tfm.asd --- ASDF system definition
 
-;; Copyright (C) 2019 Didier Verna
+;; Copyright (C) 2019, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -25,9 +25,7 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.tfm.setup)
-
-(asdf:defsystem :net.didierverna.tfm
+(defsystem :net.didierverna.tfm
   :long-name "TeX Font Metrics"
   :description "A Common Lisp interface to the TeX Font Metrics format"
   :long-description "\
@@ -40,7 +38,8 @@ Common Lisp."
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/typesetting.php#tfm"
   :source-control "https://github.com/didierverna/tfm"
   :license "BSD"
-  :version #.(net.didierverna.tfm.setup:version :short)
-  :depends-on (:net.didierverna.tfm.setup :net.didierverna.tfm.core))
+  :version (:read-file-line #p"make/version.make"
+	     :at (1 (lambda (str) (subseq str 19))))
+  :depends-on (:net.didierverna.tfm.core))
 
 ;;; net.didierverna.tfm.asd ends here

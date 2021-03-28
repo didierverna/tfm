@@ -1,6 +1,6 @@
-;;; version.cl --- TFM version extractor script
+;;; configuration.lisp --- TFM configuration management
 
-;; Copyright (C) 2019, 2021 Didier Verna
+;; Copyright (C) 2019-2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -25,19 +25,23 @@
 
 ;;; Code:
 
-(in-package :cl-user)
+(in-package :net.didierverna.tfm.setup)
 
-(require "asdf")
 
-(asdf:load-system :net.didierverna.tfm.setup)
+(defvar *configuration* nil
+  "The TFM configuration settings.
+This variable contains a property list of configuration options.
+Current options are:
+- :swank-eval-in-emacs (Boolean)
 
-(format t "LONG_VERSION    := ~A~%~
-	   SHORT_VERSION   := ~A~%~
-	   COPYRIGHT_YEARS := ~A~%"
-  (net.didierverna.tfm.setup:version :long)
-  (net.didierverna.tfm.setup:version :short)
-  net.didierverna.tfm.setup:*copyright-years*)
+See Chapter 5 of the user manual for more information.")
 
-(uiop:quit)
+(defun configuration (key)
+  "Return KEY's value in the current TFM configuration."
+  (getf *configuration* key))
 
-;;; version.cl ends here
+(defun configure (key value)
+  "Set KEY to VALUE in the current TFM configuration."
+  (setf (getf *configuration* key) value))
+
+;;; configuration.lisp ends here

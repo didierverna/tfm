@@ -1,6 +1,6 @@
 ;;; generate.cl --- TFM reference manual generation script
 
-;; Copyright (C) 2019 Didier Verna
+;; Copyright (C) 2019, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -26,8 +26,6 @@
 ;;; Code:
 
 (require "asdf")
-
-(defconstant +copyright-years+ "2018, 2019")
 
 (defconstant +introduction+
   "@macro tfm
@@ -65,28 +63,25 @@ for a more human-readable guide to using @tfm{}."
 (net.didierverna.declt:nickname-package)
 
 ;; ASDF doesn't understand my version numbering scheme. That will change soon,
-;; but in the meantime, I have to provide my version number explicitly here.
+;; but in the meantime, I have to provide my version number explicitly here
+;; (and so I need to load at least the setup system in order to get the
+;; VERSION function).
 (asdf:load-system :net.didierverna.tfm.setup)
 
-(if (and (second sb-ext:*posix-argv*)
-	 (string= (second sb-ext:*posix-argv*) "--web"))
-    (declt:declt :net.didierverna.tfm
-		 :library-name "TFM"
-		 :version (net.didierverna.tfm.setup:version :long)
-		 :copyright-years +copyright-years+
-		 :license :bsd
-		 :introduction +introduction+
-		 :texi-name "webreference"
-		 :info-name "tfm-webreference") ; but we don't care
-    (declt:declt :net.didierverna.tfm
-		 :library-name "TFM"
-		 :version (net.didierverna.tfm.setup:version :long)
-		 :copyright-years +copyright-years+
-		 :license :bsd
-		 :introduction +introduction+
-		 :texi-name "reference"
-		 :info-name "tfm-reference"
-		 :hyperlinks t))
+(defvar *hyperlinks* nil)
+(when (and (second sb-ext:*posix-argv*)
+	   (string= (second sb-ext:*posix-argv*) "--hyperlinks"))
+  (setq *hyperlinks* t))
+
+(declt:declt :net.didierverna.tfm
+	     :library-name "TFM"
+	     :version (net.didierverna.tfm.setup:version :long)
+	     :copyright-years net.didierverna.tfm.setup:*copyright-years*
+	     :license :bsd
+	     :introduction +introduction+
+	     :texi-name "reference"
+	     :info-name "tfm-reference"
+	     :hyperlinks *hyperlinks*)
 
 (uiop:quit)
 

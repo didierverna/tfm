@@ -1,6 +1,6 @@
-;;; declt.cl --- Declt availability checking script
+;;; setup.lisp --- TFM setup package definition
 
-;; Copyright (C) 2019 Didier Verna
+;; Copyright (C) 2019-2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -21,26 +21,24 @@
 
 ;;; Commentary:
 
-;; Contents management by FCM version 0.1.
 
 
 ;;; Code:
 
-(require "asdf")
+(in-package :cl-user)
 
-(with-open-file (stream "declt.make" :direction :output :if-exists :supersede)
-  (princ "TEXI_REF :=" stream)
-  (handler-case
-      (progn (asdf:load-system :net.didierverna.declt)
-	     (princ " reference.texi" stream))
-  (asdf:missing-component ()
-    (format *error-output* "~
-*********************************************************************
-* WARNING: ASDF component NET.DIDIERVERNA.DECLT not found.          *
-* The TFM reference manual will not be generated.                   *
-*********************************************************************~%")))
-  (terpri stream))
+(defpackage :net.didierverna.tfm.setup
+  (:documentation "The TFM setup library's package.")
+  (:use :cl)
+  (:import-from :named-readtables :defreadtable :in-readtable)
+  (:export
+    :in-readtable
+    ;; From src/version.lisp:
+    :*copyright-years*
+    :*release-major-level* :*release-minor-level* :*release-status*
+    :*release-status-level* :*release-name*
+    :version
+    ;; From src/configuration.lisp:
+    :configuration :configure))
 
-(uiop:quit)
-
-;;; declt.cl ends here
+;; package.lisp ends here

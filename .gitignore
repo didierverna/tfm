@@ -1,25 +1,11 @@
-.clisp.cnf
-
-sbcl-*/
-cmu-*/
-openmcl-*/
-
-doc/declt.make
-
 doc/conditions.eps
 doc/conditions.pdf
 doc/conditions.png
 doc/tfm-user-data
 doc/user.pdf
-doc/user.pdf
 doc/user.ps
 doc/user/
 
-doc/reference.texi
 doc/reference.pdf
 doc/reference.ps
 doc/reference/
-
-doc/webreference.texi
-doc/webreference.pdf
-doc/webreference/

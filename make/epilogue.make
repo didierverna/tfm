@@ -1,6 +1,6 @@
-### lisp.make --- Generic Makefile for Lisp source directories
+### epilogue.make --- Epilogue Makefile
 
-## Copyright (C) 2019 Didier Verna
+## Copyright (C) 2021 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
@@ -21,38 +21,16 @@
 
 ### Commentary:
 
-## Please use GNU Make with this makefile.
+## Contents management by FCM version 0.1.
 
 
 ### Code:
 
-# Should contain at least TOP_DIR and SUBDIRS settings
-include local.inc
+$(TOP_DIR)/make/version.make: \
+  $(TOP_DIR)/make/epilogue.make $(TOP_DIR)/make/version.cl \
+  $(TOP_DIR)/setup/src/version.lisp
+	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl \
+	  | tail -3 > $@.new
+	mv $@.new $@
 
-include $(TOP_DIR)/make/config.make
-hack: all
-include $(TOP_DIR)/make/include.make
-
-all:
-
-clean:
-	$(MAKE) gen TARGET=clean
-	-rm *~ $(EXTRA_CLEAN_FILES)
-
-distclean: clean
-	$(MAKE) gen TARGET=distclean
-	-rm -fr $(BINLOC)-* $(EXTRA_DISTCLEAN_FILES)
-	-rm -fr $(BINLOC_CACHE)/$(BINLOC)-*$(abspath $(PWD))
-
-gen:
-	@for i in $(SUBDIRS) ; do                 \
-	   echo "making $(TARGET) in $${i} ..." ; \
-	   ( cd $${i} && $(MAKE) $(TARGET) ) ;    \
-	 done
-
-.DEFAULT:
-	$(MAKE) gen TARGET=$@
-
-.PHONY: hack all clean distclean gen
-
-### lisp.make ends here
+### epilogue.make ends here

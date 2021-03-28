@@ -1,6 +1,6 @@
-;;; setup.lisp --- TFM setup
+;;; version.lisp --- TFM version management
 
-;; Copyright (C) 2019, 2020 Didier Verna
+;; Copyright (C) 2019-2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -25,22 +25,17 @@
 
 ;;; Code:
 
-(defpackage :net.didierverna.tfm.setup
-  (:documentation "The TFM setup package.")
-  (:use :cl)
-  (:export
-   :*release-major-level* :*release-minor-level* :*release-status*
-   :*release-status-level* :*release-name*
-   :version
-   :configuration
-   :configure))
-
 (in-package :net.didierverna.tfm.setup)
 
 
-;; ----------
-;; Versioning
-;; ----------
+
+;; Copyright years
+(defvar *copyright-years* "2018-2021"
+  "A string denoting the copyright years for the whole project.")
+
+
+
+;; Version specifiers
 
 (defparameter *release-major-level* 1
   "The major level of this release.")
@@ -58,6 +53,10 @@
   "The name of this release.
 The general naming theme for TFM is \"Uncial Fonts\", from the LaTeX Font
 Catalogue (https://www.tug.org/FontCatalogue/uncialfonts.html).")
+
+
+
+;; Internal utilities
 
 (defun release-status-number (release-status)
   (ecase release-status
@@ -104,6 +103,10 @@ Catalogue (https://www.tug.org/FontCatalogue/uncialfonts.html).")
        level
        name))))
 
+
+
+;; Entry point
+
 (defun version (&optional (type :number))
   "Return the current version of TFM.
 TYPE can be one of :number, :short or :long.
@@ -123,25 +126,4 @@ As for the short version, a patchlevel of 0 is ignored in the output."
 	    *release-status* *release-status-level*
 	    *release-name*))
 
-
-;; -------------
-;; Configuration
-;; -------------
-
-(defvar *configuration* nil
-  "The TFM configuration settings.
-This variable contains a property list of configuration options.
-Current options are:
-- :swank-eval-in-emacs (Boolean)
-
-See section A.1 of the user manual for more information.")
-
-(defun configuration (key)
-  "Return KEY's value in the current TFM configuration."
-  (getf *configuration* key))
-
-(defun configure (key value)
-  "Set KEY to VALUE in the current TFM configuration."
-  (setf (getf *configuration* key) value))
-
-;;; setup.lisp ends here
+;;; version.lisp ends here

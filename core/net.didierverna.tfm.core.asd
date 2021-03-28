@@ -1,6 +1,6 @@
-;;; net.didierverna.tfm.core.asd --- ASDF system definition, core library
+;;; net.didierverna.tfm.core.asd --- ASDF system definition
 
-;; Copyright (C) 2018, 2019 Didier Verna
+;; Copyright (C) 2018, 2019, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -25,22 +25,22 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.tfm.setup)
-
-(asdf:defsystem :net.didierverna.tfm.core
-  :long-name "TeX Font Metrics Core"
-  :description "TFM's core library"
-  :long-description "The TeX Font Metrics core library.
-For a more complete description of TFM, see the net.didierverna.tfm system."
+(defsystem :net.didierverna.tfm.core
+  :long-name "TFM Core"
+  :description "TeX Font Metrics, core library"
+  :long-description "\
+The TeX Font Metrics core library provides the main functionality of TFM.
+For a more complete description of TFM, see the `net.didierverna.tfm' system."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/typesetting.php#tfm"
   :source-control "https://github.com/didierverna/tfm"
   :license "BSD"
-  :version #.(net.didierverna.tfm.setup:version :short)
+  :version (:read-file-line #p"../make/version.make"
+	     :at (1 (lambda (str) (subseq str 19))))
   :depends-on (:net.didierverna.tfm.setup)
   :serial t
-  :components ((:file "meta")
+  :components ((:file "package")
 	       (:module "src"
 		:serial t
 		:components ((:file "util")

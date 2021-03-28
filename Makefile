@@ -1,6 +1,6 @@
 ### Makefile --- Toplevel directory
 
-## Copyright (C) 2019 Didier Verna
+## Copyright (C) 2019, 2021 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
@@ -26,18 +26,13 @@
 
 ### Code:
 
-# Needed in include.make
 TOP_DIR := .
 
 include make/config.make
-hack: all
-include make/include.make
-ifeq ($(LISP),CLISP)
-  include make/clisp.make
-endif
 include make/version.make
+include make/prologue.make
 
-SUBDIRS   := setup core doc
+SUBDIRS   := doc
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
@@ -51,7 +46,7 @@ all-formats dvi ps ref all-formats-ref dvi-ref ps-ref:
 	cd doc && $(MAKE) $@
 
 # Needed because we have an INSTALL file which fucks up the gen mechanism
-# (remember that Mac OSX is case-insensitive).
+# on case-insensitive OSX platforms.
 install:
 	$(MAKE) gen TARGET=install
 
@@ -64,7 +59,6 @@ clean:
 
 distclean: clean
 	$(MAKE) gen TARGET=distclean
-	-rm -f .clisp.cnf
 	-rm *.tar.gz *.tar.gz.asc
 	-rm -fr $($(LISP)_BINLOC)-*
 	-rm -fr "${HOME}"/.cache/common-lisp/$($(LISP)_CACHE)-*"`pwd`"
@@ -117,6 +111,8 @@ $(TARBALL):
 $(SIGNATURE): $(TARBALL)
 	gpg -b -a $<
 
+include make/epilogue.make
+
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
@@ -126,6 +122,5 @@ $(SIGNATURE): $(TARBALL)
 	clean distclean					\
 	tag tar gpg dist install-www				\
 	gen
-
 
 ### Makefile ends here

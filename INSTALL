@@ -2,30 +2,38 @@
 2 Installation
 **************
 
-*Note Supported Platforms::, for information on portability or
-requirements.  See TFM’s homepage for tarballs, Git repository and
-online documentation.  TFM is also available via Quicklisp.
+First of all, see TFM’s homepage for tarballs, Git repository and online
+documentation.  TFM is an ASDF 3 library.  If you download a TFM
+tarball, or clone the repository, you need to unpack somewhere in the
+ASDF source registry.  Otherwise, TFM is also available via Quicklisp.
+*Note Supported Platforms::, for more information on portability and
+dependencies.
 
-   In order to install and load the bare Lisp library, unpack it
-somewhere in the ASDF 3 source registry and type this at the REPL:
-(asdf:load-system :net.didierverna.tfm)
+   TFM’s main system is called ‘net.didierverna.tfm’.  Depending on your
+installation, you may thus either ‘asdf:load-system’, or ‘ql:quickload’
+it in your Lisp image.
 
-   In addition to the bare Lisp library, the TFM distribution offers
+   In addition to the Lisp library itself, the TFM distribution offers
 documentation in the form of 2 different manuals: the User Manual (you
 are reading it) and the *note Reference Manual: (tfm-reference)Top.  If
 you want to compile the manuals by yourself, please follow the
 instructions below.
   1. Edit ‘make/config.make’ to your specific needs.
-  2. Switch to the ‘doc/’ subdirectory and type ‘make’.  By default, the
-     documentation is built in info, PDF and HTML formats.  If you want
-     other formats (DVI and PostScript are available), type ‘make
-     all-formats’.  You can also type individually ‘make dvi’ and/or
-     ‘make ps’ in order to get the corresponding format.
+  2. Type ‘make’.  By default, the documentation is built in info, PDF
+     and HTML formats.  If you want other formats (DVI and PostScript
+     are available), type ‘make all-formats’.  You can also type
+     individually ‘make dvi’ and/or ‘make ps’ in order to get the
+     corresponding format.
   3. Type ‘make install’ to install the documentation.  If you have
      compiled the documentation in DVI and PostScript format, those will
      be installed as well.
-   Note that if Declt is not installed on your system, the reference
-manual won’t be generated.
+
+   The reference manual’s Texinfo source is included in the distribution
+(and in the repository), although it is generated automatically by
+Declt.  Before compiling, it is possible to regenerate a local version
+of it with hyperlinks to your installation by typing ‘make localref’.
+For this to work, you need SBCL and Declt though.  If you ever need to
+regenerate the regular version, you can also type ‘make generate’.
 
    Type ‘make uninstall’ to uninstall the library.
 
@@ -67,6 +75,5 @@ specific options with the following function.
 Appendix A Supported Platforms
 ******************************
 
-TFM is an ASDF 3 library.  Apart from that, there is nothing special
-about portability.
+TFM is an ASDF 3 library.  It requires ‘editor-hints.named-readtables’.
 
