@@ -70,17 +70,19 @@ install: $(INFO_FILES) $(PDF_FILES) $(HTML_DIRS)
 	for i in $(INFO_FILES); do					\
 	  install-info --info-dir="$(INFO_DIR)" $$i;			\
 	done
+	cp -R $(PROJECT)-$(USR_MAN)-data "$(INFO_DIR)/"
 	$(MAKE) install-at LOCATION="$(PROJECT_DOC_DIR)"
-	for i in $(DVI_FILES) $(PS_FILES); do				\
+	-for i in $(DVI_FILES) $(PS_FILES); do				\
 	  test -f $$i && install -m 644 $$i "$(PROJECT_DOC_DIR)"/;	\
 	done
 
 uninstall:
 	rm -fr "$(PROJECT_DOC_DIR)"
-	for i in $(INFO_FILES); do					\
-	  install-info --remove --info-dir="$(INFO_DIR)" $$i;		\
+	for i in $(INFO_FILES); do				\
+	  install-info --remove --info-dir="$(INFO_DIR)" $$i;	\
 	done
-	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES)
+	cd "$(INFO_DIR)"					\
+	&& rm -rf $(ALL_INFO_FILES) $(PROJECT)-$(USR_MAN)-data
 
 info: $(INFO_FILES)
 pdf: $(PDF_FILES)
@@ -88,16 +90,22 @@ html: $(HTML_DIRS)
 dvi: $(DVI_FILES)
 ps: $(PS_FILES)
 
+$(PROJECT)-$(USR_MAN).info: $(PROJECT)-$(USR_MAN)-data/conditions.png
 $(PROJECT)-%.info: %.texi
 	$(MAKEINFO) $<
 
+$(USR_MAN).pdf: conditions.pdf
 %.pdf: %.texi
 	$(TEXI2DVI) -p $<
 
+$(USR_MAN): conditions.png
 $(HTML_DIRS): %: %.texi
 	$(MAKEINFO) --css-include=$(CSS).css --html -o $@ $<
+	-test "$@" = "$(USR_MAN)" && cp conditions.png $@/
 	touch $@
 
+
+$(USR_MAN).dvi: conditions.eps
 %.dvi: %.texi
 	$(TEXI2DVI) $<
 
@@ -107,11 +115,26 @@ $(HTML_DIRS): %: %.texi
 %.eps: %.jpg
 	$(CONVERT) $< $@
 
+conditions.pdf: conditions.dot
+	dot -Tpdf -o $@ $<
+
+$(PROJECT)-$(USR_MAN)-data/conditions.png: conditions.png
+	test -d $(PROJECT)-$(USR_MAN)-data/ || mkdir $(PROJECT)-$(USR_MAN)-data/
+	cp $< $(PROJECT)-$(USR_MAN)-data/
+
+conditions.png: conditions.dot
+	dot -Tpng -o $@ $<
+
+conditions.eps: conditions.dot
+	dot -Teps -o $@ $<
+
 clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr $(HTML_DIRS)						\
+	-rm -fr conditions.pdf conditions.png conditions.eps	\
+		$(PROJECT)-$(USR_MAN)-data/			\
+		$(HTML_DIRS)					\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
 $(USR_MAN:%=%.texi): $(TOP_DIR)/make/version.make
