@@ -2,7 +2,7 @@
 
 @c reference.texi --- Reference manual
 
-@c Copyright (C) 2018, 2019 Didier Verna
+@c Copyright (C) 2018-2021 Didier Verna
 
 @c This file is part of TFM.
 
@@ -22,7 +22,7 @@
 @c Commentary:
 
 @c Generated automatically by Declt version 3.0 "Montgomery Scott"
-@c on Thu Mar 25 15:48:21 2021 GMT+1.
+@c on Mon Mar 29 09:54:34 2021 GMT+1.
 
 
 @c ====================================================================
@@ -102,7 +102,7 @@
 @c ====================================================================
 @setchapternewpage odd
 @documentdescription
-The TFM Reference Manual, version 1.1 "Carolingan Miniscules".
+The TFM Reference Manual, version 1.1 patchlevel 1 "Carolingan Miniscules".
 @end documentdescription
 
 
@@ -283,7 +283,7 @@ The TFM Reference Manual, version 1.1 "Carolingan Miniscules".
 @c ====================================================================
 @copying
 @quotation
-Copyright @copyright{} 2018@comma{} 2019 Didier Verna
+Copyright @copyright{} 2018-2021 Didier Verna
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -313,13 +313,13 @@ except that this permission notice may be translated as well.
 @c ====================================================================
 @titlepage
 @title The TFM Reference Manual
-@subtitle TeX Font Metrics, version 1.1 "Carolingan Miniscules"
+@subtitle TeX Font Metrics, version 1.1 patchlevel 1 "Carolingan Miniscules"
 
 @author Didier Verna <@email{didier@atchar{}didierverna.net}>
 
 @page
 @quotation
-This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu Mar 25 15:48:21 2021 GMT+1.
+This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Mon Mar 29 09:54:34 2021 GMT+1.
 @end quotation
 @vskip 0pt plus 1filll
 @insertcopying
@@ -340,9 +340,9 @@ This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu M
 @ifnottex
 @node Top, Copying, (dir), (dir)
 @top The TFM Reference Manual
-This is the TFM Reference Manual, version 1.1 "Carolingan Miniscules",
+This is the TFM Reference Manual, version 1.1 patchlevel 1 "Carolingan Miniscules",
 generated automatically by Declt version 3.0 "Montgomery Scott"
-on Thu Mar 25 15:48:21 2021 GMT+1.
+on Mon Mar 29 09:54:34 2021 GMT+1.
 
 @menu
 * Copying:: The BSD License
@@ -461,18 +461,11 @@ TeX. The TFM library parses and decodes TFM files into an abstract data
 structure@comma{} providing easy access to the corresponding font information in
 Common Lisp.
 @item Version
-1.1
-@item Dependencies
-@itemize @bullet
-@item
-@ref{go to the net․didierverna․tfm․setup system, , @t{net.didierverna.tfm.setup}} (system)
-@item
+1.1.1
+@item Dependency
 @ref{go to the net․didierverna․tfm․core system, , @t{net.didierverna.tfm.core}} (system)
-@end itemize
 @item Source
 @ref{go to the net․didierverna․tfm․asd file, , @t{net.didierverna.tfm.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/}}
 @end table
 
 
@@ -485,7 +478,7 @@ Common Lisp.
 @systemindex{net.didierverna.tfm.core}@c
 @table @strong
 @item Long Name
-TeX Font Metrics Core
+TFM Core
 @item Author
 Didier Verna
 @item Contact
@@ -497,22 +490,21 @@ Didier Verna
 @item License
 BSD
 @item Description
-TFM's core library
+TeX Font Metrics@comma{} core library
 @item Long Description
-The TeX Font Metrics core library.@*
-For a more complete description of TFM@comma{} see the net.didierverna.tfm system.
+
+The TeX Font Metrics core library provides the main functionality of TFM.
+For a more complete description of TFM@comma{} see the `net.didierverna.tfm' system.
 @item Version
-1.1
+1.1.1
 @item Dependency
 @ref{go to the net․didierverna․tfm․setup system, , @t{net.didierverna.tfm.setup}} (system)
 @item Source
 @ref{go to the net․didierverna․tfm․core․asd file, , @t{net.didierverna.tfm.core.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/}}
 @item Components
 @itemize @bullet
 @item
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․core/package․lisp file, , @t{package.lisp}} (file)
 @item
 @ref{go to the net․didierverna․tfm․core/src module, , @t{src}} (module)
 @end itemize
@@ -528,7 +520,7 @@ For a more complete description of TFM@comma{} see the net.didierverna.tfm syste
 @systemindex{net.didierverna.tfm.setup}@c
 @table @strong
 @item Long Name
-TeX Font Metrics Setup
+TeX Font Metrics@comma{} setup library
 @item Author
 Didier Verna
 @item Contact
@@ -540,16 +532,25 @@ Didier Verna
 @item License
 BSD
 @item Description
-TFM's setup library
+TFM's preload setup library
 @item Long Description
-The TeX Font Metrics setup library.@*
-For a more complete description of TFM@comma{} see the net.didierverna.tfm system.
+
+The TFM setup library provides support for various preload configuration
+parameters and meta-utilities. For a more complete description of TFM@comma{}
+see the `net.didierverna.tfm' system.
+@item Version
+1.1.1
+@item Dependency
+@t{named-readtables}
 @item Source
 @ref{go to the net․didierverna․tfm․setup․asd file, , @t{net.didierverna.tfm.setup.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/setup/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/setup/}}
-@item Component
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@item Components
+@itemize @bullet
+@item
+@ref{go to the net․didierverna․tfm․setup/package․lisp file, , @t{package.lisp}} (file)
+@item
+@ref{go to the net․didierverna․tfm․setup/src module, , @t{src}} (module)
+@end itemize
 @end table
 
 
@@ -563,23 +564,24 @@ Modules are listed depth-first from the system components tree.
 
 @menu
 * The net.didierverna.tfm.core/src module: The net․didierverna․tfm․core/src module.
+* The net.didierverna.tfm.setup/src module: The net․didierverna․tfm․setup/src module.
 @end menu
 
 
 @c ---------------------------------------
 @c The net.didierverna.tfm.core/src module
 @c ---------------------------------------
-@node The net․didierverna․tfm․core/src module, , Modules, Modules
+@node The net․didierverna․tfm․core/src module, The net․didierverna․tfm․setup/src module, Modules, Modules
 @section @t{net.didierverna.tfm.core/src}
 @anchor{go to the net․didierverna․tfm․core/src module}@c
 @moduleindex{net.didierverna.tfm.core/src}@c
 @table @strong
 @item Dependency
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․core/package․lisp file, , @t{package.lisp}} (file)
 @item Parent
 @ref{go to the net․didierverna․tfm․core system, , @t{net.didierverna.tfm.core}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/src/, ignore, @t{core/src/}}
+@t{core/src/}
 @item Components
 @itemize @bullet
 @item
@@ -592,6 +594,32 @@ Modules are listed depth-first from the system components tree.
 @ref{go to the net․didierverna․tfm․core/src/font․lisp file, , @t{font.lisp}} (file)
 @item
 @ref{go to the net․didierverna․tfm․core/src/file․lisp file, , @t{file.lisp}} (file)
+@end itemize
+@end table
+
+
+@c ----------------------------------------
+@c The net.didierverna.tfm.setup/src module
+@c ----------------------------------------
+@node The net․didierverna․tfm․setup/src module, , The net․didierverna․tfm․core/src module, Modules
+@section @t{net.didierverna.tfm.setup/src}
+@anchor{go to the net․didierverna․tfm․setup/src module}@c
+@moduleindex{net.didierverna.tfm.setup/src}@c
+@table @strong
+@item Dependency
+@ref{go to the net․didierverna․tfm․setup/package․lisp file, , @t{package.lisp}} (file)
+@item Parent
+@ref{go to the net․didierverna․tfm․setup system, , @t{net.didierverna.tfm.setup}} (system)
+@item Location
+@t{setup/src/}
+@item Components
+@itemize @bullet
+@item
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
+@item
+@ref{go to the net․didierverna․tfm․setup/src/configuration․lisp file, , @t{configuration.lisp}} (file)
+@item
+@ref{go to the net․didierverna․tfm․setup/src/readtable․lisp file, , @t{readtable.lisp}} (file)
 @end itemize
 @end table
 
@@ -619,13 +647,16 @@ components trees.
 * The net.didierverna.tfm.asd file: The net․didierverna․tfm․asd file.
 * The net.didierverna.tfm.core.asd file: The net․didierverna․tfm․core․asd file.
 * The net.didierverna.tfm.setup.asd file: The net․didierverna․tfm․setup․asd file.
-* The net.didierverna.tfm.core/meta.lisp file: The net․didierverna․tfm․core/meta․lisp file.
+* The net.didierverna.tfm.core/package.lisp file: The net․didierverna․tfm․core/package․lisp file.
 * The net.didierverna.tfm.core/src/util.lisp file: The net․didierverna․tfm․core/src/util․lisp file.
 * The net.didierverna.tfm.core/src/intermediate.lisp file: The net․didierverna․tfm․core/src/intermediate․lisp file.
 * The net.didierverna.tfm.core/src/character.lisp file: The net․didierverna․tfm․core/src/character․lisp file.
 * The net.didierverna.tfm.core/src/font.lisp file: The net․didierverna․tfm․core/src/font․lisp file.
 * The net.didierverna.tfm.core/src/file.lisp file: The net․didierverna․tfm․core/src/file․lisp file.
-* The net.didierverna.tfm.setup/setup.lisp file: The net․didierverna․tfm․setup/setup․lisp file.
+* The net.didierverna.tfm.setup/package.lisp file: The net․didierverna․tfm․setup/package․lisp file.
+* The net.didierverna.tfm.setup/src/version.lisp file: The net․didierverna․tfm․setup/src/version․lisp file.
+* The net.didierverna.tfm.setup/src/configuration.lisp file: The net․didierverna․tfm․setup/src/configuration․lisp file.
+* The net.didierverna.tfm.setup/src/readtable.lisp file: The net․didierverna․tfm․setup/src/readtable․lisp file.
 @end menu
 
 @node The net․didierverna․tfm․asd file, The net․didierverna․tfm․core․asd file, Lisp files, Lisp files
@@ -634,7 +665,7 @@ components trees.
 @lispfileindex{net.didierverna.tfm.asd}@c
 @table @strong
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/net.didierverna.tfm.asd, ignore, @t{net.didierverna.tfm.asd}}
+@t{net.didierverna.tfm.asd}
 @item Systems
 @ref{go to the net․didierverna․tfm system, , @t{net.didierverna.tfm}} (system)
 @end table
@@ -645,53 +676,38 @@ components trees.
 @lispfileindex{net.didierverna.tfm.core.asd}@c
 @table @strong
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/net.didierverna.tfm.core.asd, ignore, @t{core/net.didierverna.tfm.core.asd}}
+@t{core/net.didierverna.tfm.core.asd}
 @item Systems
 @ref{go to the net․didierverna․tfm․core system, , @t{net.didierverna.tfm.core}} (system)
 @end table
 
-@node The net․didierverna․tfm․setup․asd file, The net․didierverna․tfm․core/meta․lisp file, The net․didierverna․tfm․core․asd file, Lisp files
+@node The net․didierverna․tfm․setup․asd file, The net․didierverna․tfm․core/package․lisp file, The net․didierverna․tfm․core․asd file, Lisp files
 @subsection @t{net.didierverna.tfm.setup.asd}
 @anchor{go to the net․didierverna․tfm․setup․asd file}@c
 @lispfileindex{net.didierverna.tfm.setup.asd}@c
 @table @strong
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/setup/net.didierverna.tfm.setup.asd, ignore, @t{setup/net.didierverna.tfm.setup.asd}}
+@t{setup/net.didierverna.tfm.setup.asd}
 @item Systems
 @ref{go to the net․didierverna․tfm․setup system, , @t{net.didierverna.tfm.setup}} (system)
 @end table
 
-@node The net․didierverna․tfm․core/meta․lisp file, The net․didierverna․tfm․core/src/util․lisp file, The net․didierverna․tfm․setup․asd file, Lisp files
-@subsection @t{net.didierverna.tfm.core/meta.lisp}
-@anchor{go to the net․didierverna․tfm․core/meta․lisp file}@c
-@lispfileindex{net.didierverna.tfm.core/meta.lisp}@c
+@node The net․didierverna․tfm․core/package․lisp file, The net․didierverna․tfm․core/src/util․lisp file, The net․didierverna․tfm․setup․asd file, Lisp files
+@subsection @t{net.didierverna.tfm.core/package.lisp}
+@anchor{go to the net․didierverna․tfm․core/package․lisp file}@c
+@lispfileindex{net.didierverna.tfm.core/package.lisp}@c
 @table @strong
 @item Parent
 @ref{go to the net․didierverna․tfm․core system, , @t{net.didierverna.tfm.core}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/meta.lisp, ignore, @t{core/meta.lisp}}
+@t{core/package.lisp}
 @item Packages
 @ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․TFM∶∶NICKNAME-PACKAGE function, , @t{nickname-package}} (function)
-@item Internal Definitions
-@itemize @bullet
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶*READTABLE* special variable, , @t{*readtable*}} (special variable)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶CLINDENT function, , @t{clindent}} (function)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶DEFINDENT macro, , @t{defindent}} (macro)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶I-READER function, , @t{i-reader}} (function)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶IN-READTABLE macro, , @t{in-readtable}} (macro)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶TILDE-READER function, , @t{tilde-reader}} (function)
-@end itemize
 @end table
 
-@node The net․didierverna․tfm․core/src/util․lisp file, The net․didierverna․tfm․core/src/intermediate․lisp file, The net․didierverna․tfm․core/meta․lisp file, Lisp files
+@node The net․didierverna․tfm․core/src/util․lisp file, The net․didierverna․tfm․core/src/intermediate․lisp file, The net․didierverna․tfm․core/package․lisp file, Lisp files
 @subsection @t{net.didierverna.tfm.core/src/util.lisp}
 @anchor{go to the net․didierverna․tfm․core/src/util․lisp file}@c
 @lispfileindex{net.didierverna.tfm.core/src/util.lisp}@c
@@ -699,7 +715,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․tfm․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/src/util.lisp, ignore, @t{core/src/util.lisp}}
+@t{core/src/util.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -780,7 +796,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․tfm․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/src/intermediate.lisp, ignore, @t{core/src/intermediate.lisp}}
+@t{core/src/intermediate.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -886,7 +902,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․tfm․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/src/character.lisp, ignore, @t{core/src/character.lisp}}
+@t{core/src/character.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -979,7 +995,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․tfm․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/src/font.lisp, ignore, @t{core/src/font.lisp}}
+@t{core/src/font.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -1272,7 +1288,7 @@ components trees.
 @end itemize
 @end table
 
-@node The net․didierverna․tfm․core/src/file․lisp file, The net․didierverna․tfm․setup/setup․lisp file, The net․didierverna․tfm․core/src/font․lisp file, Lisp files
+@node The net․didierverna․tfm․core/src/file․lisp file, The net․didierverna․tfm․setup/package․lisp file, The net․didierverna․tfm․core/src/font․lisp file, Lisp files
 @subsection @t{net.didierverna.tfm.core/src/file.lisp}
 @anchor{go to the net․didierverna․tfm․core/src/file․lisp file}@c
 @lispfileindex{net.didierverna.tfm.core/src/file.lisp}@c
@@ -1282,7 +1298,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․tfm․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/core/src/file.lisp, ignore, @t{core/src/file.lisp}}
+@t{core/src/file.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -1483,19 +1499,32 @@ components trees.
 @end itemize
 @end table
 
-@node The net․didierverna․tfm․setup/setup․lisp file, , The net․didierverna․tfm․core/src/file․lisp file, Lisp files
-@subsection @t{net.didierverna.tfm.setup/setup.lisp}
-@anchor{go to the net․didierverna․tfm․setup/setup․lisp file}@c
-@lispfileindex{net.didierverna.tfm.setup/setup.lisp}@c
+@node The net․didierverna․tfm․setup/package․lisp file, The net․didierverna․tfm․setup/src/version․lisp file, The net․didierverna․tfm․core/src/file․lisp file, Lisp files
+@subsection @t{net.didierverna.tfm.setup/package.lisp}
+@anchor{go to the net․didierverna․tfm․setup/package․lisp file}@c
+@lispfileindex{net.didierverna.tfm.setup/package.lisp}@c
 @table @strong
 @item Parent
 @ref{go to the net․didierverna․tfm․setup system, , @t{net.didierverna.tfm.setup}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/tfm/setup/setup.lisp, ignore, @t{setup/setup.lisp}}
+@t{setup/package.lisp}
 @item Packages
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
+@end table
+
+@node The net․didierverna․tfm․setup/src/version․lisp file, The net․didierverna․tfm․setup/src/configuration․lisp file, The net․didierverna․tfm․setup/package․lisp file, Lisp files
+@subsection @t{net.didierverna.tfm.setup/src/version.lisp}
+@anchor{go to the net․didierverna․tfm․setup/src/version․lisp file}@c
+@lispfileindex{net.didierverna.tfm.setup/src/version.lisp}@c
+@table @strong
+@item Parent
+@ref{go to the net․didierverna․tfm․setup/src module, , @t{src}} (module)
+@item Location
+@t{setup/src/version.lisp}
 @item Exported Definitions
 @itemize @bullet
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*COPYRIGHT-YEARS* special variable, , @t{*copyright-years*}} (special variable)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*RELEASE-MAJOR-LEVEL* special variable, , @t{*release-major-level*}} (special variable)
 @item
@@ -1507,10 +1536,6 @@ components trees.
 @item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*RELEASE-STATUS-LEVEL* special variable, , @t{*release-status-level*}} (special variable)
 @item
-@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶CONFIGURATION function, , @t{configuration}} (function)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶CONFIGURE function, , @t{configure}} (function)
-@item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶VERSION function, , @t{version}} (function)
 @end itemize
 @item Internal Definitions
@@ -1518,9 +1543,51 @@ components trees.
 @item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶%VERSION function, , @t{%version}} (function)
 @item
-@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*CONFIGURATION* special variable, , @t{*configuration*}} (special variable)
-@item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶RELEASE-STATUS-NUMBER function, , @t{release-status-number}} (function)
+@end itemize
+@end table
+
+@node The net․didierverna․tfm․setup/src/configuration․lisp file, The net․didierverna․tfm․setup/src/readtable․lisp file, The net․didierverna․tfm․setup/src/version․lisp file, Lisp files
+@subsection @t{net.didierverna.tfm.setup/src/configuration.lisp}
+@anchor{go to the net․didierverna․tfm․setup/src/configuration․lisp file}@c
+@lispfileindex{net.didierverna.tfm.setup/src/configuration.lisp}@c
+@table @strong
+@item Parent
+@ref{go to the net․didierverna․tfm․setup/src module, , @t{src}} (module)
+@item Location
+@t{setup/src/configuration.lisp}
+@item Exported Definitions
+@itemize @bullet
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶CONFIGURATION function, , @t{configuration}} (function)
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶CONFIGURE function, , @t{configure}} (function)
+@end itemize
+@item Internal Definitions
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*CONFIGURATION* special variable, , @t{*configuration*}} (special variable)
+@end table
+
+@node The net․didierverna․tfm․setup/src/readtable․lisp file, , The net․didierverna․tfm․setup/src/configuration․lisp file, Lisp files
+@subsection @t{net.didierverna.tfm.setup/src/readtable.lisp}
+@anchor{go to the net․didierverna․tfm․setup/src/readtable․lisp file}@c
+@lispfileindex{net.didierverna.tfm.setup/src/readtable.lisp}@c
+@table @strong
+@item Dependency
+@ref{go to the net․didierverna․tfm․setup/src/configuration․lisp file, , @t{configuration.lisp}} (file)
+@item Parent
+@ref{go to the net․didierverna․tfm․setup/src module, , @t{src}} (module)
+@item Location
+@t{setup/src/readtable.lisp}
+@item Internal Definitions
+@itemize @bullet
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶CLINDENT function, , @t{clindent}} (function)
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶DEFINDENT macro, , @t{defindent}} (macro)
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶I-READER function, , @t{i-reader}} (function)
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶~-READER function, , @t{~-reader}} (function)
 @end itemize
 @end table
 
@@ -1549,7 +1616,7 @@ Packages are listed by definition order.
 The TeX Font Metrics package.
 @table @strong
 @item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․core/package․lisp file, , @t{package.lisp}} (file)
 @item Nickname
 @t{tfm}
 @item Use List
@@ -2401,8 +2468,6 @@ The TeX Font Metrics package.
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶%RUN-LIGATURE/KERNING-PROGRAM function, , @t{%run-ligature/kerning-program}} (function)
 @item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶*READTABLE* special variable, , @t{*readtable*}} (special variable)
-@item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶*STREAM* special variable, , @t{*stream*}} (special variable)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶+CHARACTER-METRICS-DIMENSION-ACCESSORS+ constant, , @t{+character-metrics-dimension-accessors+}} (constant)
@@ -2425,8 +2490,6 @@ The TeX Font Metrics package.
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶CHAR-INFO-P function, , @t{char-info-p}} (function)
 @item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶CLINDENT function, , @t{clindent}} (function)
-@item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶CODE-CHARACTER function, , @t{code-character}} (function)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶❨SETF CODE-CHARACTER❩ function, , @t{(setf code-character)}} (function)
@@ -2442,8 +2505,6 @@ The TeX Font Metrics package.
 @ref{go to the NET․DIDIERVERNA․TFM∶∶DECODE-EXTEN function, , @t{decode-exten}} (function)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶DECODE-LIG/KERN function, , @t{decode-lig/kern}} (function)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶DEFINDENT macro, , @t{defindent}} (macro)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶DEFINE-CONSTANT macro, , @t{define-constant}} (macro)
 @item
@@ -2478,10 +2539,6 @@ The TeX Font Metrics package.
 @ref{go to the NET․DIDIERVERNA․TFM∶∶HEIGHT-INDEX function, , @t{height-index}} (function)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶❨SETF HEIGHT-INDEX❩ function, , @t{(setf height-index)}} (function)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶I-READER function, , @t{i-reader}} (function)
-@item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶IN-READTABLE macro, , @t{in-readtable}} (macro)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶INVALID-ORIGINAL-DESIGN-SIZE condition, , @t{invalid-original-design-size}} (condition)
 @item
@@ -2605,8 +2662,6 @@ The TeX Font Metrics package.
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶TFM-TABLE-ERROR condition, , @t{tfm-table-error}} (condition)
 @item
-@ref{go to the NET․DIDIERVERNA․TFM∶∶TILDE-READER function, , @t{tilde-reader}} (function)
-@item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶TOP function, , @t{top}} (function)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM∶∶❨SETF TOP❩ function, , @t{(setf top)}} (function)
@@ -2627,16 +2682,18 @@ The TeX Font Metrics package.
 @section @t{net.didierverna.tfm.setup}
 @anchor{go to the NET․DIDIERVERNA․TFM․SETUP package}@c
 @packageindex{net.didierverna.tfm.setup}@c
-The TFM setup package.
+The TFM setup library's package.
 @table @strong
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/package․lisp file, , @t{package.lisp}} (file)
 @item Use List
 @t{common-lisp}
 @item Used By List
 @ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
 @item Exported Definitions
 @itemize @bullet
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*COPYRIGHT-YEARS* special variable, , @t{*copyright-years*}} (special variable)
 @item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*RELEASE-MAJOR-LEVEL* special variable, , @t{*release-major-level*}} (special variable)
 @item
@@ -2661,7 +2718,15 @@ The TFM setup package.
 @item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*CONFIGURATION* special variable, , @t{*configuration*}} (special variable)
 @item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶CLINDENT function, , @t{clindent}} (function)
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶DEFINDENT macro, , @t{defindent}} (macro)
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶I-READER function, , @t{i-reader}} (function)
+@item
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶RELEASE-STATUS-NUMBER function, , @t{release-status-number}} (function)
+@item
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP∶∶~-READER function, , @t{~-reader}} (function)
 @end itemize
 @end table
 
@@ -2696,6 +2761,17 @@ lexicographic order.
 
 @node Exported special variables, Exported functions, Exported definitions, Exported definitions
 @subsection Special variables
+@defvr {Special Variable} *copyright-years*
+@anchor{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*COPYRIGHT-YEARS* special variable}@c
+@specialsubindex{*copyright-years*}@c
+A string denoting the copyright years for the whole project.
+@table @strong
+@item Package
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
+@item Source
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
+@end table
+@end defvr
 @defvr {Special Variable} *release-major-level*
 @anchor{go to the NET․DIDIERVERNA․TFM․SETUP∶∶*RELEASE-MAJOR-LEVEL* special variable}@c
 @specialsubindex{*release-major-level*}@c
@@ -2704,7 +2780,7 @@ The major level of this release.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end defvr
 @defvr {Special Variable} *release-minor-level*
@@ -2715,7 +2791,7 @@ The minor level of this release.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end defvr
 @defvr {Special Variable} *release-name*
@@ -2728,7 +2804,7 @@ Catalogue (https://www.tug.org/FontCatalogue/uncialfonts.html).
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end defvr
 @defvr {Special Variable} *release-status*
@@ -2739,7 +2815,7 @@ The status of this release.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end defvr
 @defvr {Special Variable} *release-status-level*
@@ -2750,7 +2826,7 @@ The status level of this release.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end defvr
 
@@ -2764,7 +2840,7 @@ Return KEY's value in the current TFM configuration.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/configuration․lisp file, , @t{configuration.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {configure} KEY VALUE
@@ -2775,7 +2851,7 @@ Set KEY to VALUE in the current TFM configuration.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/configuration․lisp file, , @t{configuration.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {extensiblep} CHARACTER
@@ -2900,7 +2976,7 @@ Add NICKNAME (:TFM by default) to the :NET.DIDIERVERNA.TFM package.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
 @item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․core/package․lisp file, , @t{package.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {unfreeze} FONT
@@ -2938,7 +3014,7 @@ As for the short version@comma{} a patchlevel of 0 is ignored in the output.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end deffn
 
@@ -7750,23 +7826,12 @@ This variable contains a property list of configuration options.
 Current options are:@*
 - :swank-eval-in-emacs (Boolean)@*
 
-See section A.1 of the user manual for more information.
+See Chapter 5 of the user manual for more information.
 @table @strong
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
-@end table
-@end defvr
-@defvr {Special Variable} *readtable*
-@anchor{go to the NET․DIDIERVERNA․TFM∶∶*READTABLE* special variable}@c
-@specialsubindex{*readtable*}@c
-The TFM readtable.
-@table @strong
-@item Package
-@ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
-@item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/configuration․lisp file, , @t{configuration.lisp}} (file)
 @end table
 @end defvr
 @defvr {Special Variable} *stream*
@@ -7784,16 +7849,14 @@ The stream being read.
 @node Internal macros, Internal functions, Internal special variables, Internal definitions
 @subsection Macros
 @deffn {Macro} {defindent} SYMBOL INDENT
-@anchor{go to the NET․DIDIERVERNA․TFM∶∶DEFINDENT macro}@c
+@anchor{go to the NET․DIDIERVERNA․TFM․SETUP∶∶DEFINDENT macro}@c
 @macrosubindex{defindent}@c
-Set SYMBOL's indentation to INDENT in (X)Emacs.
-SYMBOL and INDENT need not be quoted.@*
-See CLINDENT for more information.
+Wrapper around `clindent' to avoid quoting SYMBOL and INDENT.
 @table @strong
 @item Package
-@ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/readtable․lisp file, , @t{readtable.lisp}} (file)
 @end table
 @end deffn
 @deffn {Macro} {define-constant} NAME VALUE &optional DOCUMENTATION
@@ -7815,17 +7878,6 @@ Like DEFCONSTANT@comma{} but reuse existing value if any.
 @ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
 @item Source
 @ref{go to the net․didierverna․tfm․core/src/character․lisp file, , @t{character.lisp}} (file)
-@end table
-@end deffn
-@deffn {Macro} {in-readtable} NAME
-@anchor{go to the NET․DIDIERVERNA․TFM∶∶IN-READTABLE macro}@c
-@macrosubindex{in-readtable}@c
-Set the current readtable to the value of NAME::*READTABLE*.
-@table @strong
-@item Package
-@ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
-@item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
 @end table
 @end deffn
 @deffn {Macro} {map-accessors} VAR OBJECT ACCESSORS &body BODY
@@ -7933,7 +7985,7 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {apply-ligature} LIGATURE STATE &aux NEW-STATE
@@ -7972,17 +8024,17 @@ STATE is a list of characters@comma{} the first two being subject to LIGATURE.
 @end table
 @end deffn
 @deffn {Function} {clindent} SYMBOL INDENT
-@anchor{go to the NET․DIDIERVERNA․TFM∶∶CLINDENT function}@c
+@anchor{go to the NET․DIDIERVERNA․TFM․SETUP∶∶CLINDENT function}@c
 @functionsubindex{clindent}@c
-Set SYMBOL's indentation to INDENT in Emacs.@*
-This function sets SYMBOL's common-lisp-indent-function property.
-If INDENT is a symbol@comma{} use its indentation definition.
-Otherwise@comma{} INDENT is considered as an indentation definition.
+Send SYMBOL's INDENTation information to Emacs.@*
+Emacs will set the 'common-lisp-indent-function property.@*
+If INDENT is a symbol@comma{} use its indentation definition. Otherwise@comma{} INDENT is
+considered as an indentation definition.
 @table @strong
 @item Package
-@ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/readtable․lisp file, , @t{readtable.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {code-character} CODE FONT &optional ERRORP
@@ -8138,14 +8190,16 @@ Make an extension recipe based on EXTEN with FONT's characters.
 @end table
 @end deffn
 @deffn {Function} {i-reader} STREAM SUBCHAR ARG
-@anchor{go to the NET․DIDIERVERNA․TFM∶∶I-READER function}@c
+@anchor{go to the NET․DIDIERVERNA․TFM․SETUP∶∶I-READER function}@c
 @functionsubindex{i-reader}@c
-Read an argument list for the DEFINDENT macro.
+Construct a call to `defindent' by reading an argument list from STREAM.
+This dispatch macro character function is installed on @hashchar{}i in the
+NET.DIDIERVERNA.TFM named readtable.
 @table @strong
 @item Package
-@ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/readtable․lisp file, , @t{readtable.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {italic-index} INSTANCE
@@ -8473,7 +8527,7 @@ Read an unsigned 32 bits Big Endian integer from *STREAM*.
 @item Package
 @ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
 @item Source
-@ref{go to the net․didierverna․tfm․setup/setup․lisp file, , @t{setup.lisp}} (file)
+@ref{go to the net․didierverna․tfm․setup/src/version․lisp file, , @t{version.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {remainder} INSTANCE
@@ -8553,17 +8607,6 @@ If INDEX is out of bounds@comma{} signal an INVALID-TABLE-INDEX error.
 @ref{go to the net․didierverna․tfm․core/src/file․lisp file, , @t{file.lisp}} (file)
 @end table
 @end deffn
-@deffn {Function} {tilde-reader} STREAM CHAR
-@anchor{go to the NET․DIDIERVERNA․TFM∶∶TILDE-READER function}@c
-@functionsubindex{tilde-reader}@c
-Read a series of ~"string" to be concatenated together.
-@table @strong
-@item Package
-@ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
-@item Source
-@ref{go to the net․didierverna․tfm․core/meta․lisp file, , @t{meta.lisp}} (file)
-@end table
-@end deffn
 @deffn {Function} {top} INSTANCE
 @anchor{go to the NET․DIDIERVERNA․TFM∶∶TOP function}@c
 @functionsubindex{top}@c
@@ -8588,6 +8631,17 @@ Read a series of ~"string" to be concatenated together.
 @ref{go to the NET․DIDIERVERNA․TFM package, , @t{net.didierverna.tfm}}
 @item Source
 @ref{go to the net․didierverna․tfm․core/src/intermediate․lisp file, , @t{intermediate.lisp}} (file)
+@end table
+@end deffn
+@deffn {Function} {~-reader} STREAM CHAR
+@anchor{go to the NET․DIDIERVERNA․TFM․SETUP∶∶~-READER function}@c
+@functionsubindex{~-reader}@c
+Read a series of ~"string" to be concatenated together.
+@table @strong
+@item Package
+@ref{go to the NET․DIDIERVERNA․TFM․SETUP package, , @t{net.didierverna.tfm.setup}}
+@item Source
+@ref{go to the net․didierverna․tfm․setup/src/readtable․lisp file, , @t{readtable.lisp}} (file)
 @end table
 @end deffn
 
