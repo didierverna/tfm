@@ -41,4 +41,4 @@
     ;; From src/configuration.lisp:
     :configuration :configure))
 
-;; package.lisp ends here
+;;; package.lisp ends here
