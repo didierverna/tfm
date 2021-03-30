@@ -26,6 +26,7 @@
 ;;; Code:
 
 (in-package :net.didierverna.tfm.setup)
+(in-readtable :net.didierverna.tfm)
 
 
 

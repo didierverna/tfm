@@ -43,9 +43,8 @@ see the `net.didierverna.tfm' system."
   :serial t
   :components ((:file "package")
 	       (:module "src"
-		:components ((:file "version")
-			     (:file "configuration")
-			     (:file "readtable"
-			      :depends-on ("configuration"))))))
+		:components ((:file "configuration")
+			     (:file "readtable" :depends-on ("configuration"))
+			     (:file "version" :depends-on ("readtable"))))))
 
 ;;; net.didierverna.tfm.setup.asd ends here
