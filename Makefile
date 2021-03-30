@@ -42,7 +42,7 @@ all:
 	$(MAKE) gen TARGET=all
 	$(MAKE) INSTALL
 
-all-formats dvi ps ref all-formats-ref dvi-ref ps-ref:
+all-formats info pdf html dvi ps localref generate:
 	cd doc && $(MAKE) $@
 
 # Needed because we have an INSTALL file which fucks up the gen mechanism
@@ -116,9 +116,8 @@ include make/epilogue.make
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: hack all						\
-	all-formats dvi ps ref all-formats-ref dvi-ref ps-ref	\
-	install install-ref uninstall				\
+.PHONY: all							\
+	install uninstall					\
 	clean distclean					\
 	tag tar gpg dist install-www				\
 	gen
