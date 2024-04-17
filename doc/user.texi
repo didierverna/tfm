@@ -41,7 +41,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.1 patchlevel 1 "Carolingan Miniscules"
-@set COPYRIGHT_YEARS 2018--2021
+@set COPYRIGHT_YEARS 2018--2021, 2024
 @setchapternewpage odd
 @documentdescription
 The TFM User Manual for version @value{VERSION}.
