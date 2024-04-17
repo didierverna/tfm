@@ -2,19 +2,6 @@ strict digraph {
   rankdir=LR;
   node [shape=ellipse color=blue]
 
-  { rank=same "file-overflow" "file-underflow" "u16-overflow"
-    "invalid-header-length" "invalid-character-range"  "invalid-table-length"
-    "invalid-section-lengths"
-    "invalid-design-size" "invalid-original-design-size"
-    "fix-word-overflow" "invalid-bcpl-string" "invalid-char-info"
-    "invalid-character-code" "invalid-ligature-opcode" "invalid-string-length"
-    "invalid-table-index" "invalid-table-start" "ligature-cycle"
-    "character-list-cycle" }
-
-  { rank=same "set-to-zero" "set-to-ten" }
-
-  { rank=same "discard-string" "discard-extension-recipe" "discard-kerning"
-    "discard-ligature" "discard-next-character" }
 
 
   "file-overflow" [shape=box color=green fixedsize=true width=2.3]
@@ -25,7 +12,8 @@ strict digraph {
   "invalid-character-code", "invalid-character-range", "invalid-design-size",
   "invalid-header-length", "invalid-ligature-opcode",
   "invalid-section-lengths", "invalid-string-length", "invalid-table-index",
-  "invalid-table-length", "invalid-table-start", "ligature-cycle"
+  "invalid-table-length", "invalid-table-start", "ligature-cycle",
+  "no-boundary-character"
   [shape=box color=red fixedsize=true width=2.3]
 
   "file-overflow" -> "cancel-loading";
@@ -45,6 +33,7 @@ strict digraph {
   "invalid-character-code" -> "discard-kerning" -> "cancel-loading";
   "invalid-character-code" -> "discard-ligature" -> "cancel-loading";
   "invalid-character-code" -> "discard-next-character" -> "cancel-loading";
+  "no-boundary-character" -> "abort-lig/kern-program" -> "cancel-loading";
   "invalid-design-size" -> "set-to-ten" -> "cancel-loading";
   "invalid-ligature-opcode" -> "discard-ligature" -> "cancel-loading";
   "invalid-string-length" -> "read-maximum-length" -> "discard-string" -> "cancel-loading";
