@@ -134,8 +134,9 @@ If >= 2^15, signal a U16-OVERFLOW error."
 (define-condition fix-word-overflow (tfm-compliance-error)
   ((value :documentation "The faulty value." :initarg :value :accessor value))
   (:report (lambda (fix-word-overflow stream)
-	     (report stream "fix word ~A is outside ]-16,+16[."
-	       (value fix-word-overflow))))
+	     (report stream "fix word ~A (~A) is outside ]-16,+16[."
+	       (value fix-word-overflow)
+	       (float (value fix-word-overflow)))))
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
 
