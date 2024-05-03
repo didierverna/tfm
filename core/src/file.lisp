@@ -419,12 +419,8 @@ DISCARD-EXTENSION-RECIPE."
 		      (setq start 0))))
 		(vector-push start array))
 	  :do (loop :repeat (1- length)
-		    :do (handler-bind
-			    ((fix-word-overflow
-			       (lambda (condition)
-				 (setf (slot-value condition 'context)
-				       (make-instance 'table-context
-					 :name name)))))
+		    :do (with-condition-context 
+			    (fix-word-overflow table-context :name name)
 			  (vector-push (read-fix-word) array))))
     (loop :repeat nl
 	  :do (vector-push (decode-lig/kern (read-u32)) lig/kerns))

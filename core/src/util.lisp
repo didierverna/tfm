@@ -42,6 +42,17 @@ conditions are signalled."))
 (defgeneric condition-context-string (condition-context)
   (:documentation "Return CONDITION-CONTEXT'string."))
 
+(defmacro with-condition-context
+    ((condition-type context-type &rest initargs) &body body)
+  "Execute BODY within a particular condition signalling context.
+While BODY is executing, conditions of type CONDITION-TYPE (not evaluated) are
+caught and augmented with an instance of CONTEXT-TYPE (not evaluated)
+initialized with INITARGS."
+  `(handler-bind ((,condition-type
+		    (lambda (condition)
+		      (setf (slot-value condition 'context)
+			    (make-instance ',context-type ,@initargs)))))
+     ,@body))
 
 (define-condition tfm ()
   ((context :documentation "The context in which the condition was signalled."
