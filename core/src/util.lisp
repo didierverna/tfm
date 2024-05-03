@@ -33,8 +33,19 @@
 ;; Error Ontology
 ;; ==========================================================================
 
-(define-condition tfm ()
+(defclass condition-context ()
   ()
+  (:documentation "The CONDITION-CONTEXT class.
+This is the base class for classes representing contexts in which
+conditions are signalled."))
+
+(defgeneric condition-context-string (condition-context)
+  (:documentation "Return CONDITION-CONTEXT'string."))
+
+
+(define-condition tfm ()
+  ((context :documentation "The context in which the condition was signalled."
+	    :initform nil :reader context))
   (:documentation "The TFM root condition."))
 
 
@@ -133,12 +144,27 @@ If >= 2^15, signal a U16-OVERFLOW error."
 
 (define-condition fix-word-overflow (tfm-compliance-error)
   ((value :documentation "The faulty value." :initarg :value :accessor value))
-  (:report (lambda (fix-word-overflow stream)
-	     (report stream "fix word ~A (~A) is outside ]-16,+16[."
-	       (value fix-word-overflow)
-	       (float (value fix-word-overflow)))))
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
+
+(defmethod print-object ((condition fix-word-overflow) stream &aux (upcase t))
+  (cond (*print-escape* (call-next-method))
+	(t
+	 (when *stream*
+	   (format stream "While reading ~A,~%"
+	     (or (when (typep *stream* 'file-stream) (pathname *stream*))
+		 *stream*))
+	   (setq upcase nil))
+	 (when (context condition)
+	   (format stream "~:[~A~;~@(~A~)~],~%"
+	     upcase
+	     (context-string (context condition)))
+	   (setq upcase nil))
+	 (format stream "~:[~@?~;~@(~@?~)~]."
+	   upcase
+	   "fix word ~A (~A) is outside ]-16,+16["
+           (value condition)
+           (float (value condition))))))
 
 (defun read-fix-word (&optional (limit t))
   "Read a fix word from *STREAM* and return it.

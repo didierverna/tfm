@@ -346,6 +346,14 @@ It signals that a cycle was found in a list of ascending character sizes."))
   (:documentation "The Ligature Cycle compliance error.
 It signals that a ligature introduces a cycle for a cons of characters."))
 
+(defclass parsed-table (condition-context)
+  ((name :documentation "The table name."
+	 :initarg :name :reader name))
+  (:documentation "The PARSED-TABLE class."))
+
+(defmethod context-string ((table parsed-table))
+  (format nil "while parsing ~A table" (name table)))
+
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT.
 NC (EC - BC + 1), NW, NH, ND, NI, NL, NK, and NE are the declared lengths of
@@ -411,7 +419,13 @@ DISCARD-EXTENSION-RECIPE."
 		      (setq start 0))))
 		(vector-push start array))
 	  :do (loop :repeat (1- length)
-		    :do (vector-push (read-fix-word) array)))
+		    :do (handler-bind
+			    ((fix-word-overflow
+			       (lambda (condition)
+				 (setf (slot-value condition 'context)
+				       (make-instance 'parsed-table
+					 :name name)))))
+			  (vector-push (read-fix-word) array))))
     (loop :repeat nl
 	  :do (vector-push (decode-lig/kern (read-u32)) lig/kerns))
     (loop :repeat nk
