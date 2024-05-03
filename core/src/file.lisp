@@ -346,13 +346,13 @@ It signals that a cycle was found in a list of ascending character sizes."))
   (:documentation "The Ligature Cycle compliance error.
 It signals that a ligature introduces a cycle for a cons of characters."))
 
-(defclass parsed-table (condition-context)
-  ((name :documentation "The table name."
-	 :initarg :name :reader name))
-  (:documentation "The PARSED-TABLE class."))
+(defclass table-context (condition-context)
+  ((name :documentation "The table name." :initarg :name :reader name))
+  (:documentation "The TABLE-CONTEXT class."))
 
-(defmethod context-string ((table parsed-table))
-  (format nil "while parsing ~A table" (name table)))
+(defmethod context-string ((context table-context))
+  "Return table CONTEXT string."
+  (format nil "while parsing ~A table" (name context)))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT.
@@ -423,7 +423,7 @@ DISCARD-EXTENSION-RECIPE."
 			    ((fix-word-overflow
 			       (lambda (condition)
 				 (setf (slot-value condition 'context)
-				       (make-instance 'parsed-table
+				       (make-instance 'table-context
 					 :name name)))))
 			  (vector-push (read-fix-word) array))))
     (loop :repeat nl
