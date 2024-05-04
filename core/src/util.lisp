@@ -60,6 +60,18 @@ conditions are signalled."))
     (setq upcase nil))
   (apply #'format stream "~:[~@?~;~@(~@?~)~]." upcase format-string arguments))
 
+(defmacro define-condition-report
+    ((condition type) format-string &rest arguments)
+  "Define a context-aware report function for a CONDITION of TYPE.
+The reporting is ultimately done by calling FORMAT on FORMAT-STRING with
+ARGUMENTS."
+  (let ((the-stream (gensym "stream")))
+    `(defmethod print-object ((,condition ,type) ,the-stream)
+       (if *print-escape*
+	 (call-next-method)
+	 (context-format ,the-stream (context ,condition)
+	   ,format-string ,@arguments)))))
+
 (defmacro with-condition-context
     ((condition-type context-type &rest initargs) &body body)
   "Execute BODY within a particular condition signalling context.
@@ -180,13 +192,10 @@ If >= 2^15, signal a U16-OVERFLOW error."
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
 
-(defmethod print-object ((condition fix-word-overflow) stream)
-  (if *print-escape*
-    (call-next-method)
-    (context-format stream (context condition)
-		    "fix word ~A (~A) is outside ]-16,+16["
-		    (value condition)
-		    (float (value condition)))))
+(define-condition-report (condition fix-word-overflow)
+  "fix word ~A (~A) is outside ]-16,+16["
+  (value condition)
+  (float (value condition)))
 
 (defun read-fix-word (&optional (limit t))
   "Read a fix word from *STREAM* and return it.
