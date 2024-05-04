@@ -346,7 +346,7 @@ It signals that a cycle was found in a list of ascending character sizes."))
   (:documentation "The Ligature Cycle compliance error.
 It signals that a ligature introduces a cycle for a cons of characters."))
 
-(defclass table-context (condition-context)
+(defclass table-context (context)
   ((name :documentation "The table name." :initarg :name :reader name)
    (index :documentation "The index in the table."
 	  :initarg :index :reader index))

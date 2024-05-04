@@ -29,18 +29,36 @@
 (in-readtable :net.didierverna.tfm)
 
 
+(defvar *stream* nil "The stream being read.")
+
+
 ;; ==========================================================================
-;; Error Ontology
+;; Context-Aware Condition Reporting and Handling
 ;; ==========================================================================
 
-(defclass condition-context ()
+(defclass context ()
   ()
-  (:documentation "The CONDITION-CONTEXT class.
+  (:documentation "The CONTEXT class.
 This is the base class for classes representing contexts in which
 conditions are signalled."))
 
-(defgeneric condition-context-string (condition-context)
-  (:documentation "Return CONDITION-CONTEXT'string."))
+(defgeneric context-string (context)
+  (:documentation "Return CONTEXT'string."))
+
+(defun context-format
+    (stream context format-string &rest arguments &aux (upcase t))
+  "Like FORMAT, but *STREAM* and CONTEXT-aware.
+- When *STREAM*, report that we're reading from it to STREAM.
+- When CONTEXT, report the context string to STREAM.
+- Finally, print FORMAT-STRING with ARGUMENTS to STREAM."
+  (when *stream*
+    (format stream "While reading ~A,~%"
+      (if (typep *stream* 'file-stream) (pathname *stream*) *stream*))
+    (setq upcase nil))
+  (when context
+    (format stream "~:[~A~;~@(~A~)~],~%" upcase (context-string context))
+    (setq upcase nil))
+  (apply #'format stream "~:[~@?~;~@(~@?~)~]." upcase format-string arguments))
 
 (defmacro with-condition-context
     ((condition-type context-type &rest initargs) &body body)
@@ -53,6 +71,12 @@ initialized with INITARGS."
 		      (setf (slot-value condition 'context)
 			    (make-instance ',context-type ,@initargs)))))
      ,@body))
+
+
+
+;; ==========================================================================
+;; Error Ontology
+;; ==========================================================================
 
 (define-condition tfm ()
   ((context :documentation "The context in which the condition was signalled."
@@ -106,8 +130,6 @@ This is the root condition for errors related to the use of the library."))
 ;; Stream Reading
 ;; ==========================================================================
 
-(defvar *stream* nil "The stream being read.")
-
 #i(report 2)
 (defun report (stream format-string &rest format-arguments)
   "Like FORMAT, but if *STREAM* is bound, report that we're reading from it."
@@ -158,24 +180,13 @@ If >= 2^15, signal a U16-OVERFLOW error."
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
 
-(defmethod print-object ((condition fix-word-overflow) stream &aux (upcase t))
-  (cond (*print-escape* (call-next-method))
-	(t
-	 (when *stream*
-	   (format stream "While reading ~A,~%"
-	     (or (when (typep *stream* 'file-stream) (pathname *stream*))
-		 *stream*))
-	   (setq upcase nil))
-	 (when (context condition)
-	   (format stream "~:[~A~;~@(~A~)~],~%"
-	     upcase
-	     (context-string (context condition)))
-	   (setq upcase nil))
-	 (format stream "~:[~@?~;~@(~@?~)~]."
-	   upcase
-	   "fix word ~A (~A) is outside ]-16,+16["
-           (value condition)
-           (float (value condition))))))
+(defmethod print-object ((condition fix-word-overflow) stream)
+  (if *print-escape*
+    (call-next-method)
+    (context-format stream (context condition)
+		    "fix word ~A (~A) is outside ]-16,+16["
+		    (value condition)
+		    (float (value condition)))))
 
 (defun read-fix-word (&optional (limit t))
   "Read a fix word from *STREAM* and return it.
