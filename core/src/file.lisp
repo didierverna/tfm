@@ -347,12 +347,16 @@ It signals that a cycle was found in a list of ascending character sizes."))
 It signals that a ligature introduces a cycle for a cons of characters."))
 
 (defclass table-context (condition-context)
-  ((name :documentation "The table name." :initarg :name :reader name))
+  ((name :documentation "The table name." :initarg :name :reader name)
+   (index :documentation "The index in the table."
+	  :initarg :index :reader index))
   (:documentation "The TABLE-CONTEXT class."))
 
 (defmethod context-string ((context table-context))
   "Return table CONTEXT string."
-  (format nil "while parsing ~A table" (name context)))
+  (format nil "while parsing ~A table at position ~D"
+    (name context)
+    (index context)))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT.
@@ -418,9 +422,10 @@ DISCARD-EXTENSION-RECIPE."
 		    (set-to-zero () :report "Set to 0."
 		      (setq start 0))))
 		(vector-push start array))
-	  :do (loop :repeat (1- length)
+	  :do (loop :for i :from 1 :upto (1- length)
 		    :do (with-condition-context 
-			    (fix-word-overflow table-context :name name)
+			    (fix-word-overflow
+			     table-context :name name :index i)
 			  (vector-push (read-fix-word) array))))
     (loop :repeat nl
 	  :do (vector-push (decode-lig/kern (read-u32)) lig/kerns))
