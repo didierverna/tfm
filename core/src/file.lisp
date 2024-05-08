@@ -42,7 +42,7 @@
 It signals that a design size is too small (< 1pt)."))
 
 (define-condition-report (condition invalid-design-size)
-  "~Apt design size is too small (< 1pt)."
+  "~Apt design size is too small (< 1pt)"
   (value condition))
 
 
@@ -56,7 +56,7 @@ It signals that, although overridden explicitly, an original design size was
 too small (< 1pt)."))
 
 (define-condition-report (condition invalid-original-design-size)
-  "~Apt original design size was too small (< 1pt)."
+  "~Apt original design size was too small (< 1pt)"
   (value condition))
 
 
@@ -153,7 +153,7 @@ This is the root condition for errors related to TFM tables."))
 It signals that a table index is greater than its largest value."))
 
 (define-condition-report (condition invalid-table-index)
-  "index ~A in ~A table is invalid (largest is ~A)."
+  "index ~A in ~A table is invalid (largest is ~A)"
   (value condition)
   (name condition)
   (largest condition))
@@ -185,7 +185,7 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
 It signals that a ligature opcode is invalid."))
 
 (define-condition-report (condition invalid-ligature-opcode)
-  "ligature opcode ~A is invalid."
+  "ligature opcode ~A is invalid"
   (value condition))
 
 
@@ -298,7 +298,7 @@ It signals that a char-info with a width-index of 0 is not completely
 zero'ed out."))
 
 (define-condition-report (condition invalid-char-info)
-  "~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
+  "~A is invalid (should be 0 0 0 0 NIL NIL NIL)"
   (value condition))
 
 
@@ -311,7 +311,7 @@ zero'ed out."))
 It signals that the first value in a TFM table is not 0."))
 
 (define-condition-report (condition invalid-table-start)
-  "first value ~A in ~A table is invalid (should be 0)."
+  "first value ~A in ~A table is invalid (should be 0)"
   (value condition)
   (name condition))
 
@@ -324,7 +324,7 @@ without a boundary character being defined."))
 
 (define-condition-report (condition no-boundary-character)
   "found a boundary character ligature/kerning program,~
-without a boundary character being defined.")
+without a boundary character being defined")
 
 
 (define-condition character-list-cycle (tfm-compliance-error)
@@ -336,7 +336,7 @@ without a boundary character being defined.")
 It signals that a cycle was found in a list of ascending character sizes."))
 
 (define-condition-report (condition character-list-cycle)
-  "found a cycle in character list ~A."
+  "found a cycle in character list ~A"
   (value condition))
 
 
@@ -353,7 +353,7 @@ It signals that a cycle was found in a list of ascending character sizes."))
 It signals that a ligature introduces a cycle for a cons of characters."))
 
 (define-condition-report (condition ligature-cycle)
-  "ligature ~A introduces a cycle for characters ~A."
+  "ligature ~A introduces a cycle for characters ~A"
   (value condition)
   (characters condition))
 
@@ -661,7 +661,7 @@ actual file sizes."))
 It signals that the file size is shorter than expected."))
 
 (define-condition-report (condition file-underflow)
-  "actual file size ~A is lesser than declared one ~A."
+  "actual file size ~A is lesser than declared one ~A"
   (actual-size condition)
   (declared-size condition))
 
@@ -675,7 +675,7 @@ It signals that the file size is shorter than expected."))
 It signals that the file size is longer than expected."))
 
 (define-condition-report (condition file-overflow)
-  "declared file size ~A is lesser than actual one ~A."
+  "declared file size ~A is lesser than actual one ~A"
   (declared-size condition)
   (actual-size condition))
 
@@ -689,7 +689,7 @@ It signals that the file size is longer than expected."))
 It signals that a header length is too small (< 2 words)."))
 
 (define-condition-report (condition invalid-header-length)
-  "~A word~:P header length is too small (< 2 words)."
+  "~A word~:P header length is too small (< 2 words)"
   (value condition))
 
 
@@ -700,7 +700,7 @@ It signals that a header length is too small (< 2 words)."))
 It signals that BC-1 > EC, or that EC > 255."))
 
 (define-condition-report (condition invalid-character-range)
-  "character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
+  "character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)"
   (bc condition)
   (ec condition))
 
@@ -756,7 +756,7 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 (define-condition-report (condition invalid-section-lengths)
   "section lengths don't satisfy ~
 ~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
-+ ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)."
++ ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)"
   (lf condition)
   (lh condition)
   (nc condition)
@@ -787,7 +787,7 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 It signals that a declared TFM table's length is out of range."))
 
 (define-condition-report (condition invalid-table-length)
-  "~A table length ~A is invalid (should be in [~A,~A])."
+  "~A table length ~A is invalid (should be in [~A,~A])"
   (name condition)
   (value condition)
   (smallest condition)
@@ -896,7 +896,7 @@ It signals that a file contains extended TFM data (OFM or JFM) rather than
 plain TFM data."))
 
 (define-condition-report (condition extended-tfm)
-  "file ~A contains ~A data (not supported yet)."
+  "file ~A contains ~A data (not supported yet)"
   (file condition)
   (value condition))
 

@@ -150,7 +150,7 @@ This is the root condition for errors related to the use of the library."))
 It signals that an unsigned 16 bits integer is greater than 2^15."))
 
 (define-condition-report (condition u16-overflow)
-  "unsigned 16 bits integer ~A is greater than 2^15."
+  "unsigned 16 bits integer ~A is greater than 2^15"
   (value condition))
 
 (defun read-u16 ()
@@ -224,7 +224,7 @@ It signals that the declared length of a padded string is greater than its
 maximum."))
 
 (define-condition-report (condition invalid-string-length)
-  "declared padded string length ~A is greater than its maximum ~A."
+  "declared padded string length ~A is greater than its maximum ~A"
   (value condition)
   (1- (padding condition)))
 
@@ -236,7 +236,7 @@ It signals that a BCPL string contains parentheses or non-ASCII characters."))
 
 (define-condition-report (condition invalid-bcpl-string)
   "BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
-characters)."
+characters)"
   (value invalid-bcpl-string))
 
 
