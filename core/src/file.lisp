@@ -403,9 +403,11 @@ DISCARD-EXTENSION-RECIPE."
 	(extens (make-array ne :fill-pointer 0)))
 
     ;; 1. Read the tables.
-    (loop :repeat nc
+    (loop :for i :from 0 :upto (1- nc)
 	  :for word = (read-u32)
-	  :do (vector-push (decode-char-info word) char-infos))
+	  :do (with-condition-context
+		  (invalid-char-info table-context :name "char info" :index i)
+		(vector-push (decode-char-info word) char-infos)))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
