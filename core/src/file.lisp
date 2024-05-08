@@ -347,14 +347,17 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 (defclass table-context (context)
   ((name :documentation "The table name." :initarg :name :reader name)
    (index :documentation "The index in the table."
-	  :initarg :index :reader index))
+	  :initarg :index :reader index)
+   (size :documentation "The table size."
+	 :initarg :size :reader size))
   (:documentation "The TABLE-CONTEXT class."))
 
 (defmethod context-string ((context table-context))
   "Return table CONTEXT string."
-  (format nil "while parsing ~A table at position ~D"
+  (format nil "while parsing ~A table at position ~D/~D"
     (name context)
-    (index context)))
+    (index context)
+    (1- (size context))))
 
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
@@ -405,8 +408,8 @@ DISCARD-EXTENSION-RECIPE."
     ;; 1. Read the tables.
     (loop :for i :from 0 :upto (1- nc)
 	  :for word = (read-u32)
-	  :do (with-condition-context
-		  (invalid-char-info table-context :name "char info" :index i)
+	  :do (with-condition-context (invalid-char-info table-context
+					:name "char info" :index i :size nc)
 		(vector-push (decode-char-info word) char-infos)))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
@@ -420,8 +423,8 @@ DISCARD-EXTENSION-RECIPE."
 		(vector-push start array))
 	  :do (loop :for i :from 1 :upto (1- length)
 		    :do (with-condition-context
-			    (fix-word-overflow
-			     table-context :name name :index i)
+			    (fix-word-overflow table-context
+			      :name name :index i :size length)
 			  (vector-push (read-fix-word) array))))
     (loop :repeat nl
 	  :do (vector-push (decode-lig/kern (read-u32)) lig/kerns))
