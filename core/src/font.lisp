@@ -313,9 +313,8 @@ It signals a reference to a character code which does not exist in the font
 being loaded."))
 
 (define-condition-report (condition invalid-character-code)
-  "character code ~A is invalid in font ~A."
-  (value condition)
-  (font condition))
+  "character code ~A is invalid."
+  (value condition))
 
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
