@@ -178,12 +178,14 @@ metrics instances are created."
     :documentation "The non extensible character."
     :initarg :value
     :accessor value))
-  (:report (lambda (not-extensible stream)
-	     (format stream "Character ~A is not extensible."
-	       (value not-extensible))))
   (:documentation "The Not Extensible usage error.
 It signals an attempt at accessing the extension recipe of a non extensible
 character."))
+
+(define-condition-report (condition not-extensible)
+  "character ~A is not extensible."
+  (value condition))
+
 
 (defmacro define-extension-recipe-pseudo-accessor (name)
   `(defmethod ,name ((character character-metrics))

@@ -38,24 +38,27 @@
     :documentation "The invalid design size."
     :initarg :value
     :accessor value))
-  (:report (lambda (invalid-design-size stream)
-	     (report stream "~Apt design size is too small (< 1pt)."
-	       (value invalid-design-size))))
   (:documentation "The Invalid Design Size compliance error.
 It signals that a design size is too small (< 1pt)."))
+
+(define-condition-report (condition invalid-design-size)
+  "~Apt design size is too small (< 1pt)."
+  (value condition))
+
 
 (define-condition invalid-original-design-size (tfm-compliance-warning)
   ((value
     :documentation "The invalid original design size."
     :initarg :value
     :accessor value))
-  (:report (lambda (invalid-original-design-size stream)
-	     (report stream
-		 "~Apt original design size was too small (< 1pt)."
-	       (value invalid-original-design-size))))
   (:documentation "The Invalid Original Design Size compliance warning.
 It signals that, although overridden explicitly, an original design size was
 too small (< 1pt)."))
+
+(define-condition-report (condition invalid-original-design-size)
+  "~Apt original design size was too small (< 1pt)."
+  (value condition))
+
 
 (defun parse-header (length font)
   "Parse a header of LENGTH words from *STREAM* into FONT.
@@ -146,13 +149,15 @@ This is the root condition for errors related to TFM tables."))
     :documentation "The largest index."
     :initarg :largest
     :accessor largest))
-  (:report (lambda (invalid-table-index stream)
-	     (report stream "index ~A in ~A table is invalid (largest is ~A)."
-	       (value invalid-table-index)
-	       (name invalid-table-index)
-	       (largest invalid-table-index))))
   (:documentation "The Invalid Table Index compliance error.
 It signals that a table index is greater than its largest value."))
+
+(define-condition-report (condition invalid-table-index)
+  "index ~A in ~A table is invalid (largest is ~A)."
+  (value condition)
+  (name condition)
+  (largest condition))
+
 
 (defun table-aref (name table index)
   "Access NAMEd TABLE at INDEX.
@@ -176,11 +181,13 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
     :documentation "The invalid ligature opcode."
     :initarg :value
     :accessor value))
-  (:report (lambda (invalid-ligature-opcode stream)
-	     (report stream "ligature opcode ~A is invalid."
-	       (value invalid-ligature-opcode))))
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
+
+(define-condition-report (condition invalid-ligature-opcode)
+  "ligature opcode ~A is invalid."
+  (value condition))
+
 
 (defun %run-ligature/kerning-program
     (character index lig/kerns kerns &aux (font (font character)))
@@ -286,48 +293,52 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
     :documentation "The invalid char-info structure."
     :initarg :value
     :accessor value))
-  (:report (lambda (invalid-char-info stream)
-	     (report stream
-		 "~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
-	       (value invalid-char-info))))
   (:documentation "The Invalid Char Info compliance error.
 It signals that a char-info with a width-index of 0 is not completely
 zero'ed out."))
+
+(define-condition-report (condition invalid-char-info)
+  "~A is invalid (should be 0 0 0 0 NIL NIL NIL)."
+  (value condition))
+
 
 (define-condition invalid-table-start (tfm-table-error)
   ((value
     :documentation "The invalid first table value."
     :initarg :value
     :accessor value))
-  (:report (lambda (invalid-table-start stream)
-	     (report stream
-		 "first value ~A in ~A table is invalid (should be 0)."
-	       (value invalid-table-start)
-	       (name invalid-table-start))))
   (:documentation "The Invalid Table Start compliance error.
 It signals that the first value in a TFM table is not 0."))
 
+(define-condition-report (condition invalid-table-start)
+  "first value ~A in ~A table is invalid (should be 0)."
+  (value condition)
+  (name condition))
+
+
 (define-condition no-boundary-character (tfm-compliance-error)
   ()
-  (:report (lambda (no-boundary-character stream)
-	     (declare (ignore no-boundary-character))
-	     (report stream
-		 "found a boundary character ligature/kerning program,~
-without a boundary character being defined.")))
   (:documentation "The No Boundary Character compliance error.
 It signals that a boundary character ligature/kerning program was found,
 without a boundary character being defined."))
+
+(define-condition-report (condition no-boundary-character)
+  "found a boundary character ligature/kerning program,~
+without a boundary character being defined.")
+
 
 (define-condition character-list-cycle (tfm-compliance-error)
   ((value
     :documentation "The cyclic character list."
     :initarg :value
     :accessor value))
-  (:report (lambda (character-list-cycle stream)
-	     (report stream "found a cycle in character list ~A."
-	       (value character-list-cycle))))
   (:documentation "The Character List Cycle compliance error.
 It signals that a cycle was found in a list of ascending character sizes."))
+
+(define-condition-report (condition character-list-cycle)
+  "found a cycle in character list ~A."
+  (value condition))
+
 
 (define-condition ligature-cycle (tfm-compliance-error)
   ((value
@@ -338,13 +349,14 @@ It signals that a cycle was found in a list of ascending character sizes."))
     :documentation "The cons of characters involved in the ligature."
     :initarg :characters
     :accessor characters))
-  (:report (lambda (ligature-cycle stream)
-	     (report stream
-		 "ligature ~A introduces a cycle for characters ~A."
-	       (value ligature-cycle)
-	       (characters ligature-cycle))))
   (:documentation "The Ligature Cycle compliance error.
 It signals that a ligature introduces a cycle for a cons of characters."))
+
+(define-condition-report (condition ligature-cycle)
+  "ligature ~A introduces a cycle for characters ~A."
+  (value condition)
+  (characters condition))
+
 
 (defclass table-context (context)
   ((name :documentation "The table name." :initarg :name :reader name)
@@ -357,6 +369,7 @@ It signals that a ligature introduces a cycle for a cons of characters."))
   (format nil "while parsing ~A table at position ~D"
     (name context)
     (index context)))
+
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT.
@@ -423,7 +436,7 @@ DISCARD-EXTENSION-RECIPE."
 		      (setq start 0))))
 		(vector-push start array))
 	  :do (loop :for i :from 1 :upto (1- length)
-		    :do (with-condition-context 
+		    :do (with-condition-context
 			    (fix-word-overflow
 			     table-context :name name :index i)
 			  (vector-push (read-fix-word) array))))
@@ -644,49 +657,53 @@ actual file sizes."))
 
 (define-condition file-underflow (file-size-mixin tfm-compliance-error)
   ()
-  (:report (lambda (file-underflow stream)
-	     (report stream
-		 "actual file size ~A is lesser than declared one ~A."
-	       (actual-size file-underflow)
-	       (declared-size file-underflow))))
   (:documentation "The File Underflow compliance error.
 It signals that the file size is shorter than expected."))
+
+(define-condition-report (condition file-underflow)
+  "actual file size ~A is lesser than declared one ~A."
+  (actual-size condition)
+  (declared-size condition))
+
 
 ;; #### NOTE: this one is a warning instead of an error because TeX silently
 ;; ignores junk at the end of TFM files (see TeX: the Program [575]). We hence
 ;; do the same, but still signal a warning.
 (define-condition file-overflow (file-size-mixin tfm-compliance-warning)
   ()
-  (:report (lambda (file-overflow stream)
-	     (report stream
-		 "declared file size ~A is lesser than actual one ~A."
-	       (declared-size file-overflow)
-	       (actual-size file-overflow))))
   (:documentation "The File Overflow compliance warning.
 It signals that the file size is longer than expected."))
+
+(define-condition-report (condition file-overflow)
+  "declared file size ~A is lesser than actual one ~A."
+  (declared-size condition)
+  (actual-size condition))
+
 
 (define-condition invalid-header-length (tfm-compliance-error)
   ((value
     :documentation "The invalid header length."
     :initarg :value
     :accessor value))
-  (:report (lambda (invalid-header-length stream)
-	     (report stream
-		 "~A word~:P header length is too small (< 2 words)."
-	       (value invalid-header-length))))
   (:documentation "The Invalid Header Length compliance error.
 It signals that a header length is too small (< 2 words)."))
+
+(define-condition-report (condition invalid-header-length)
+  "~A word~:P header length is too small (< 2 words)."
+  (value condition))
+
 
 (define-condition invalid-character-range (tfm-compliance-error)
   ((bc :documentation "The smallest character code." :initarg :bc :accessor bc)
    (ec :documentation "The largest character code." :initarg :ec :accessor ec))
-  (:report (lambda (invalid-character-range stream)
-	     (report stream "~
-character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
-	       (bc invalid-character-range)
-	       (ec invalid-character-range))))
   (:documentation "The Invalid Character Range compliance error.
 It signals that BC-1 > EC, or that EC > 255."))
+
+(define-condition-report (condition invalid-character-range)
+  "character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)."
+  (bc condition)
+  (ec condition))
+
 
 (define-condition invalid-section-lengths (tfm-compliance-error)
   ((lf
@@ -733,24 +750,25 @@ It signals that BC-1 > EC, or that EC > 255."))
     :documentation "The declared length of the parameters section."
     :initarg :np
     :accessor np))
-  (:report (lambda (section-lengths stream)
-	     (report stream "~
-section lengths don't satisfy ~
-~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
-+ ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)."
-	       (lf section-lengths)
-	       (lh section-lengths)
-	       (nc section-lengths)
-	       (nw section-lengths)
-	       (nh section-lengths)
-	       (nd section-lengths)
-	       (ni section-lengths)
-	       (nl section-lengths)
-	       (nk section-lengths)
-	       (ne section-lengths)
-	       (np section-lengths))))
   (:documentation "The Section Lengths compliance error.
 It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
+
+(define-condition-report (condition invalid-section-lengths)
+  "section lengths don't satisfy ~
+~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
++ ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)."
+  (lf condition)
+  (lh condition)
+  (nc condition)
+  (nw condition)
+  (nh condition)
+  (nd condition)
+  (ni condition)
+  (nl condition)
+  (nk condition)
+  (ne condition)
+  (np condition))
+
 
 (define-condition invalid-table-length (tfm-table-error)
   ((value
@@ -765,15 +783,16 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
     :documentation "The largest table length."
     :initarg :largest
     :accessor largest))
-  (:report (lambda (invalid-table-length stream)
-	     (report stream "~
-~A table length ~A is invalid (should be in [~A,~A])."
-	       (name invalid-table-length)
-	       (value invalid-table-length)
-	       (smallest invalid-table-length)
-	       (largest invalid-table-length))))
   (:documentation "The Invalid Table Length compliance error.
 It signals that a declared TFM table's length is out of range."))
+
+(define-condition-report (condition invalid-table-length)
+  "~A table length ~A is invalid (should be in [~A,~A])."
+  (name condition)
+  (value condition)
+  (smallest condition)
+  (largest condition))
+
 
 (defun load-tfm-font
     (lf &key (file (when (typep *stream* 'file-stream) (pathname *stream*)))
@@ -872,13 +891,15 @@ length, signal an INVALID-SECTION-LENGTHS error."
 (define-condition extended-tfm (tfm-warning)
   ((value :documentation "The TFM extension." :initarg :value :accessor value)
    (file :documentation "The extended TFM file." :initarg :file :accessor file))
-  (:report (lambda (extended-tfm stream)
-	     (format stream "File ~A contains ~A data (not supported yet)."
-	       (file extended-tfm)
-	       (value extended-tfm))))
   (:documentation "The Extended TFM warning.
 It signals that a file contains extended TFM data (OFM or JFM) rather than
 plain TFM data."))
+
+(define-condition-report (condition extended-tfm)
+  "file ~A contains ~A data (not supported yet)."
+  (file condition)
+  (value condition))
+
 
 (defun load-font (file &rest arguments &key design-size freeze)
   "Load FILE into a new font, and return it.

@@ -86,6 +86,7 @@ initialized with INITARGS."
 
 
 
+
 ;; ==========================================================================
 ;; Error Ontology
 ;; ==========================================================================
@@ -138,33 +139,19 @@ This is the root condition for errors related to the use of the library."))
 
 
 
+
 ;; ==========================================================================
-;; Stream Reading
+;; Numbers
 ;; ==========================================================================
-
-#i(report 2)
-(defun report (stream format-string &rest format-arguments)
-  "Like FORMAT, but if *STREAM* is bound, report that we're reading from it."
-  (if *stream*
-    (format stream "While reading ~A, "
-      (or (when (typep *stream* 'file-stream) (pathname *stream*))
-	  *stream*))
-    (when (alpha-char-p (aref format-string 0))
-      (setf (aref format-string 0) (char-upcase (aref format-string 0)))))
-  (apply #'format stream format-string format-arguments))
-
-
-;; ----------------
-;; Numerical values
-;; ----------------
 
 (define-condition u16-overflow (tfm-compliance-error)
   ((value :documentation "The faulty value." :initarg :value :accessor value))
-  (:report (lambda (u16-overflow stream)
-	     (report stream "unsigned 16 bits integer ~A is greater than 2^15."
-	       (value u16-overflow))))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
+
+(define-condition-report (condition u16-overflow)
+  "unsigned 16 bits integer ~A is greater than 2^15."
+  (value condition))
 
 (defun read-u16 ()
   "Read an unsigned 16 bits Big Endian integer from *STREAM* and return it.
@@ -217,9 +204,11 @@ SET-TO-ZERO."
     fix-word))
 
 
-;; -------
+
+
+;; ==========================================================================
 ;; Strings
-;; -------
+;; ==========================================================================
 
 (define-condition invalid-string-length (tfm-compliance-error)
   ((value
@@ -230,24 +219,26 @@ SET-TO-ZERO."
     :documentation "The maximum length."
     :initarg :padding
     :accessor padding))
-  (:report (lambda (invalid-string-length stream)
-	     (report stream "~
-declared padded string length ~A is greater than its maximum ~A."
-	       (value invalid-string-length)
-	       (1- (padding invalid-string-length)))))
   (:documentation "The Invalid String Length compliance error.
 It signals that the declared length of a padded string is greater than its
 maximum."))
 
+(define-condition-report (condition invalid-string-length)
+  "declared padded string length ~A is greater than its maximum ~A."
+  (value condition)
+  (1- (padding condition)))
+
+
 (define-condition invalid-bcpl-string (tfm-compliance-error)
   ((value :documentation "The invalid string." :initarg :value :accessor value))
-  (:report (lambda (invalid-bcpl-string stream)
-	     (report stream "~
-BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
-characters)."
-	       (value invalid-bcpl-string))))
   (:documentation "The Invalid BCPL String compliance error.
 It signals that a BCPL string contains parentheses or non-ASCII characters."))
+
+(define-condition-report (condition invalid-bcpl-string)
+  "BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
+characters)."
+  (value invalid-bcpl-string))
+
 
 (defun read-padded-string
     (padding &aux (length (read-byte *stream*)) string)
@@ -315,6 +306,7 @@ DISCARD-STRING."
 
 
 
+
 ;; ==========================================================================
 ;; Miscellaneous
 ;; ==========================================================================

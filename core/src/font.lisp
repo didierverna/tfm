@@ -278,11 +278,12 @@ subclasses."))
 ;; be triggered yet (by the public API).
 (define-condition anonymous-font (tfm-usage-error)
   ()
-  (:report (lambda (anonymous-font stream)
-	     (declare (ignore anonymous-font))
-	     (princ "All fonts must be named." stream)))
   (:documentation "The Anonymous Font usage error.
 It signals an attempt at creating a font with no name."))
+
+(define-condition-report (condition anonymous-font)
+  "all fonts must be named.")
+
 
 (defmethod initialize-instance :before ((font font) &key name)
   "Check that FONT has a name, or signal an ANONYMOUS-FONT error."
@@ -307,13 +308,15 @@ If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
     :documentation "The invalid character code."
     :initarg :value
     :accessor value))
-  (:report (lambda (invalid-character-code stream)
-	     (report stream "character code ~A is invalid in font ~A."
-	       (value invalid-character-code)
-	       (font invalid-character-code))))
   (:documentation "The Invalid Character Code compliance error.
 It signals a reference to a character code which does not exist in the font
 being loaded."))
+
+(define-condition-report (condition invalid-character-code)
+  "character code ~A is invalid in font ~A."
+  (value condition)
+  (font condition))
+
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
 (defun code-character (code font &optional (errorp t))
@@ -345,14 +348,15 @@ retrieved by this function."
     :documentation "The second character."
     :initarg :character2
     :accessor character2))
-  (:report (lambda (different-fonts stream)
-	     (format stream
-		 "Characters ~A and ~A don't belong to the same font."
-	       (character1 different-fonts)
-	       (character2 different-fonts))))
   (:documentation "The Different Fonts usage error.
 It signals an attempt at retrieving a ligature or kerning for two characters
 from different fonts."))
+
+(define-condition-report (condition different-fonts)
+  "characters ~A and ~A don't belong to the same font."
+  (character1 condition)
+  (character2 condition))
+
 
 (defun ligature (character1 character2)
   "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
