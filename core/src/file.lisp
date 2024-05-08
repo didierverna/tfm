@@ -288,20 +288,6 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
 ;; Character Information
 ;; ---------------------
 
-(define-condition invalid-char-info (tfm-compliance-error)
-  ((value
-    :documentation "The invalid char-info structure."
-    :initarg :value
-    :accessor value))
-  (:documentation "The Invalid Char Info compliance error.
-It signals that a char-info with a width-index of 0 is not completely
-zero'ed out."))
-
-(define-condition-report (condition invalid-char-info)
-  "~A is invalid (should be 0 0 0 0 NIL NIL NIL)"
-  (value condition))
-
-
 (define-condition invalid-table-start (tfm-table-error)
   ((value
     :documentation "The invalid first table value."
@@ -419,12 +405,7 @@ DISCARD-EXTENSION-RECIPE."
     ;; 1. Read the tables.
     (loop :repeat nc
 	  :for word = (read-u32)
-	  :for char-info := (decode-char-info word)
-	  :unless (or (not (zerop (width-index char-info))) (zerop word))
-	    :do (restart-case (error 'invalid-char-info :value char-info)
-		  (set-to-zero () :report "Zero it out."
-		    (setq char-info (decode-char-info 0))))
-	  :do (vector-push char-info char-infos))
+	  :do (vector-push (decode-char-info word) char-infos))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)

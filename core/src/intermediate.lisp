@@ -44,6 +44,19 @@ This structure is used to store decoded information from the char-info table
   width-index height-index depth-index italic-index
   lig/kern-index next-char exten-index)
 
+(define-condition invalid-char-info (tfm-compliance-error)
+  ((value
+    :documentation "The invalid char-info structure."
+    :initarg :value
+    :accessor value))
+  (:documentation "The Invalid Char Info compliance error.
+It signals that a char-info with a width-index of 0 is not completely
+zero'ed out."))
+
+(define-condition-report (condition invalid-char-info)
+  "~A is invalid (should be zero'ed out)"
+  (value condition))
+
 (defun decode-char-info (word)
   "Decode char-info WORD into a new CHAR-INFO instance, and return it."
   (let ((char-info (make-char-info
@@ -57,6 +70,10 @@ This structure is used to store decoded information from the char-info table
       (1 (setf (lig/kern-index char-info) remainder))
       (2 (setf (next-char char-info) remainder))
       (3 (setf (exten-index char-info) remainder)))
+    (unless (or (not (zerop (width-index char-info))) (zerop word))
+      (restart-case (error 'invalid-char-info :value char-info)
+	(set-to-zero () :report "Zero it out."
+	  (setq char-info (decode-char-info 0)))))
     char-info))
 
 
