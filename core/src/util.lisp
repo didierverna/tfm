@@ -237,7 +237,7 @@ It signals that a BCPL string contains parentheses or non-ASCII characters."))
 (define-condition-report (condition invalid-bcpl-string)
   "BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
 characters)"
-  (value invalid-bcpl-string))
+  (value condition))
 
 
 (defun read-padded-string
