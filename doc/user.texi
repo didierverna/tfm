@@ -40,7 +40,7 @@
 @c ====================================================================
 @c Settings
 @c ====================================================================
-@set VERSION 1.1 patchlevel 1 "Carolingan Miniscules"
+@set VERSION 1.2 "QT Dublin Irish"
 @set COPYRIGHT_YEARS 2018--2021, 2024
 @setchapternewpage odd
 @documentdescription

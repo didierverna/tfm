@@ -41,16 +41,16 @@
 (defparameter *release-major-level* 1
   "The major level of this release.")
 
-(defparameter *release-minor-level* 1
+(defparameter *release-minor-level* 2
   "The minor level of this release.")
 
 (defparameter *release-status* :patchlevel
   "The status of this release.")
 
-(defparameter *release-status-level* 1
+(defparameter *release-status-level* 0
   "The status level of this release.")
 
-(defparameter *release-name* "Carolingan Miniscules"
+(defparameter *release-name* "QT Dublin Irish"
   "The name of this release.
 The general naming theme for TFM is \"Uncial Fonts\", from the LaTeX Font
 Catalogue (https://www.tug.org/FontCatalogue/uncialfonts.html).")
