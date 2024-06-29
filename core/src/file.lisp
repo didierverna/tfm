@@ -642,7 +642,7 @@ It is used in both errors and warnings to report different declared and
 actual file sizes."))
 
 (define-condition file-underflow (file-size-mixin tfm-compliance-error)
-  ()
+  ((section :initform 540)) ; slot merge
   (:documentation "The File Underflow compliance error.
 It signals that the file size is shorter than expected."))
 
@@ -656,7 +656,7 @@ It signals that the file size is shorter than expected."))
 ;; ignores junk at the end of TFM files (see TeX: the Program [575]). We hence
 ;; do the same, but still signal a warning.
 (define-condition file-overflow (file-size-mixin tfm-compliance-warning)
-  ()
+  ((section :initform 540)) ; slot merge
   (:documentation "The File Overflow compliance warning.
 It signals that the file size is longer than expected."))
 

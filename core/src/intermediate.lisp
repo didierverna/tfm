@@ -45,7 +45,8 @@ This structure is used to store decoded information from the char-info table
   lig/kern-index next-char exten-index)
 
 (define-condition invalid-char-info (tfm-compliance-error)
-  ((value
+  ((section :initform 543) ; slot merge
+   (value
     :documentation "The invalid char-info structure."
     :initarg :value
     :accessor value))
@@ -70,6 +71,10 @@ zero'ed out."))
       (1 (setf (lig/kern-index char-info) remainder))
       (2 (setf (next-char char-info) remainder))
       (3 (setf (exten-index char-info) remainder)))
+    ;; #### FIXME: actually, I'm not so sure about this anymore. TFM has
+    ;; encountered fonts in TeXlive that are all zero'ed out, except for a
+    ;; lig/kern program index. Why would a non-existent character in the font
+    ;; still have a lig/kern program ?
     (unless (or (not (zerop (width-index char-info))) (zerop word))
       (restart-case (error 'invalid-char-info :value char-info)
 	(set-to-zero () :report "Zero it out."
