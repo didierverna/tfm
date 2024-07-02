@@ -108,13 +108,13 @@ initialized with INITARGS."
 
 (define-condition tfm-compliance (tfm)
   ((section :documentation "The related documentation section."
-	    :allocation :class :reader section))
+	    :allocation :class :initform nil :reader section))
   (:documentation "The TFM Compliance root condition.
 This is the mixin for conditions related to TFM compliance."))
 
 (defmethod print-object :after ((condition tfm-compliance) stream)
   "Advertise CONDITION's relevant section in the documentation."
-  (unless *print-escape*
+  (unless (or *print-escape* (not (section condition)))
     (format stream
 	"~&See §~A of the METAFONT Book (Computers & Typesetting, Volume C) for more information."
       (section condition))))
