@@ -116,7 +116,7 @@ This is the mixin for conditions related to TFM compliance."))
   "Advertise CONDITION's relevant section in the documentation."
   (unless *print-escape*
     (format stream
-	"~&See Section ~A of the METAFONT Book (Computers and Typesetting, Volume C) for more information."
+	"~&See §~A of the METAFONT Book (Computers & Typesetting, Volume C) for more information."
       (section condition))))
 
 (define-condition tfm-compliance-warning (tfm-warning tfm-compliance)
