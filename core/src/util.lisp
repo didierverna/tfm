@@ -116,8 +116,8 @@ This is the mixin for conditions related to TFM compliance."))
   "Advertise CONDITION's relevant section in the documentation."
   (unless *print-escape*
     (format stream
-	    "~&See Section ~A of “TeX: the Program” for more information."
-	    (section condition))))
+	"~&See Section ~A of the METAFONT Book (Computers and Typesetting, Volume C) for more information."
+      (section condition))))
 
 (define-condition tfm-compliance-warning (tfm-warning tfm-compliance)
   ()
@@ -153,7 +153,7 @@ This is the root condition for errors related to the use of the library."))
 ;; ==========================================================================
 
 (define-condition u16-overflow (tfm-compliance-error)
-  ((section :initform 540) ; slot merge
+  ((section :initform 1088) ; slot merge
    (value :documentation "The faulty value." :initarg :value :accessor value))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
@@ -184,7 +184,7 @@ If >= 2^15, signal a U16-OVERFLOW error."
 
 
 (define-condition fix-word-overflow (tfm-compliance-error)
-  ((section :initform 541) ; slot merge
+  ((section :initform 1089) ; slot merge
    (value :documentation "The faulty value." :initarg :value :accessor value))
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
