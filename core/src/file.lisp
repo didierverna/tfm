@@ -859,6 +859,11 @@ length, signal an INVALID-SECTION-LENGTHS error."
 		 :actual-size actual-size
 		 :declared-size declared-size))
 	      ((> actual-size declared-size)
+	       ;; #### NOTE: we could collect the actual junk at the end of
+	       ;; parsing and report it, but it doesn't seem to be worth it.
+	       ;; I've looked at a couple of concerned files and there doesn't
+	       ;; seem to be any kind of interesting information in there
+	       ;; (contrary to padded strings).
 	       (warn 'file-overflow
 		     :actual-size actual-size
 		     :declared-size declared-size)))))
