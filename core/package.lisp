@@ -51,8 +51,9 @@
     :tfm-usage-warning :tfm-usage-error
     :u16-overflow :value
     :fix-word-overflow :value :set-to-zero
-    :invalid-string-length :value :padding
-    :invalid-bcpl-string :value
+    :invalid-padded-string-length :value :pad
+    :invalid-padded-string :value
+    :padded-string-overflow :value
     :read-maximum-length :keep-string :fix-string :discard-string
 
     ;; From src/character.lisp:

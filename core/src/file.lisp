@@ -62,12 +62,12 @@ too small (< 1pt)."))
   (value condition))
 
 
-(defclass string-context (context)
+(defclass padded-string-context (context)
   ((name :documentation "The string name." :initarg :name :reader name))
-  (:documentation "The STRING-CONTEXT class."))
+  (:documentation "The Padded String Context class."))
 
-(defmethod context-string ((context string-context))
-  "Return string CONTEXT string."
+(defmethod context-string ((context padded-string-context))
+  "Return padded string CONTEXT'string."
   (format nil "while reading the ~A string"
     (name context)))
 
@@ -102,7 +102,7 @@ INVALID-ORIGINAL-DESIGN-SIZE warning."
 If so, decrease LENGTH by NEEDED afterwards."
 	       `(when (>= length ,needed) ,@body (decf length ,needed))))
     (with-condition-context
-	(string-tail string-context :name "character encoding scheme")
+	(padded-string padded-string-context :name "character encoding scheme")
       (checking-length 10 (setf (encoding font) (read-padded-string 40))))
     (when (encoding font)
       ;; #### NOTE: we don't upcase the BCPL strings, but tftopl does, so it's
@@ -114,7 +114,7 @@ If so, decrease LENGTH by NEEDED afterwards."
 	    ((string= (string-upcase (encoding font)) "TEX MATH EXTENSION")
 	     (change-class font 'math-extension-font))))
     (with-condition-context
-	(string-tail string-context :name "font identifier")
+	(padded-string padded-string-context :name "font identifier")
       (checking-length  5 (setf (family font) (read-padded-string 20))))
     (checking-length  1
       (let ((word (read-u32)))

@@ -217,7 +217,7 @@ SET-TO-ZERO."
 
 
 ;; ==========================================================================
-;; Strings
+;; Padded Strings
 ;; ==========================================================================
 
 ;; #### WARNING: I'm lucky enough that padded strings only occur in the header
@@ -225,50 +225,61 @@ SET-TO-ZERO."
 ;; Otherwise, I'd be in trouble with the class-wide SECTION slot in
 ;; conditions...
 
-(define-condition invalid-string-length (tfm-compliance-error)
+;; #### NOTE: this mixin is currently empty but serves as a catchall for
+;; WITH-CONDITION-CONTEXT.
+(define-condition padded-string (tfm)
+  ()
+  (:documentation "The Padded String condition.
+This is a mixin for all conditions related to padded strings."))
+
+
+(define-condition invalid-padded-string-length
+    (tfm-compliance-error padded-string)
   ((section :initform 10) ; slot merge
    (value
     :documentation "The invalid length."
     :initarg :value
     :accessor value)
-   (padding
+   (pad
     :documentation "The maximum length."
-    :initarg :padding
-    :accessor padding))
-  (:documentation "The Invalid String Length compliance error.
+    :initarg :pad
+    :accessor pad))
+  (:documentation "The Invalid Padded String Length compliance error.
 It signals that the declared length of a padded string is greater than its
 maximum."))
 
-(define-condition-report (condition invalid-string-length)
+(define-condition-report (condition invalid-padded-string-length)
   "declared padded string length ~A is greater than its maximum ~A"
   (value condition)
-  (1- (padding condition)))
+  (1- (pad condition)))
 
 
-(define-condition invalid-bcpl-string (tfm-compliance-error)
+(define-condition invalid-padded-string (tfm-compliance-error padded-string)
   ((section :initform 10) ; slot merge
    (value :documentation "The invalid string." :initarg :value :accessor value))
-  (:documentation "The Invalid BCPL String compliance error.
-It signals that a BCPL string contains parentheses or non-ASCII characters."))
+  (:documentation "The Invalid Padded String compliance error.
+It signals that a padded string is not in BCPL format (it contains parentheses
+or non-ASCII characters)."))
 
-(define-condition-report (condition invalid-bcpl-string)
-  "BCPL string ~S is invalid (it shouldn't contain parentheses or non-ASCII ~
-characters)"
+(define-condition-report (condition invalid-padded-string)
+  "padded string ~S is not in BCPL format (it contains parentheses and/or ~
+non-ASCII characters)"
   (value condition))
 
 
-(define-condition string-tail (tfm-compliance-warning)
-  ((value :documentation "The strings' tail." :initarg :value :accessor value))
-  (:documentation "The String Tail compliance warning.
+(define-condition padded-string-overflow (tfm-compliance-warning padded-string)
+  ((value :documentation "The string's overflow."
+	  :initarg :value :accessor value))
+  (:documentation "The Padded String Overflow compliance warning.
 It signals that a padded string contains non null characters after its
 declared length."))
 
-(define-condition-report (condition string-tail)
-  "padded string has a non-null tail (~S)"
+(define-condition-report (condition padded-string-overflow)
+  "padded string contains non-null overflow characters (~S)"
   (value condition))
 
-(defmethod print-object :after ((condition string-tail) stream)
-  "Advertise String Tail CONDITION's relevant documentation."
+(defmethod print-object :after ((condition padded-string-overflow) stream)
+  "Advertise padded string overflow CONDITION's relevant documentation."
   (unless *print-escape*
     (format stream
 	"~&This font may have been created before April 1983.
@@ -277,26 +288,27 @@ See §87 of the PLtoTF documentation, or “TeX Font Metrics Files”
 
 
 (defun read-padded-string
-    (padding &aux (length (read-byte *stream*)) string)
-  "Read a BCPL string out of PADDING bytes from *STREAM*.
+    (pad &aux (length (read-byte *stream*)) string)
+  "Read a padded string out of PAD bytes from *STREAM*.
 The first byte in *STREAM* indicates the actual length of the string.
-The remaining bytes are ignored.
 
-If the declared string length is too large, signal an INVALID-STRING-LENGTH
-error. This error is immediately restartable with READ-MAXIMUM-LENGTH or
-DISCARD-STRING.
+If the declared string's length is too large, signal an
+INVALID-PADDED-STRING-LENGTH error. This error is immediately restartable with
+READ-MAXIMUM-LENGTH or DISCARD-STRING.
 
-If the string is not in BCPL format (it contains parentheses or non plain
-ASCII characters, signal an INVALID-BCPL-STRING error. This error is
-immediately restartable with KEEP-STRING, FIX-STRING (replacing parentheses
-with slashes, and non plain ASCII characters with question marks), or
-DISCARD-STRING."
-  (unless (< length padding)
-    (restart-case (error 'invalid-string-length :value length :padding padding)
+If the string is not in BCPL format (it contains parentheses or non-ASCII
+characters, signal an INVALID-PADDED-STRING error. This error is immediately
+restartable with KEEP-STRING, FIX-STRING (replacing parentheses with slashes,
+and non-ASCII characters with question marks), or DISCARD-STRING.
+
+If the string is not padded with zeros, signal a PADDED-STRING-OVERFLOW
+warning."
+  (unless (< length pad)
+    (restart-case (error 'invalid-padded-string-length :value length :pad pad)
       (read-maximum-length () :report "Read the maximum possible length."
-	(setq length (1- padding)))
+	(setq length (1- pad)))
       (discard-string () :report "Discard the string."
-	(setq length 0))))
+	(return-from read-padded-string)))) ; also bypass the overflow check
   (unless (zerop length)
     (setq string (make-string length))
     (loop :for i :from 0 :upto (1- length)
@@ -309,7 +321,7 @@ DISCARD-STRING."
 			 (or (< (char-code character) 32)
 			     (> (char-code character) 126)))
 		       string))
-      (restart-case (error 'invalid-bcpl-string :value string)
+      (restart-case (error 'invalid-padded-string :value string)
 	(keep-string () :report "Keep it anyway.")
 	(fix-string () :report "Fix it using /'s and ?'s."
 	  (loop :for i :from 0 :upto (1- (length string))
@@ -337,7 +349,7 @@ DISCARD-STRING."
 
   ;; So it may very well be the case that older tfm files do have garbage
   ;; after the actual string. In any case, this is worth a warning.
-  (let ((tail-length (- padding 1 length)))
+  (let ((tail-length (- pad 1 length)))
     (unless (zerop tail-length)
       (let ((tail (make-string tail-length)))
 	(loop :for i :from 0 :upto (1- tail-length)
@@ -345,7 +357,7 @@ DISCARD-STRING."
 	      ;; encoding agrees at least with ASCII.
 	      :do (setf (aref tail i) (code-char (read-byte *stream*))))
 	(when (find-if-not #'zerop tail :key #'char-code)
-	  (warn 'string-tail :value tail)))))
+	  (warn 'padded-string-overflow :value tail)))))
   string)
 
 
