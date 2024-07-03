@@ -45,7 +45,7 @@ This structure is used to store decoded information from the char-info table
   lig/kern-index next-char exten-index)
 
 (define-condition invalid-char-info (tfm-compliance-error)
-  ((section :initform 1091) ; slot merge
+  ((section :initform 11) ; slot merge
    (value
     :documentation "The invalid char-info structure."
     :initarg :value

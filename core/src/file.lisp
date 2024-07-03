@@ -34,7 +34,7 @@
 ;; ==========================================================================
 
 (define-condition invalid-design-size (tfm-compliance-error)
-  ((section :initform 1090) ; slot merge
+  ((section :initform 10) ; slot merge
    (value
     :documentation "The invalid design size."
     :initarg :value
@@ -48,7 +48,7 @@ It signals that a design size is too small (< 1pt)."))
 
 
 (define-condition invalid-original-design-size (tfm-compliance-warning)
-  ((section :initform 1090) ; slot merge
+  ((section :initform 10) ; slot merge
    (value
     :documentation "The invalid original design size."
     :initarg :value
@@ -143,7 +143,7 @@ If so, decrease LENGTH by NEEDED afterwards."
 This is the root condition for errors related to TFM tables."))
 
 (define-condition invalid-table-index (tfm-table-error)
-  ((section :initform 1088) ; slot merge
+  ((section :initform 8) ; slot merge
    (value
     :documentation "The invalid index."
     :initarg :value
@@ -180,7 +180,7 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
 ;; -------------------------
 
 (define-condition invalid-ligature-opcode (tfm-compliance-error)
-  ((section :initform 1093) ; slot merge
+  ((section :initform 13) ; slot merge
    (value
     :documentation "The invalid ligature opcode."
     :initarg :value
@@ -293,7 +293,7 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
 ;; ---------------------
 
 (define-condition invalid-table-start (tfm-table-error)
-  ((section :initform 1091) ; slot merge
+  ((section :initform 11) ; slot merge
    (value
     :documentation "The invalid first table value."
     :initarg :value
@@ -308,7 +308,7 @@ It signals that the first value in a TFM table is not 0."))
 
 
 (define-condition no-boundary-character (tfm-compliance-error)
-  ((section :initform 1093)) ; slot merge
+  ((section :initform 13)) ; slot merge
   (:documentation "The No Boundary Character compliance error.
 It signals that a boundary character ligature/kerning program was found,
 without a boundary character being defined."))
@@ -319,7 +319,7 @@ without a boundary character being defined")
 
 
 (define-condition character-list-cycle (tfm-compliance-error)
-  ((section :initform 1092) ; slot merge
+  ((section :initform 12) ; slot merge
    (value
     :documentation "The cyclic character list."
     :initarg :value
@@ -333,7 +333,7 @@ It signals that a cycle was found in a list of ascending character sizes."))
 
 
 (define-condition ligature-cycle (tfm-compliance-error)
-  ((section :initform 1093) ; slot merge
+  ((section :initform 13) ; slot merge
    (value
     :documentation "The ligature introducing a cycle."
     :initarg :value
@@ -649,7 +649,7 @@ It is used in both errors and warnings to report different declared and
 actual file sizes."))
 
 (define-condition file-underflow (file-size-mixin tfm-compliance-error)
-  ((section :initform 1088)) ; slot merge
+  ((section :initform 8)) ; slot merge
   (:documentation "The File Underflow compliance error.
 It signals that the file size is shorter than expected."))
 
@@ -663,7 +663,7 @@ It signals that the file size is shorter than expected."))
 ;; ignores junk at the end of TFM files (see TeX: the Program [575]). We hence
 ;; do the same, but still signal a warning.
 (define-condition file-overflow (file-size-mixin tfm-compliance-warning)
-  ((section :initform 1088)) ; slot merge
+  ((section :initform 8)) ; slot merge
   (:documentation "The File Overflow compliance warning.
 It signals that the file size is longer than expected."))
 
@@ -674,7 +674,7 @@ It signals that the file size is longer than expected."))
 
 
 (define-condition invalid-header-length (tfm-compliance-error)
-  ((section :initform 1088) ; slot merge
+  ((section :initform 8) ; slot merge
    (value
     :documentation "The invalid header length."
     :initarg :value
@@ -688,7 +688,7 @@ It signals that a header length is too small (< 2 words)."))
 
 
 (define-condition invalid-character-range (tfm-compliance-error)
-  ((section :initform 1088) ; slot merge
+  ((section :initform 8) ; slot merge
    (bc :documentation "The smallest character code." :initarg :bc :accessor bc)
    (ec :documentation "The largest character code." :initarg :ec :accessor ec))
   (:documentation "The Invalid Character Range compliance error.
@@ -701,7 +701,7 @@ It signals that BC-1 > EC, or that EC > 255."))
 
 
 (define-condition invalid-section-lengths (tfm-compliance-error)
-  ((section :initform 1088) ; slot merge
+  ((section :initform 8) ; slot merge
    (lf
     :documentation "The declared length of the file."
     :initarg :lf
@@ -767,7 +767,7 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 
 
 (define-condition invalid-table-length (tfm-table-error)
-  ((section :initform 1091) ; slot merge
+  ((section :initform 11) ; slot merge
    (value
     :documentation "The invalid table length."
     :initarg :value

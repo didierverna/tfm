@@ -107,16 +107,16 @@ initialized with INITARGS."
 
 
 (define-condition tfm-compliance (tfm)
-  ((section :documentation "The related documentation section."
+  ((section :documentation "The related TFtoPL documentation section."
 	    :allocation :class :initform nil :reader section))
   (:documentation "The TFM Compliance root condition.
 This is the mixin for conditions related to TFM compliance."))
 
 (defmethod print-object :after ((condition tfm-compliance) stream)
-  "Advertise CONDITION's relevant section in the documentation."
+  "Advertise CONDITION's relevant section in the TFtoPL documentation."
   (unless (or *print-escape* (not (section condition)))
     (format stream
-	"~&See §~A of the METAFONT Book (Computers & Typesetting, Volume C) for more information."
+	"~&See §~A of the TFtoPL documentation for more information."
       (section condition))))
 
 (define-condition tfm-compliance-warning (tfm-warning tfm-compliance)
@@ -153,7 +153,7 @@ This is the root condition for errors related to the use of the library."))
 ;; ==========================================================================
 
 (define-condition u16-overflow (tfm-compliance-error)
-  ((section :initform 1088) ; slot merge
+  ((section :initform 8) ; slot merge
    (value :documentation "The faulty value." :initarg :value :accessor value))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
@@ -184,7 +184,7 @@ If >= 2^15, signal a U16-OVERFLOW error."
 
 
 (define-condition fix-word-overflow (tfm-compliance-error)
-  ((section :initform 1089) ; slot merge
+  ((section :initform 9) ; slot merge
    (value :documentation "The faulty value." :initarg :value :accessor value))
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
