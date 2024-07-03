@@ -62,6 +62,16 @@ too small (< 1pt)."))
   (value condition))
 
 
+(defclass string-context (context)
+  ((name :documentation "The string name." :initarg :name :reader name))
+  (:documentation "The STRING-CONTEXT class."))
+
+(defmethod context-string ((context string-context))
+  "Return string CONTEXT string."
+  (format nil "while reading the ~A string"
+    (name context)))
+
+
 (defun parse-header (length font)
   "Parse a header of LENGTH words from *STREAM* into FONT.
 If FONT's design size is less than 1pt, signal an INVALID-DESIGN-SIZE error.
@@ -91,7 +101,9 @@ INVALID-ORIGINAL-DESIGN-SIZE warning."
 	       "Execute BODY if LENGTH >= NEEDED.
 If so, decrease LENGTH by NEEDED afterwards."
 	       `(when (>= length ,needed) ,@body (decf length ,needed))))
-    (checking-length 10 (setf (encoding font) (read-padded-string 40)))
+    (with-condition-context
+	(string-tail string-context :name "character encoding scheme")
+      (checking-length 10 (setf (encoding font) (read-padded-string 40))))
     (when (encoding font)
       ;; #### NOTE: we don't upcase the BCPL strings, but tftopl does, so it's
       ;; probably better to do string comparisons on upcased versions. Also,
@@ -101,7 +113,9 @@ If so, decrease LENGTH by NEEDED afterwards."
 	     (change-class font 'math-symbols-font))
 	    ((string= (string-upcase (encoding font)) "TEX MATH EXTENSION")
 	     (change-class font 'math-extension-font))))
-    (checking-length  5 (setf (family font) (read-padded-string 20)))
+    (with-condition-context
+	(string-tail string-context :name "font identifier")
+      (checking-length  5 (setf (family font) (read-padded-string 20))))
     (checking-length  1
       (let ((word (read-u32)))
 	(setf (7bits-safe font) (ldb (byte 1 31) word))
