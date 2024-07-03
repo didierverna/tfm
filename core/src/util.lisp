@@ -220,8 +220,14 @@ SET-TO-ZERO."
 ;; Strings
 ;; ==========================================================================
 
+;; #### WARNING: I'm lucky enough that padded strings only occur in the header
+;; section, and hence relate to section 10 of the TFtoPL documentation.
+;; Otherwise, I'd be in trouble with the class-wide SECTION slot in
+;; conditions...
+
 (define-condition invalid-string-length (tfm-compliance-error)
-  ((value
+  ((section :initform 10) ; slot merge
+   (value
     :documentation "The invalid length."
     :initarg :value
     :accessor value)
@@ -240,7 +246,8 @@ maximum."))
 
 
 (define-condition invalid-bcpl-string (tfm-compliance-error)
-  ((value :documentation "The invalid string." :initarg :value :accessor value))
+  ((section :initform 10) ; slot merge
+   (value :documentation "The invalid string." :initarg :value :accessor value))
   (:documentation "The Invalid BCPL String compliance error.
 It signals that a BCPL string contains parentheses or non-ASCII characters."))
 
