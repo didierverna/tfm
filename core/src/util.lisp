@@ -257,6 +257,25 @@ characters)"
   (value condition))
 
 
+(define-condition string-tail (tfm-compliance-warning)
+  ((value :documentation "The strings' tail." :initarg :value :accessor value))
+  (:documentation "The String Tail compliance warning.
+It signals that a padded string contains non null characters after its
+declared length."))
+
+(define-condition-report (condition string-tail)
+  "padded string has a non-null tail (~S)"
+  (value condition))
+
+(defmethod print-object :after ((condition string-tail) stream)
+  "Advertise String Tail CONDITION's relevant documentation."
+  (unless *print-escape*
+    (format stream
+	"~&This font may have been created before April 1983.
+See §87 of the PLtoTF documentation, or “TeX Font Metrics Files”
+(David Fuchs, TUGBoat, Volume 2, №1) for more information.")))
+
+
 (defun read-padded-string
     (padding &aux (length (read-byte *stream*)) string)
   "Read a BCPL string out of PADDING bytes from *STREAM*.
@@ -317,8 +336,16 @@ DISCARD-STRING."
   ;; commenting on the routine creating a BCPL string.
 
   ;; So it may very well be the case that older tfm files do have garbage
-  ;; after the actual string.
-  (loop :repeat (- padding 1 length) :do (read-byte *stream*))
+  ;; after the actual string. In any case, this is worth a warning.
+  (let ((tail-length (- padding 1 length)))
+    (unless (zerop tail-length)
+      (let ((tail (make-string tail-length)))
+	(loop :for i :from 0 :upto (1- tail-length)
+	      ;; #### NOTE: this assumes that Lisp's internal character
+	      ;; encoding agrees at least with ASCII.
+	      :do (setf (aref tail i) (code-char (read-byte *stream*))))
+	(when (find-if-not #'zerop tail :key #'char-code)
+	  (warn 'string-tail :value tail)))))
   string)
 
 
