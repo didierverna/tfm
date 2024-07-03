@@ -129,6 +129,8 @@ If so, decrease LENGTH by NEEDED afterwards."
 	      ((12 13 14 15 16 17)
 	       (setf (expansion font) :extended
 		     (aref (face-code font) 2) #\E))))))))
+  ;; #### TODO: if applicable, maybe store the remainder somewhere instead of
+  ;; just discarding it.
   (loop :repeat length :do (read-u32)))
 
 
