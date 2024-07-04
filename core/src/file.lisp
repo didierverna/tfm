@@ -670,9 +670,9 @@ actual file sizes."))
 It signals that the file size is shorter than expected."))
 
 (define-condition-report (condition file-underflow)
-  "actual file size ~A is lesser than declared one ~A"
-  (actual-size condition)
-  (declared-size condition))
+  "declared file size ~A is greater than actual ~A"
+  (declared-size condition)
+  (actual-size condition))
 
 
 ;; #### NOTE: this one is a warning instead of an error because TeX silently
@@ -684,7 +684,7 @@ It signals that the file size is shorter than expected."))
 It signals that the file size is longer than expected."))
 
 (define-condition-report (condition file-overflow)
-  "declared file size ~A is lesser than actual one ~A"
+  "declared file size ~A is less than actual ~A"
   (declared-size condition)
   (actual-size condition))
 
