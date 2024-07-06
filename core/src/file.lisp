@@ -382,6 +382,15 @@ It signals that a ligature introduces a cycle for a cons of characters."))
     (index context)
     (1- (size context))))
 
+(defclass char-info-table-context (table-context)
+  ((code :documentation "The corresponding character code."
+	 :initarg :code :reader code))
+  (:documentation "The Char Info Table Context class."))
+
+(defmethod context-string ((context char-info-table-context))
+  "Return char info table CONTEXT string."
+  (format nil "~A, for character code ~A" (call-next-method) (code context)))
+
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT.
@@ -430,9 +439,11 @@ DISCARD-EXTENSION-RECIPE."
 
     ;; 1. Read the tables.
     (loop :for i :from 0 :upto (1- nc)
+	  :for code :from (min-code font)
 	  :for word = (read-u32)
-	  :do (with-condition-context (invalid-char-info table-context
-					:name "char info" :index i :size nc)
+	  :do (with-condition-context
+		  (invalid-char-info char-info-table-context
+		    :name "char info" :code code :index i :size nc)
 		(vector-push (decode-char-info word) char-infos)))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
