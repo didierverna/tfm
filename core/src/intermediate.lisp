@@ -44,22 +44,30 @@ This structure is used to store decoded information from the char-info table
   width-index height-index depth-index italic-index
   lig/kern-index next-char exten-index)
 
-(define-condition invalid-char-info (tfm-compliance-error)
+;; #### FIXME: this one is a bit obscure and I don't fully understand it.
+;; There seems to be fonts that are all zero'ed out, except for a lig/kern
+;; program index. Why would a non-existent character in the font still have a
+;; lig/kern program ? One possibility would be a bounding character (in which
+;; case this warning would be wrong), but experimentation shows that it's not.
+
+(define-condition spurious-char-info (tfm-compliance-warning)
   ((section :initform 11) ; slot merge
    (value
-    :documentation "The invalid char-info structure."
+    :documentation "The culprit char-info structure."
     :initarg :value
     :accessor value))
-  (:documentation "The Invalid Char Info compliance error.
-It signals that a char-info with a width-index of 0 is not completely
-zero'ed out."))
+  (:documentation "The Spurious Char Info compliance warning.
+It signals that a char-info for a non-existent character (that is, with a
+width-index of 0) is not completely zero'ed out."))
 
-(define-condition-report (condition invalid-char-info)
-  "~A is invalid (should be zero'ed out)"
+(define-condition-report (condition spurious-char-info)
+  "char-info structure for a non-existent character is not blank~%~A"
   (value condition))
 
 (defun decode-char-info (word)
-  "Decode char-info WORD into a new CHAR-INFO instance, and return it."
+  "Decode char-info WORD into a new CHAR-INFO instance, and return it.
+If the char-info denotes a non-existent character (that is, it is has a width
+index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
   (let ((char-info (make-char-info
 		    :width-index (ldb (byte 8 24) word)
 		    :height-index (ldb (byte 4 20) word)
@@ -71,14 +79,8 @@ zero'ed out."))
       (1 (setf (lig/kern-index char-info) remainder))
       (2 (setf (next-char char-info) remainder))
       (3 (setf (exten-index char-info) remainder)))
-    ;; #### FIXME: actually, I'm not so sure about this anymore. TFM has
-    ;; encountered fonts in TeXlive that are all zero'ed out, except for a
-    ;; lig/kern program index. Why would a non-existent character in the font
-    ;; still have a lig/kern program ?
     (unless (or (not (zerop (width-index char-info))) (zerop word))
-      (restart-case (error 'invalid-char-info :value char-info)
-	(set-to-zero () :report "Zero it out."
-	  (setq char-info (decode-char-info 0)))))
+      (warn 'spurious-char-info :value char-info))
     char-info))
 
 

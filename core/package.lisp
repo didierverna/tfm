@@ -89,7 +89,7 @@
     :invalid-ligature-opcode :value
     :abort-lig/kern-program :discard-ligature :discard-kerning
     :abort-lig/kern-program
-    :invalid-char-info :value
+    :spurious-char-info :value
     :invalid-table-start :value
     :no-boundary-character
     :character-list-cycle :value

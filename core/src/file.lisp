@@ -442,7 +442,7 @@ DISCARD-EXTENSION-RECIPE."
 	  :for code :from (min-code font)
 	  :for word = (read-u32)
 	  :do (with-condition-context
-		  (invalid-char-info char-info-table-context
+		  (spurious-char-info char-info-table-context
 		    :name "char info" :code code :index i :size nc)
 		(vector-push (decode-char-info word) char-infos)))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")

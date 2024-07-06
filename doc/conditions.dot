@@ -4,12 +4,12 @@ strict digraph {
 
 
 
-  "file-overflow" [shape=box color=green fixedsize=true width=2.3]
-  "padded-string-overflow" [shape=box color=green fixedsize=true width=2.3]
-  "invalid-original-design-size" [shape=box color=green fixedsize=true width=2.3]
+  "file-overflow", "padded-string-overflow", "invalid-original-design-size",
+  "spurious-char-info"
+  [shape=box color=green fixedsize=true width=2.3]
 
   "character-list-cycle", "file-underflow", "u16-overflow",
-  "fix-word-overflow", "invalid-padded-string", "invalid-char-info",
+  "fix-word-overflow", "invalid-padded-string",
   "invalid-character-code", "invalid-character-range", "invalid-design-size",
   "invalid-header-length", "invalid-ligature-opcode",
   "invalid-section-lengths", "invalid-padded-string-length", "invalid-table-index",
@@ -30,7 +30,7 @@ strict digraph {
   "invalid-padded-string" -> "keep-string" -> "fix-string" -> "discard-string" -> "cancel-loading";
   "invalid-padded-string-length" -> "read-maximum-length" -> "discard-string" -> "cancel-loading";
   "padded-string-overflow" -> "cancel-loading";
-"invalid-char-info" -> "set-to-zero" -> "cancel-loading";
+  "spurious-char-info" -> "cancel-loading";
   "invalid-character-code" -> "cancel-loading";
   "invalid-character-code" -> "discard-extension-recipe" -> "cancel-loading";
   "invalid-character-code" -> "discard-kerning" -> "cancel-loading";
