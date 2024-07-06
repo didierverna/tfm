@@ -373,7 +373,7 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 	  :initarg :index :reader index)
    (size :documentation "The table size."
 	 :initarg :size :reader size))
-  (:documentation "The TABLE-CONTEXT class."))
+  (:documentation "The Table Context class."))
 
 (defmethod context-string ((context table-context))
   "Return table CONTEXT string."
