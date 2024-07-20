@@ -162,13 +162,14 @@ It signals that an unsigned 16 bits integer is greater than 2^15."))
   "unsigned 16 bits integer ~A is greater than 2^15"
   (value condition))
 
-(defun read-u16 ()
+(defun read-u16 (&optional (limit t))
   "Read an unsigned 16 bits Big Endian integer from *STREAM* and return it.
-If >= 2^15, signal a U16-OVERFLOW error."
+If LIMIT (the default), check that the number is less than 2^15, or signal a
+U16-OVERFLOW error."
   (let ((u16 0))
     (setf (ldb (byte 8 8) u16) (read-byte *stream*)
 	  (ldb (byte 8 0) u16) (read-byte *stream*))
-    (unless (zerop (ldb (byte 1 15) u16))
+    (when (and limit (not (zerop (ldb (byte 1 15) u16))))
       (error 'u16-overflow :value u16))
     u16))
 
