@@ -953,7 +953,7 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 	     (warn 'extended-tfm :value "OFM" :file file))
 	    ((or (= lf 9) (= lf 11))
 	     (warn 'extended-tfm :value "JFM" :file file))
-	    ((numberp lf)
+	    (t
 	     (with-simple-restart (cancel-loading "Cancel loading this font.")
 	       (unless (zerop (ldb (byte 1 15) lf))
 		 (error 'u16-overflow :value lf))
