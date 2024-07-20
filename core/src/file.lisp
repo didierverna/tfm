@@ -945,14 +945,18 @@ CANCEL-LOADING, in which case this function simply returns NIL."
   (declare (ignore design-size freeze))
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
-    (let ((lf (with-simple-restart (cancel-loading "Cancel loading this font.")
-		(read-u16))))
+    ;; #### NOTE: in order to detect the format, we don't even know how many
+    ;; bytes to read at first. TFM requires 2 but OFM requires 4. So we cannot
+    ;; perform any early checking on the first two bytes.
+    (let ((lf (read-u16 nil)))
       (cond ((zerop lf)
 	     (warn 'extended-tfm :value "OFM" :file file))
 	    ((or (= lf 9) (= lf 11))
 	     (warn 'extended-tfm :value "JFM" :file file))
 	    ((numberp lf)
 	     (with-simple-restart (cancel-loading "Cancel loading this font.")
+	       (unless (zerop (ldb (byte 1 15) lf))
+		 (error 'u16-overflow :value lf))
 	       (apply #'load-tfm-font lf arguments)))))))
 
 ;;; file.lisp ends here
