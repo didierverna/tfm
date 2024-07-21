@@ -174,13 +174,26 @@ U16-OVERFLOW error."
     u16))
 
 
-(defun read-u32 ()
-  "Read an unsigned 32 bits Big Endian integer from *STREAM*."
+(define-condition u32-overflow (tfm-compliance-error)
+  ((value :documentation "The faulty value." :initarg :value :accessor value))
+  (:documentation "The U32 Overflow compliance error.
+It signals that an unsigned 32 bits integer is greater than 2^31."))
+
+(define-condition-report (condition u32-overflow)
+  "unsigned 32 bits integer ~A is greater than 2^31"
+  (value condition))
+
+(defun read-u32 (&optional (limit t))
+  "Read an unsigned 32 bits Big Endian integer from *STREAM* and return it.
+If LIMIT (the default), check that the number is less than 2^31, or signal a
+U32-OVERFLOW error."
   (let ((u32 0))
     (setf (ldb (byte 8 24) u32) (read-byte *stream*)
 	  (ldb (byte 8 16) u32) (read-byte *stream*)
 	  (ldb (byte 8  8) u32) (read-byte *stream*)
 	  (ldb (byte 8  0) u32) (read-byte *stream*))
+    (when (and limit (not (zerop (ldb (byte 1 31) u32))))
+      (error 'u32-overflow :value u32))
     u32))
 
 
@@ -200,7 +213,7 @@ It signals that a fix word is outside ]-16,+16[."))
 If LIMIT (the default), check that the number lies within ]-16,+16[, or
 signal a FIX-WORD-OVERFLOW error. This error is immediately restartable with
 SET-TO-ZERO."
-  (let* ((bytes (read-u32))
+  (let* ((bytes (read-u32 nil))
 	 (neg (= (ldb (byte 1 31) bytes) 1))
 	 fix-word)
     (when neg (setq bytes (lognot (1- bytes))))

@@ -80,7 +80,7 @@ However, if FONT's design size was explicitly overridden, only signal an
 INVALID-ORIGINAL-DESIGN-SIZE warning."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
   ;; LOAD-TFM-FONT.
-  (setf (checksum font) (read-u32))
+  (setf (checksum font) (read-u32 nil))
   (decf length)
   (setf (original-design-size font) (read-fix-word nil))
   (unless (>= (original-design-size font) 1)
@@ -117,7 +117,7 @@ If so, decrease LENGTH by NEEDED afterwards."
 	(padded-string padded-string-context :name "font identifier")
       (checking-length  5 (setf (family font) (read-padded-string 20))))
     (checking-length  1
-      (let ((word (read-u32)))
+      (let ((word (read-u32 nil)))
 	(setf (7bits-safe font) (ldb (byte 1 31) word))
 	(let ((face (ldb (byte 8 0) word)))
 	  (setf (face-number font) face)
@@ -145,7 +145,7 @@ If so, decrease LENGTH by NEEDED afterwards."
 		     (aref (face-code font) 2) #\E))))))))
   ;; #### TODO: if applicable, maybe store the remainder somewhere instead of
   ;; just discarding it.
-  (loop :repeat length :do (read-u32)))
+  (loop :repeat length :do (read-u32 nil)))
 
 
 
@@ -440,7 +440,7 @@ DISCARD-EXTENSION-RECIPE."
     ;; 1. Read the tables.
     (loop :for i :from 0 :upto (1- nc)
 	  :for code :from (min-code font)
-	  :for word = (read-u32)
+	  :for word = (read-u32 nil)
 	  :do (with-condition-context
 		  (spurious-char-info char-info-table-context
 		    :name "char info" :code code :index i :size nc)
@@ -461,11 +461,11 @@ DISCARD-EXTENSION-RECIPE."
 			      :name name :index i :size length)
 			  (vector-push (read-fix-word) array))))
     (loop :repeat nl
-	  :do (vector-push (decode-lig/kern (read-u32)) lig/kerns))
+	  :do (vector-push (decode-lig/kern (read-u32 nil)) lig/kerns))
     (loop :repeat nk
 	  :do (vector-push (read-fix-word) kerns))
     (loop :repeat ne
-	  :do (vector-push (decode-exten (read-u32)) extens))
+	  :do (vector-push (decode-exten (read-u32 nil)) extens))
 
     ;; 2. Create the character metrics.
     (loop :for char-info :across char-infos
