@@ -84,6 +84,7 @@
 
     ;; From src/omega.lisp:
     :invalid-ofm-level :value
+    :l0-omega-font :direction
     
     ;; From src/file.lisp:
     :invalid-design-size :value :set-to-ten
@@ -105,6 +106,7 @@
     :invalid-header-length :value
     :invalid-character-range :bc :ec
     :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
+    :invalid-l0-ofm-section-lengths
     :invalid-table-length :value :smallest :largest
     :extended-tfm :value :file
     :load-font :cancel-loading))

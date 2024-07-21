@@ -727,6 +727,36 @@ It signals that BC-1 > EC, or that EC > 255."))
   (ec condition))
 
 
+(define-condition invalid-table-length (tfm-table-error)
+  ((section :initform 11) ; slot merge
+   (value
+    :documentation "The invalid table length."
+    :initarg :value
+    :accessor value)
+   (smallest
+    :documentation "The smallest table length."
+    :initarg :smallest
+    :accessor smallest)
+   (largest
+    :documentation "The largest table length."
+    :initarg :largest
+    :accessor largest))
+  (:documentation "The Invalid Table Length compliance error.
+It signals that a declared TFM table's length is out of range."))
+
+(define-condition-report (condition invalid-table-length)
+  "~A table length ~A is invalid (should be in [~A,~A])"
+  (name condition)
+  (value condition)
+  (smallest condition)
+  (largest condition))
+
+
+
+;; ==========================================================================
+;; TFM Data
+;; ==========================================================================
+
 (define-condition invalid-section-lengths (tfm-compliance-error)
   ((section :initform 8) ; slot merge
    (lf
@@ -793,37 +823,12 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
   (np condition))
 
 
-(define-condition invalid-table-length (tfm-table-error)
-  ((section :initform 11) ; slot merge
-   (value
-    :documentation "The invalid table length."
-    :initarg :value
-    :accessor value)
-   (smallest
-    :documentation "The smallest table length."
-    :initarg :smallest
-    :accessor smallest)
-   (largest
-    :documentation "The largest table length."
-    :initarg :largest
-    :accessor largest))
-  (:documentation "The Invalid Table Length compliance error.
-It signals that a declared TFM table's length is out of range."))
-
-(define-condition-report (condition invalid-table-length)
-  "~A table length ~A is invalid (should be in [~A,~A])"
-  (name condition)
-  (value condition)
-  (smallest condition)
-  (largest condition))
-
-
 (defun load-tfm-font
     (lf &key (file (when (typep *stream* 'file-stream) (pathname *stream*)))
 	     (name (when file (pathname-name file)))
 	     design-size freeze
-	&aux (font (make-font name :file file)))
-  "Parse *STREAM* of declared length LF into a new font, and return it.
+	&aux (font (make-font name 'font :file file)))
+  "Parse *STREAM* of declared length LF into a new TFM font.
 - FILE defaults to *STREAM*'s associated file if any.
 - NAME defaults to the FILE's base name, if any.
 - If DESIGN-SIZE is provided and not a real greater or equal to 1, signal a
@@ -914,6 +919,133 @@ length, signal an INVALID-SECTION-LENGTHS error."
 
 
 ;; ==========================================================================
+;; Level 0 OFM Data
+;; ==========================================================================
+
+(define-condition invalid-l0-ofm-section-lengths (invalid-section-lengths)
+  ((section :initform nil)) ; slot merge
+  (:documentation "The Invalid Level 0 OFM Section Lengths compliance error.
+It signals that
+LF != 14 + LH + 2*NC + NW + NH + ND + NI + 2*NL + NK + 2*NE + NP."))
+
+(define-condition-report (condition invalid-section-lengths)
+  "section lengths don't satisfy ~
+~A (lf) = 14 + ~A (lh) + 2*~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
++ 2*~A (nl) + ~A (nk) + 2*~A (ne) + ~A (np)"
+  (lf condition)
+  (lh condition)
+  (nc condition)
+  (nw condition)
+  (nh condition)
+  (nd condition)
+  (ni condition)
+  (nl condition)
+  (nk condition)
+  (ne condition)
+  (np condition))
+
+
+(defun load-l0-ofm-font
+    (lf &key (file (when (typep *stream* 'file-stream) (pathname *stream*)))
+	     (name (when file (pathname-name file)))
+	     design-size freeze
+	&aux (font (make-font name 'l0-omega-font :file file)))
+  "Parse *STREAM* of declared length LF into a new level 0 OFM font.
+- FILE defaults to *STREAM*'s associated file if any.
+- NAME defaults to the FILE's base name, if any.
+- If DESIGN-SIZE is provided and not a real greater or equal to 1, signal a
+  type error. Otherwise, override the original design size with it.
+- When FREEZE (NIL by default), freeze the font immediately after creation.
+
+If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
+If *STREAM* is longer than expected, signal a FILE-OVERFLOW warning.
+
+If the declared header length is less than 2, signal an INVALID-HEADER-LENGTH
+error.
+
+If BC and EC don't make sense, signal an INVALID-CHARACTER-RANGE error.
+
+If the widths, heights, depths, italic corrections, or extens tables lengths
+are not within the expected range, signal an INVALID-TABLE-LENGTH error.
+
+Finally, if the declared sections lengths don't add up to the declared file
+length, signal an INVALID-SECTION-LENGTHS error."
+
+  ;; 0. Handle early, user-provided information.
+  (when design-size (setf (design-size font) design-size))
+
+  ;; 1. Read the rest of the preamble and perform some sanity checks.
+  ;; #### NOTE: the errors signalled below (directly, or by READ-U32) are
+  ;; really too early to attempt any clever recovery.
+  (let ((lh (read-u32))
+	(bc (read-u32))
+	(ec (read-u32))
+	(nw (read-u32))
+	(nh (read-u32))
+	(nd (read-u32))
+	(ni (read-u32))
+	(nl (read-u32))
+	(nk (read-u32))
+	(ne (read-u32))
+	(np (read-u32))
+	(fd (read-u32))
+	nc)
+    (let ((actual-size (file-length *stream*))
+	  (declared-size (* 4 lf)))
+      (when actual-size
+	(cond ((< actual-size declared-size)
+	       (error 'file-underflow
+		 :actual-size actual-size
+		 :declared-size declared-size))
+	      ((> actual-size declared-size)
+	       ;; #### NOTE: we could collect the actual junk at the end of
+	       ;; parsing and report it, but it doesn't seem to be worth it.
+	       ;; I've looked at a couple of concerned files and there doesn't
+	       ;; seem to be any kind of interesting information in there
+	       ;; (contrary to padded strings).
+	       (warn 'file-overflow
+		     :actual-size actual-size
+		     :declared-size declared-size)))))
+    (unless (>= lh 2) (error 'invalid-header-length :value lh))
+    (unless (and (<= (1- bc) ec) (<= ec 65535))
+      (error 'invalid-character-range :bc bc :ec ec))
+    ;; #### FIXME: what to do about this?
+    ;; (when (> bc 255) (setq bc 1 ec 0))
+    (setq nc (+ ec (- bc) 1))
+    (setf (min-code font) bc (max-code font) ec)
+    (loop :for length :in (list nw nh nd ni ne)
+	  :for min :in '(1 1 1 1 0)
+	  :for max :in '(65536 256 256 256 256)
+	  :for name :in '("widths" "heights" "depths" "italic corrections"
+			  "extens")
+	  :unless (<= min length max)
+	    :do (error 'invalid-table-length
+		       :value length :smallest min :largest max :name name))
+    (unless (= lf (+ 14 lh (* 2 nc) nw nh nd ni (* 2 nl) nk (* 2 ne) np))
+      (error 'invalid-l0-ofm-section-lengths
+	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
+	     :ne ne :np np))
+    (setf (direction font) fd)
+
+    ;; 2. Parse the header section.
+    (parse-header lh font)
+
+    #|
+    ;; 3. Parse the 8 character-related sections.
+    (parse-character-information nc nw nh nd ni nl nk ne font)
+
+    ;; 4. Parse the parameters section.
+    (parse-parameters np font)|#)
+
+  ;; 5. Maybe freeze the font
+    #|
+    (when freeze (freeze font))
+    |#
+  font)
+
+
+
+;; ==========================================================================
 ;; Entry Point
 ;; ==========================================================================
 
@@ -952,7 +1084,10 @@ CANCEL-LOADING, in which case this function simply returns NIL."
       (cond ((zerop lf)
 	     (setq lf (read-u16 nil))
 	     (cond ((zerop lf)
-		    )
+		    (setq lf (read-u32))
+		    (with-simple-restart
+			(cancel-loading "Cancel loading this font.")
+		      (apply #'load-l0-ofm-font lf arguments)))
 		   ((= lf 1)
 		    (warn 'extended-tfm :value "Level 1 OFM" :file file))
 		   (t

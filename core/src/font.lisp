@@ -289,10 +289,10 @@ It signals an attempt at creating a font with no name."))
   "Check that FONT has a name, or signal an ANONYMOUS-FONT error."
   (unless name (error 'anonymous-font)))
 
-(defun make-font (name &rest initargs)
-  "Make a new NAMEd FONT instance, and return it.
+(defun make-font (name class &rest initargs)
+  "Make a new NAMEd instance of font CLASS, and return it.
 If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
-  (apply #'make-instance 'font :name name initargs))
+  (apply #'make-instance class :name name initargs))
 
 
 ;; ----------------
