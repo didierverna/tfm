@@ -82,6 +82,9 @@
     :big-op-spacing1 :big-op-spacing2 :big-op-spacing3 :big-op-spacing4
     :big-op-spacing5
 
+    ;; From src/omega.lisp:
+    :invalid-ofm-level :value
+    
     ;; From src/file.lisp:
     :invalid-design-size :value :set-to-ten
     :name

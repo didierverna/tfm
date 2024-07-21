@@ -950,7 +950,15 @@ CANCEL-LOADING, in which case this function simply returns NIL."
     ;; perform any early checking on the first two bytes.
     (let ((lf (read-u16 nil)))
       (cond ((zerop lf)
-	     (warn 'extended-tfm :value "OFM" :file file))
+	     (setq lf (read-u16 nil))
+	     (cond ((zerop lf)
+		    )
+		   ((= lf 1)
+		    (warn 'extended-tfm :value "Level 1 OFM" :file file))
+		   (t
+		    (with-simple-restart
+			(cancel-loading "Cancel loading this font.")
+		      (error 'invalid-ofm-level :value lf)))))
 	    ((or (= lf 9) (= lf 11))
 	     (warn 'extended-tfm :value "JFM" :file file))
 	    (t
