@@ -440,11 +440,10 @@ DISCARD-EXTENSION-RECIPE."
     ;; 1. Read the tables.
     (loop :for i :from 0 :upto (1- nc)
 	  :for code :from (min-code font)
-	  :for word = (read-u32)
 	  :do (with-condition-context
 		  (spurious-char-info char-info-table-context
 		    :name "char info" :code code :index i :size nc)
-		(vector-push (decode-char-info word) char-infos)))
+		(vector-push (read-char-info) char-infos)))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
