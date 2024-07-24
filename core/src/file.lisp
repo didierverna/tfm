@@ -438,12 +438,16 @@ DISCARD-EXTENSION-RECIPE."
 	(extens (make-array ne :fill-pointer 0)))
 
     ;; 1. Read the tables.
-    (loop :for i :from 0 :upto (1- nc)
+    (loop :with char-info-reader
+	    := (typecase font
+		 (l0-omega-font #'read-l0-omega-char-info)
+		 (t #'read-char-info))
+      :for i :from 0 :upto (1- nc)
 	  :for code :from (min-code font)
 	  :do (with-condition-context
 		  (spurious-char-info char-info-table-context
 		    :name "char info" :code code :index i :size nc)
-		(vector-push (read-char-info) char-infos)))
+		(vector-push (funcall char-info-reader) char-infos)))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
@@ -1029,10 +1033,10 @@ length, signal an INVALID-SECTION-LENGTHS error."
     ;; 2. Parse the header section.
     (parse-header lh font)
 
-    #|
     ;; 3. Parse the 8 character-related sections.
     (parse-character-information nc nw nh nd ni nl nk ne font)
 
+    #|
     ;; 4. Parse the parameters section.
     (parse-parameters np font)|#)
 

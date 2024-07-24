@@ -52,5 +52,34 @@ It signals that an OFM font advertises a level different from 0 or 1."))
 	      :accessor direction))
   (:documentation "The Level 0 Omega Font Metrics class."))
 
+
+;; ------------
+;; Intermediate
+;; ------------
+
+(defun read-l0-omega-char-info ()
+  "Read one char-info from *STREAM* into a new CHAR-INFO instance.
+If the char-info denotes a non-existent character (that is, it is has a width
+index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
+  (let* ((char-info (make-char-info
+		     :width-index (read-u16 nil)
+		     :height-index (read-byte *stream*)
+		     :depth-index (read-byte *stream*)
+		     :italic-index (read-byte *stream*)))
+	 (tag (ldb (byte 2 0) (read-byte *stream*)))
+	 (remainder (read-u16 nil)))
+    (case tag
+      (1 (setf (lig/kern-index char-info) remainder))
+      (2 (setf (next-char char-info) remainder))
+      (3 (setf (exten-index char-info) remainder)))
+    (unless (or (not (zerop (width-index char-info)))
+		(and (zerop (height-index char-info))
+		     (zerop (depth-index char-info))
+		     (zerop (italic-index char-info))
+		     (zerop tag)
+		     (zerop remainder)))
+      (warn 'spurious-char-info :value char-info))
+    char-info))
+
 ;;; omega.lisp ends here
 
