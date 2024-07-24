@@ -64,22 +64,28 @@ width-index of 0) is not completely zero'ed out."))
   "char-info structure for a non-existent character is not blank~%~A"
   (value condition))
 
-(defun decode-char-info (word)
-  "Decode char-info WORD into a new CHAR-INFO instance, and return it.
+(defun read-char-info ()
+  "Read one char-info from *STREAM* into a new CHAR-INFO instance.
 If the char-info denotes a non-existent character (that is, it is has a width
 index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
-  (let ((char-info (make-char-info
-		    :width-index (ldb (byte 8 24) word)
-		    :height-index (ldb (byte 4 20) word)
-		    :depth-index (ldb (byte 4 16) word)
-		    :italic-index (ldb (byte 6 10) word)))
-	(tag (ldb (byte 2 8) word))
-	(remainder (ldb (byte 8 0) word)))
+  (let* ((w (read-byte *stream*))
+	 (h&d (read-byte *stream*))
+	 (i&t (read-byte *stream*))
+	 (char-info (make-char-info
+		     :width-index w
+		     :height-index (ldb (byte 4 4) h&d)
+		     :depth-index (ldb (byte 4 0) h&d)
+		     :italic-index (ldb (byte 6 2) i&t)))
+	 (tag (ldb (byte 2 0) i&t))
+	 (remainder (read-byte *stream*)))
     (case tag
       (1 (setf (lig/kern-index char-info) remainder))
       (2 (setf (next-char char-info) remainder))
       (3 (setf (exten-index char-info) remainder)))
-    (unless (or (not (zerop (width-index char-info))) (zerop word))
+    (unless (or (not (zerop (width-index char-info)))
+		(and (zerop h&d)
+		     (zerop i&t)
+		     (zerop remainder)))
       (warn 'spurious-char-info :value char-info))
     char-info))
 

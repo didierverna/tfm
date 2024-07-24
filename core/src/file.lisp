@@ -394,9 +394,9 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT.
-NC (EC - BC + 1), NW, NH, ND, NI, NL, NK, and NE are the declared lengths of
-the 8 tables, that is, the char infos, widths, heights, depths, italic
-corrections, lig/kern instructions, kerns, and extens respectively.
+NC (EC - BC + 1), NW, NH, ND, NI, NL, NK, and NE are the declared numbers of
+entries in the 8 tables, that is, the char infos, widths, heights, depths,
+italic corrections, lig/kern instructions, kerns, and extens respectively.
 
 If a char info structure with a width index of 0 is not completely zero'ed
 out, signal an INVALID-CHAR-INFO error. This error is immediately restartable
@@ -440,11 +440,10 @@ DISCARD-EXTENSION-RECIPE."
     ;; 1. Read the tables.
     (loop :for i :from 0 :upto (1- nc)
 	  :for code :from (min-code font)
-	  :for word = (read-u32 nil)
 	  :do (with-condition-context
 		  (spurious-char-info char-info-table-context
 		    :name "char info" :code code :index i :size nc)
-		(vector-push (decode-char-info word) char-infos)))
+		(vector-push (read-char-info) char-infos)))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
