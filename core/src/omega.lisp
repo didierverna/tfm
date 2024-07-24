@@ -81,5 +81,13 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
       (warn 'spurious-char-info :value char-info))
     char-info))
 
+(defun read-l0-omega-lig/kern ()
+  "Read one lig/kern from *stream* into a new LIG/KERN instance."
+  (make-lig/kern
+   :skip (read-u16 nil)
+   :next (read-u16 nil)
+   :op (read-u16 nil)
+   :remainder (read-u16 nil)))
+
 ;;; omega.lisp ends here
 

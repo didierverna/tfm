@@ -463,8 +463,12 @@ DISCARD-EXTENSION-RECIPE."
 			    (fix-word-overflow table-context
 			      :name name :index i :size length)
 			  (vector-push (read-fix-word) array))))
-    (loop :repeat nl
-	  :do (vector-push (read-lig/kern) lig/kerns))
+    (loop :with lig/kern-reader
+	    := (typecase font
+		 (l0-omega-font #'read-l0-omega-lig/kern)
+		 (t #'read-lig/kern))
+	  :repeat nl
+	  :do (vector-push (funcall lig/kern-reader) lig/kerns))
     (loop :repeat nk
 	  :do (vector-push (read-fix-word) kerns))
     (loop :repeat ne
