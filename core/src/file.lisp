@@ -460,7 +460,7 @@ DISCARD-EXTENSION-RECIPE."
 			      :name name :index i :size length)
 			  (vector-push (read-fix-word) array))))
     (loop :repeat nl
-	  :do (vector-push (decode-lig/kern (read-u32)) lig/kerns))
+	  :do (vector-push (read-lig/kern) lig/kerns))
     (loop :repeat nk
 	  :do (vector-push (read-fix-word) kerns))
     (loop :repeat ne

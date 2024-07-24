@@ -121,12 +121,12 @@ This structure is used to store decoded information from the lig/kern table
 (see TeX: the Program [545])."
   skip next op remainder)
 
-(defun decode-lig/kern (word)
-  "Decode lig/kern WORD into a new LIG/KERN instance, and return it."
+(defun read-lig/kern ()
+  "Read one lig/kern from *stream* into a new LIG/KERN instance."
   (make-lig/kern
-   :skip (ldb (byte 8 24) word)
-   :next (ldb (byte 8 16) word)
-   :op (ldb (byte 8 8) word)
-   :remainder (ldb (byte 8 0) word)))
+   :skip (read-byte *stream*)
+   :next (read-byte *stream*)
+   :op (read-byte *stream*)
+   :remainder (read-byte *stream*)))
 
 ;;; intermediate.lisp ends here
