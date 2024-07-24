@@ -394,9 +394,9 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 
 (defun parse-character-information (nc nw nh nd ni nl nk ne font)
   "Parse the 8 character information tables from *STREAM* into FONT.
-NC (EC - BC + 1), NW, NH, ND, NI, NL, NK, and NE are the declared lengths of
-the 8 tables, that is, the char infos, widths, heights, depths, italic
-corrections, lig/kern instructions, kerns, and extens respectively.
+NC (EC - BC + 1), NW, NH, ND, NI, NL, NK, and NE are the declared numbers of
+entries in the 8 tables, that is, the char infos, widths, heights, depths,
+italic corrections, lig/kern instructions, kerns, and extens respectively.
 
 If a char info structure with a width index of 0 is not completely zero'ed
 out, signal an INVALID-CHAR-INFO error. This error is immediately restartable
