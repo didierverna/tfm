@@ -152,6 +152,11 @@ This is the root condition for errors related to the use of the library."))
 ;; Numbers
 ;; ==========================================================================
 
+(defun read-u8 ()
+  "Read an unsigned 8 bits integer from *STREAM*."
+  (read-byte *stream*))
+
+
 (define-condition u16-overflow (tfm-compliance-error)
   ((section :initform 8) ; slot merge
    (value :documentation "The faulty value." :initarg :value :accessor value))
@@ -167,8 +172,8 @@ It signals that an unsigned 16 bits integer is greater than 2^15."))
 If LIMIT (the default), check that the number is less than 2^15, or signal a
 U16-OVERFLOW error."
   (let ((u16 0))
-    (setf (ldb (byte 8 8) u16) (read-byte *stream*)
-	  (ldb (byte 8 0) u16) (read-byte *stream*))
+    (setf (ldb (byte 8 8) u16) (read-u8)
+	  (ldb (byte 8 0) u16) (read-u8))
     (when (and limit (not (zerop (ldb (byte 1 15) u16))))
       (error 'u16-overflow :value u16))
     u16))
@@ -188,10 +193,10 @@ It signals that an unsigned 32 bits integer is greater than 2^31."))
 If LIMIT (the default), check that the number is less than 2^31, or signal a
 U32-OVERFLOW error."
   (let ((u32 0))
-    (setf (ldb (byte 8 24) u32) (read-byte *stream*)
-	  (ldb (byte 8 16) u32) (read-byte *stream*)
-	  (ldb (byte 8  8) u32) (read-byte *stream*)
-	  (ldb (byte 8  0) u32) (read-byte *stream*))
+    (setf (ldb (byte 8 24) u32) (read-u8)
+	  (ldb (byte 8 16) u32) (read-u8)
+	  (ldb (byte 8  8) u32) (read-u8)
+	  (ldb (byte 8  0) u32) (read-u8))
     (when (and limit (not (zerop (ldb (byte 1 31) u32))))
       (error 'u32-overflow :value u32))
     u32))
@@ -302,7 +307,7 @@ See §87 of the PLtoTF documentation, or “TeX Font Metrics Files”
 
 
 (defun read-padded-string
-    (pad &aux (length (read-byte *stream*)) string)
+    (pad &aux (length (read-u8)) string)
   "Read a padded string out of PAD bytes from *STREAM*.
 The first byte in *STREAM* indicates the actual length of the string.
 
@@ -328,7 +333,7 @@ warning."
     (loop :for i :from 0 :upto (1- length)
 	  ;; #### NOTE: this assumes that Lisp's internal character encoding
 	  ;; agrees at least with ASCII.
-	  :do (setf (aref string i) (code-char (read-byte *stream*))))
+	  :do (setf (aref string i) (code-char (read-u8))))
     (when (or (find #\( string)
 	      (find #\) string)
 	      (find-if (lambda (character)
@@ -369,7 +374,7 @@ warning."
 	(loop :for i :from 0 :upto (1- tail-length)
 	      ;; #### NOTE: this assumes that Lisp's internal character
 	      ;; encoding agrees at least with ASCII.
-	      :do (setf (aref tail i) (code-char (read-byte *stream*))))
+	      :do (setf (aref tail i) (code-char (read-u8))))
 	(when (find-if-not #'zerop tail :key #'char-code)
 	  (warn 'padded-string-overflow :value tail)))))
   string)
