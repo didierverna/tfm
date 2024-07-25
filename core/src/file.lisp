@@ -471,8 +471,12 @@ DISCARD-EXTENSION-RECIPE."
 	  :do (vector-push (funcall lig/kern-reader) lig/kerns))
     (loop :repeat nk
 	  :do (vector-push (read-fix-word) kerns))
-    (loop :repeat ne
-	  :do (vector-push (read-exten) extens))
+    (loop :with exten-reader
+	    := (typecase font
+		 (l0-omega-font #'read-l0-omega-exten)
+		 (t #'read-exten))
+	  :repeat ne
+	  :do (vector-push (funcall exten-reader) extens))
 
     ;; 2. Create the character metrics.
     (loop :for char-info :across char-infos

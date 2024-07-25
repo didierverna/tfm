@@ -135,6 +135,14 @@ This structure is used to store decoded information from the exten table
    :bot (read-u8)
    :rep (read-u8)))
 
+(defun read-l0-omega-exten ()
+  "Read one exten from *STREAM* into a new EXTEN instance."
+  (make-exten
+   :top (read-u16 nil)
+   :mid (read-u16 nil)
+   :bot (read-u16 nil)
+   :rep (read-u16 nil)))
+
 
 
 ;; ==========================================================================
