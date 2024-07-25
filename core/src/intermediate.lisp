@@ -68,16 +68,16 @@ width-index of 0) is not completely zero'ed out."))
   "Read one char-info from *STREAM* into a new CHAR-INFO instance.
 If the char-info denotes a non-existent character (that is, it is has a width
 index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
-  (let* ((w (read-byte *stream*))
-	 (h&d (read-byte *stream*))
-	 (i&t (read-byte *stream*))
+  (let* ((w (read-u8))
+	 (h&d (read-u8))
+	 (i&t (read-u8))
 	 (char-info (make-char-info
 		     :width-index w
 		     :height-index (ldb (byte 4 4) h&d)
 		     :depth-index (ldb (byte 4 0) h&d)
 		     :italic-index (ldb (byte 6 2) i&t)))
 	 (tag (ldb (byte 2 0) i&t))
-	 (remainder (read-byte *stream*)))
+	 (remainder (read-u8)))
     (case tag
       (1 (setf (lig/kern-index char-info) remainder))
       (2 (setf (next-char char-info) remainder))
@@ -124,9 +124,9 @@ This structure is used to store decoded information from the lig/kern table
 (defun read-lig/kern ()
   "Read one lig/kern from *stream* into a new LIG/KERN instance."
   (make-lig/kern
-   :skip (read-byte *stream*)
-   :next (read-byte *stream*)
-   :op (read-byte *stream*)
-   :remainder (read-byte *stream*)))
+   :skip (read-u8)
+   :next (read-u8)
+   :op (read-u8)
+   :remainder (read-u8)))
 
 ;;; intermediate.lisp ends here
