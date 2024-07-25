@@ -97,10 +97,10 @@ If the char-info denotes a non-existent character (that is, it is has a width
 index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
   (let* ((char-info (make-char-info
 		     :width-index (read-u16 nil)
-		     :height-index (read-byte *stream*)
-		     :depth-index (read-byte *stream*)
-		     :italic-index (read-byte *stream*)))
-	 (tag (ldb (byte 2 0) (read-byte *stream*)))
+		     :height-index (read-u8)
+		     :depth-index (read-u8)
+		     :italic-index (read-u8)))
+	 (tag (ldb (byte 2 0) (read-u8)))
 	 (remainder (read-u16 nil)))
     (case tag
       (1 (setf (lig/kern-index char-info) remainder))
