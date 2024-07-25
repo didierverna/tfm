@@ -81,11 +81,8 @@
     :math-extension-font :default-rule-thickness
     :big-op-spacing1 :big-op-spacing2 :big-op-spacing3 :big-op-spacing4
     :big-op-spacing5
-
-    ;; From src/omega.lisp:
-    :invalid-ofm-level :value
     :l0-omega-font :direction
-    
+
     ;; From src/file.lisp:
     :invalid-design-size :value :set-to-ten
     :name
@@ -108,6 +105,7 @@
     :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
     :invalid-l0-ofm-section-lengths
     :invalid-table-length :value :smallest :largest
+    :invalid-ofm-level :value
     :extended-tfm :value :file
     :load-font :cancel-loading))
 
