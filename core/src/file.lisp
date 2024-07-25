@@ -1056,6 +1056,16 @@ length, signal an INVALID-SECTION-LENGTHS error."
 ;; Entry Point
 ;; ==========================================================================
 
+(define-condition invalid-ofm-level (tfm-compliance-error)
+  ((value :documentation "The invalid level." :initarg :value :accessor value))
+  (:documentation "The Invalid OFM LEVEL compliance error.
+It signals that an OFM font advertises a level different from 0 or 1."))
+
+(define-condition-report (condition invalid-ofm-level)
+  "OFM level ~S is invalid (should be 0 or 1)"
+  (value condition))
+
+
 (define-condition extended-tfm (tfm-warning)
   ((value :documentation "The TFM extension." :initarg :value :accessor value)
    (file :documentation "The extended TFM file." :initarg :file :accessor file))

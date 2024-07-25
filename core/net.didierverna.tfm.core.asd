@@ -47,7 +47,6 @@ For a more complete description of TFM, see the `net.didierverna.tfm' system."
 			     (:file "intermediate")
 			     (:file "character")
 			     (:file "font")
-			     (:file "omega")
 			     (:file "file")))))
 
 ;;; net.didierverna.tfm.core.asd ends here

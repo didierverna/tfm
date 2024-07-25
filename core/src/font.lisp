@@ -79,7 +79,7 @@ STATE is a list of characters, the first two being subject to LIGATURE."
 
 
 ;; ==========================================================================
-;; Base Font
+;; Base (TFM) Font
 ;; ==========================================================================
 
 ;; -----
@@ -619,5 +619,21 @@ scheme."))
   (map-math-extension-font-dimension-accessors slot font
     (setf slot (* slot factor)))
   (call-next-method))
+
+
+
+;; ==========================================================================
+;; Level 0 Omega Font
+;; ==========================================================================
+
+;; -----
+;; Class
+;; -----
+
+(defclass l0-omega-font (font)
+  ((direction :documentation "The font direction."
+	      :accessor direction))
+  (:documentation "The Level 0 Omega Font Metrics class."))
+
 
 ;;; font.lisp ends here

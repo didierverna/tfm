@@ -50,6 +50,7 @@ This structure is used to store decoded information from the char-info table
 ;; lig/kern program ? One possibility would be a bounding character (in which
 ;; case this warning would be wrong), but experimentation shows that it's not.
 
+
 (define-condition spurious-char-info (tfm-compliance-warning)
   ((section :initform 11) ; slot merge
    (value
@@ -63,6 +64,7 @@ width-index of 0) is not completely zero'ed out."))
 (define-condition-report (condition spurious-char-info)
   "char-info structure for a non-existent character is not blank~%~A"
   (value condition))
+
 
 (defun read-char-info ()
   "Read one char-info from *STREAM* into a new CHAR-INFO instance.
@@ -85,6 +87,30 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
     (unless (or (not (zerop (width-index char-info)))
 		(and (zerop h&d)
 		     (zerop i&t)
+		     (zerop remainder)))
+      (warn 'spurious-char-info :value char-info))
+    char-info))
+
+(defun read-l0-omega-char-info ()
+  "Read one char-info from *STREAM* into a new CHAR-INFO instance.
+If the char-info denotes a non-existent character (that is, it is has a width
+index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
+  (let* ((char-info (make-char-info
+		     :width-index (read-u16 nil)
+		     :height-index (read-byte *stream*)
+		     :depth-index (read-byte *stream*)
+		     :italic-index (read-byte *stream*)))
+	 (tag (ldb (byte 2 0) (read-byte *stream*)))
+	 (remainder (read-u16 nil)))
+    (case tag
+      (1 (setf (lig/kern-index char-info) remainder))
+      (2 (setf (next-char char-info) remainder))
+      (3 (setf (exten-index char-info) remainder)))
+    (unless (or (not (zerop (width-index char-info)))
+		(and (zerop (height-index char-info))
+		     (zerop (depth-index char-info))
+		     (zerop (italic-index char-info))
+		     (zerop tag)
 		     (zerop remainder)))
       (warn 'spurious-char-info :value char-info))
     char-info))
@@ -128,5 +154,13 @@ This structure is used to store decoded information from the lig/kern table
    :next (read-byte *stream*)
    :op (read-byte *stream*)
    :remainder (read-byte *stream*)))
+
+(defun read-l0-omega-lig/kern ()
+  "Read one lig/kern from *stream* into a new LIG/KERN instance."
+  (make-lig/kern
+   :skip (read-u16 nil)
+   :next (read-u16 nil)
+   :op (read-u16 nil)
+   :remainder (read-u16 nil)))
 
 ;;; intermediate.lisp ends here
