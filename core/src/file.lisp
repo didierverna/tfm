@@ -1044,14 +1044,12 @@ length, signal an INVALID-SECTION-LENGTHS error."
     ;; 3. Parse the 8 character-related sections.
     (parse-character-information nc nw nh nd ni nl nk ne font)
 
-    #|
     ;; 4. Parse the parameters section.
-    (parse-parameters np font)|#)
+    (parse-parameters np font))
 
   ;; 5. Maybe freeze the font
-    #|
-    (when freeze (freeze font))
-    |#
+  (when freeze (freeze font))
+
   font)
 
 
