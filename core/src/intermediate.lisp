@@ -101,13 +101,13 @@ This structure is used to store decoded information from the exten table
 (see TeX: the Program [546])."
   top mid bot rep)
 
-(defun decode-exten (word)
-  "Decode exten WORD into a new EXTEN instance, and return it."
+(defun read-exten ()
+  "Read one exten from *STREAM* into a new EXTEN instance."
   (make-exten
-   :top (ldb (byte 8 24) word)
-   :mid (ldb (byte 8 16) word)
-   :bot (ldb (byte 8  8) word)
-   :rep (ldb (byte 8  0) word)))
+   :top (read-u8)
+   :mid (read-u8)
+   :bot (read-u8)
+   :rep (read-u8)))
 
 
 
