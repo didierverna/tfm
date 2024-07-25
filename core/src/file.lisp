@@ -472,7 +472,7 @@ DISCARD-EXTENSION-RECIPE."
     (loop :repeat nk
 	  :do (vector-push (read-fix-word) kerns))
     (loop :repeat ne
-	  :do (vector-push (decode-exten (read-u32 nil)) extens))
+	  :do (vector-push (read-exten) extens))
 
     ;; 2. Create the character metrics.
     (loop :for char-info :across char-infos
