@@ -107,16 +107,16 @@ initialized with INITARGS."
 
 
 (define-condition tfm-compliance (tfm)
-  ((section :documentation "The related TFtoPL documentation section."
+  ((section :documentation "The related TFtoPL section."
 	    :allocation :class :initform nil :reader section))
   (:documentation "The TFM Compliance root condition.
 This is the mixin for conditions related to TFM compliance."))
 
 (defmethod print-object :after ((condition tfm-compliance) stream)
-  "Advertise CONDITION's relevant section in the TFtoPL documentation."
+  "Advertise CONDITION's relevant TFtoPL section."
   (unless (or *print-escape* (not (section condition)))
     (format stream
-	"~&See §~A of the TFtoPL documentation for more information."
+	"~&See §~A of TFtoPL for more information."
       (section condition))))
 
 (define-condition tfm-compliance-warning (tfm-warning tfm-compliance)
@@ -226,9 +226,8 @@ SET-TO-ZERO."
 ;; ==========================================================================
 
 ;; #### WARNING: I'm lucky enough that padded strings only occur in the header
-;; section, and hence relate to section 10 of the TFtoPL documentation.
-;; Otherwise, I'd be in trouble with the class-wide SECTION slot in
-;; conditions...
+;; section, and hence relate to section 10 of TFtoPL. Otherwise, I'd be in
+;; trouble with the class-wide SECTION slot in conditions...
 
 ;; #### NOTE: this mixin is currently empty but serves as a catchall for
 ;; WITH-CONDITION-CONTEXT.
