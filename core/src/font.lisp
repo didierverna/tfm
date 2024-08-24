@@ -1,6 +1,6 @@
 ;;; font.lisp --- Font Information
 
-;; Copyright (C) 2018, 2019 Didier Verna
+;; Copyright (C) 2018, 2019, 2024 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
