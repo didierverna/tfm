@@ -115,8 +115,8 @@ If so, decrease LENGTH by NEEDED afterwards."
 	     (change-class font 'math-extension-font))))
     (with-condition-context
 	(padded-string padded-string-context :name "font identifier")
-      (checking-length  5 (setf (family font) (read-padded-string 20))))
-    (checking-length  1
+      (checking-length 5 (setf (family font) (read-padded-string 20))))
+    (checking-length 1
       (let ((word (read-u32)))
 	(setf (7bits-safe font) (ldb (byte 1 31) word))
 	(let ((face (ldb (byte 8 0) word)))
