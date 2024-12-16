@@ -1072,8 +1072,9 @@ It signals that an OFM font advertises a level different from 0 or 1."))
   ((value :documentation "The TFM extension." :initarg :value :accessor value)
    (file :documentation "The extended TFM file." :initarg :file :accessor file))
   (:documentation "The Extended TFM warning.
-It signals that a file contains extended TFM data (OFM or JFM) rather than
-plain TFM data."))
+It signals that a file contains unsupported extended TFM data.
+In addition to plain TFM, level 0 OFM is currently supported.
+Level 1 OFM and JFM formats might be supported in the future."))
 
 (define-condition-report (condition extended-tfm)
   "file ~A contains ~A data (not supported yet)"
