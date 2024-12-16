@@ -78,8 +78,8 @@ If FONT's design size is less than 1pt, signal an INVALID-DESIGN-SIZE error.
 This error is immediately restartable with SET-TO-TEN.
 However, if FONT's design size was explicitly overridden, only signal an
 INVALID-ORIGINAL-DESIGN-SIZE warning."
-  ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
-  ;; LOAD-TFM-FONT.
+  ;; #### NOTE: LENGTH >= 2 has already been checked by the caller
+  ;; (LOAD-TFM-FONT or LOAD-l0-OFM-FONT).
   (setf (checksum font) (read-u32 nil))
   (decf length)
   (setf (original-design-size font) (read-fix-word nil))
