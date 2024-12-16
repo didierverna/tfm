@@ -104,6 +104,9 @@ If so, decrease LENGTH by NEEDED afterwards."
     (with-condition-context
 	(padded-string padded-string-context :name "character encoding scheme")
       (checking-length 10 (setf (encoding font) (read-padded-string 40))))
+    ;; #### FIXME: is it possible for OFM data to be math symbol or extension?
+    ;; If so, the code below is wrong because those classes are only
+    ;; subclasses of regular TFM.
     (when (encoding font)
       ;; #### NOTE: we don't upcase the BCPL strings, but tftopl does, so it's
       ;; probably better to do string comparisons on upcased versions. Also,
