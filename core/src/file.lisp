@@ -675,11 +675,11 @@ Return remaining LENGTH.")
 
 (define-condition file-size-mixin ()
   ((declared-size
-    :documentation "The declared file size."
+    :documentation "The declared file size, in bytes."
     :initarg :declared-size
     :accessor declared-size)
    (actual-size
-    :documentation "The actual file size."
+    :documentation "The actual file size, in bytes."
     :initarg :actual-size
     :accessor actual-size))
   (:documentation "The File Size Mixin condition.
@@ -692,7 +692,7 @@ actual file sizes."))
 It signals that the file size is shorter than expected."))
 
 (define-condition-report (condition file-underflow)
-  "declared file size ~A is greater than actual ~A"
+  "declared file size ~A is greater than actual ~A bytes"
   (declared-size condition)
   (actual-size condition))
 
@@ -706,7 +706,7 @@ It signals that the file size is shorter than expected."))
 It signals that the file size is longer than expected."))
 
 (define-condition-report (condition file-overflow)
-  "declared file size ~A is less than actual ~A"
+  "declared file size ~A is less than actual ~A bytes"
   (declared-size condition)
   (actual-size condition))
 
