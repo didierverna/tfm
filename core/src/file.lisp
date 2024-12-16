@@ -939,7 +939,7 @@ length, signal an INVALID-SECTION-LENGTHS error."
 It signals that
 LF != 14 + LH + 2*NC + NW + NH + ND + NI + 2*NL + NK + 2*NE + NP."))
 
-(define-condition-report (condition invalid-section-lengths)
+(define-condition-report (condition invalid-l0-ofm-section-lengths)
   "section lengths don't satisfy ~
 ~A (lf) = 14 + ~A (lh) + 2*~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
 + 2*~A (nl) + ~A (nk) + 2*~A (ne) + ~A (np)"
