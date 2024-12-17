@@ -211,10 +211,14 @@ font is frozen."
     :initform nil
     :accessor parameters)
    (min-code
-    :documentation "The font's smallest character code."
+    :documentation
+    "The font's smallest character code, or NIL if the font is empty."
+    :initform nil
     :accessor min-code)
    (max-code
-    :documentation "The font's largest character code."
+    :documentation
+    "The font's largest character code, or NIL if the font is empty."
+    :initform nil
     :accessor max-code)
    (characters
     :documentation "The font's characters.

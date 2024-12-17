@@ -438,12 +438,17 @@ DISCARD-EXTENSION-RECIPE."
 	(extens (make-array ne :fill-pointer 0)))
 
     ;; 1. Read the tables.
-    (loop :for i :from 0 :upto (1- nc)
-	  :for code :from (min-code font)
-	  :do (with-condition-context
-		  (spurious-char-info char-info-table-context
-		    :name "char info" :code code :index i :size nc)
-		(vector-push (read-char-info) char-infos)))
+    ;; #### NOTE: the test for (ZEROP NC) below is technically not necessary,
+    ;; but the font's MIN-CODE is NIL when there is no character, so the
+    ;; second LOOP clause would evaluate to ":from NIL", which could still
+    ;; signal a warning even if there is no iteration.
+    (unless (zerop nc)
+      (loop :for i :from 0 :upto (1- nc)
+	    :for code :from (min-code font)
+	    :do (with-condition-context
+		    (spurious-char-info char-info-table-context
+		      :name "char info" :code code :index i :size nc)
+		  (vector-push (read-char-info) char-infos))))
     (loop :for name :in (list "widths" "heights" "depths" "italic corrections")
 	  :for array :in (list widths heights depths italics)
 	  :for length :in (list nw nh nd ni)
@@ -467,26 +472,28 @@ DISCARD-EXTENSION-RECIPE."
 	  :do (vector-push (read-exten) extens))
 
     ;; 2. Create the character metrics.
-    (loop :for char-info :across char-infos
-	  :for code :from (min-code font)
-	  :unless (zerop (width-index char-info))
-	    :do (setf (code-character font)
-		      (make-character-metrics
-		       code
-		       font
-		       (restart-case (tref widths (width-index char-info))
-			 (set-to-zero () :report "Use a width of 0."
-			   0))
-		       (restart-case (tref heights (height-index char-info))
-			 (set-to-zero () :report "Use an height of 0."
-			   0))
-		       (restart-case (tref depths (depth-index char-info))
-			 (set-to-zero () :report "Use a depth of 0."
-			   0))
-		       (restart-case (tref italics (italic-index char-info))
-			 (set-to-zero ()
-			   :report "Use an italic correction of 0."
-			   0)))))
+    ;; #### NOTE: see comment above the first LOOP call about this test.
+    (unless (zerop nc)
+      (loop :for char-info :across char-infos
+	    :for code :from (min-code font)
+	    :unless (zerop (width-index char-info))
+	      :do (setf (code-character font)
+			(make-character-metrics
+			 code
+			 font
+			 (restart-case (tref widths (width-index char-info))
+			   (set-to-zero () :report "Use a width of 0."
+			     0))
+			 (restart-case (tref heights (height-index char-info))
+			   (set-to-zero () :report "Use an height of 0."
+			     0))
+			 (restart-case (tref depths (depth-index char-info))
+			   (set-to-zero () :report "Use a depth of 0."
+			     0))
+			 (restart-case (tref italics (italic-index char-info))
+			   (set-to-zero ()
+			     :report "Use an italic correction of 0."
+			     0))))))
     ;; #### NOTE: this count doesn't (and shouldn't) include a zero'ed out
     ;; boundary character potentially added below.
     (setf (character-count font) (hash-table-count (characters font)))
@@ -523,46 +530,48 @@ DISCARD-EXTENSION-RECIPE."
 
     ;; 4. Process ligature / kerning programs, character lists, and extension
     ;; recipes, character by character.
-    (loop :for char-info :across char-infos
-	  :for code :from (min-code font)
-	  ;; #### NOTE: technically, this check is not needed because Step 2
-	  ;; made sure that such an (inexistent) character is completely
-	  ;; zero'ed out. But it's cleaner and more explicit to keep it, plus
-	  ;; it avoids the 3 useless COND checks below.
-	  :unless (zerop (width-index char-info))
-	    :do (cond ((lig/kern-index char-info)
-		       ;; No need to protect anything here. We know accessing
-		       ;; the character of CODE is ok because of Step 2.
-		       (run-ligature/kerning-program
-			(code-character code font)
-			(lig/kern-index char-info)
-			lig/kerns
-			kerns))
-		      ((next-char char-info)
-		       ;; We're not sure about the next character below,
-		       ;; however.
-		       (with-simple-restart
-			   (discard-next-character
-			    "Discard the next character.")
-			 (setf (next-character (code-character code font))
-			       (code-character (next-char char-info) font))))
-		      ((exten-index char-info)
-		       ;; And neither about those in the extension recipe
-		       ;; below.
-		       (with-simple-restart
-			   (discard-extension-recipe
-			    "Discard this extension recipe.")
-			 (setf (extension-recipe (code-character code font))
-			       (font-extension-recipe
-				(tref extens (exten-index char-info))
-				font)))))))
+    ;; #### NOTE: see comment above the first LOOP call about this test.
+    (unless (zerop nc)
+      (loop :for char-info :across char-infos
+	    :for code :from (min-code font)
+	    ;; #### NOTE: technically, this check is not needed because Step 2
+	    ;; made sure that such an (inexistent) character is completely
+	    ;; zero'ed out. But it's cleaner and more explicit to keep it,
+	    ;; plus it avoids the 3 useless COND checks below.
+	    :unless (zerop (width-index char-info))
+	      :do (cond ((lig/kern-index char-info)
+			 ;; No need to protect anything here. We know
+			 ;; accessing the character of CODE is ok because of
+			 ;; Step 2.
+			 (run-ligature/kerning-program
+			  (code-character code font)
+			  (lig/kern-index char-info)
+			  lig/kerns
+			  kerns))
+			((next-char char-info)
+			 ;; We're not sure about the next character below,
+			 ;; however.
+			 (with-simple-restart
+			     (discard-next-character
+			      "Discard the next character.")
+			   (setf (next-character (code-character code font))
+				 (code-character (next-char char-info) font))))
+			((exten-index char-info)
+			 ;; And neither about those in the extension recipe
+			 ;; below.
+			 (with-simple-restart
+			     (discard-extension-recipe
+			      "Discard this extension recipe.")
+			   (setf (extension-recipe (code-character code font))
+				 (font-extension-recipe
+				  (tref extens (exten-index char-info))
+				  font))))))))
 
-  ;; #### NOTE: we're done with the tables now.
+  ;; We're done with the tables now.
 
   ;; #### WARNING: the two checks below have not been tested thoroughly. They
-  ;; #### have been applied to all fonts in TeX Live, but not on fonts made
-  ;; #### explicitly to contain cycles, so we're not really sure that they
-  ;; #### work.
+  ;; have been applied to all fonts in TeX Live, but not on fonts made
+  ;; explicitly to contain cycles, so we're not really sure that they work.
 
   ;; 5. Check for cycles in character lists, character by character. Note that
   ;; this is not the best way to do it, as we will end up checking the same
@@ -880,9 +889,8 @@ length, signal an INVALID-SECTION-LENGTHS error."
     (unless (>= lh 2) (error 'invalid-header-length :value lh))
     (unless (and (<= (1- bc) ec) (<= ec 255))
       (error 'invalid-character-range :bc bc :ec ec))
-    (when (> bc 255) (setq bc 1 ec 0))
     (setq nc (+ ec (- bc) 1))
-    (setf (min-code font) bc (max-code font) ec)
+    (unless (zerop nc) (setf (min-code font) bc (max-code font) ec))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(256 16 16 64 256)
