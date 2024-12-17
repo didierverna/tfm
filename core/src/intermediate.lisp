@@ -100,7 +100,8 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		     :height-index (read-u8)
 		     :depth-index (read-u8)
 		     :italic-index (read-u8)))
-	 (tag (ldb (byte 2 0) (read-u8)))
+	 (rfu&tag (read-u8))
+	 (tag (ldb (byte 2 0) rfu&tag))
 	 (remainder (read-u16 nil)))
     (case tag
       (1 (setf (lig/kern-index char-info) remainder))
@@ -110,7 +111,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		(and (zerop (height-index char-info))
 		     (zerop (depth-index char-info))
 		     (zerop (italic-index char-info))
-		     (zerop tag)
+		     (zerop rfu&tag)
 		     (zerop remainder)))
       (warn 'spurious-char-info :value char-info))
     char-info))
