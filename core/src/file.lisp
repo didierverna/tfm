@@ -1031,10 +1031,8 @@ length, signal an INVALID-SECTION-LENGTHS error."
     (unless (>= lh 2) (error 'invalid-header-length :value lh))
     (unless (and (<= (1- bc) ec) (<= ec 65535))
       (error 'invalid-character-range :bc bc :ec ec))
-    ;; #### FIXME: what to do about this?
-    ;; (when (> bc 255) (setq bc 1 ec 0))
     (setq nc (+ ec (- bc) 1))
-    (setf (min-code font) bc (max-code font) ec)
+    (unless (zerop nc) (setf (min-code font) bc (max-code font) ec))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(65536 256 256 256 256)
