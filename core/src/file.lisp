@@ -522,6 +522,10 @@ DISCARD-EXTENSION-RECIPE."
     ;; https://tug.org/pipermail/texhax/2019-September/023988.html
     (unless (zerop nl)
       (let ((lig/kern (aref lig/kerns 0)))
+	;; #### NOTE: it is a bit surprising, but according to the ofm2opl
+	;; sources, the constants below (255 and 256) are not different for
+	;; level 0 OFM fonts, even though the lig/kern table has a double
+	;; size.
 	(when (= (skip lig/kern) 255)
 	  (let ((code (next lig/kern)))
 	    (setf (boundary-character font)
