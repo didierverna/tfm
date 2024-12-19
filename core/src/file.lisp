@@ -1101,10 +1101,10 @@ Level 1 OFM and JFM formats might be supported in the future."))
 - When FREEZE (NIL by default), freeze the font immediately after creation.
   See the eponymous function for more information.
 
-Only actual TFM data is currently supported. If OFM or JFM data is detected,
-this function signals an EXTENDED-TFM warning and returns NIL.
+TFM and level 0 OFM data are currently supported. If level 1 OFM or JFM data
+is detected, this function signals an EXTENDED-TFM warning and returns NIL.
 
-While loading TFM data, any signalled condition is restartable with
+While loading font data, any signalled condition is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
   (declare (ignore design-size freeze))
   (with-open-file
