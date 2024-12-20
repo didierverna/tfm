@@ -135,7 +135,7 @@ width-index of 0) is not completely zero'ed out."))
 	       (> (rfu&tag condition) 3))
 	   (format nil " (RFU/TAG byte = 0b~B)" (rfu&tag condition)))
 	  ((zerop (rfu&tag condition))
-	   (format nil " (remainder byte = ~A)" (remainder condition)))
+	   (format nil " (remainder = ~A)" (remainder condition)))
 	  (t "")))
   (value condition))
 
