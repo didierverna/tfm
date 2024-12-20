@@ -52,6 +52,14 @@ This structure is used to store decoded information from the char-info table
 
 (define-condition spurious-char-info (tfm-compliance-warning)
   ((section :initform 11) ; slot merge
+   (tag
+    :documentation "The original tag."
+    :initarg :tag
+    :accessor tag)
+   (remainder
+    :documentation "The original remainder."
+    :initarg :remainder
+    :accessor remainder)
    (value
     :documentation "The culprit char-info structure."
     :initarg :value
@@ -69,10 +77,12 @@ width-index of 0) is not completely zero'ed out."))
 (define-condition-report (condition spurious-char-info)
   "char-info structure for a non-existent character is not blank~A~%~A"
   (let ((char-info (value condition)))
-    ;; #### WARNING: no ZEROP below because we might be comparing with NIL.
+    ;; #### WARNING: EQL below because we might be comparing with NIL.
     (cond ((eql (lig/kern-index char-info) 0) " (tag = 1)")
 	  ((eql (next-char char-info) 0) " (tag = 2)")
 	  ((eql (exten-index char-info) 0) " (tag = 3)")
+	  ((zerop (tag condition))
+	   (format nil " (remainder byte = ~A)" (remainder condition)))
 	  (t "")))
   (value condition))
 
@@ -98,7 +108,8 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		(and (zerop h&d)
 		     (zerop i&t)
 		     (zerop remainder)))
-      (warn 'spurious-char-info :value char-info))
+      (warn 'spurious-char-info
+	    :tag tag :remainder remainder :value char-info))
     char-info))
 
 
