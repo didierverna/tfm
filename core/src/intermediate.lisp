@@ -87,7 +87,6 @@ width-index of 0) is not completely zero'ed out."))
 	  (t "")))
   (value condition))
 
-
 (defun read-char-info ()
   "Read one char-info from *STREAM* into a new CHAR-INFO instance.
 If the char-info denotes a non-existent character (that is, it is has a width
@@ -114,6 +113,32 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 	    :tag tag :remainder remainder :value char-info))
     char-info))
 
+
+(define-condition spurious-l0-omega-char-info (spurious-char-info)
+  ((section :initform nil) ; slot merge
+   (tag ; slot merge, even though a bit dirty
+    :documentation "The RFU/TAG byte."
+    :initarg :rfu&tag
+    :accessor rfu&tag))
+  (:documentation "The Spurious Level 0 Omega Char Info compliance warning.
+It signals that a char-info for a non-existent character (that is, with a
+width-index of 0) is not completely zero'ed out."))
+  
+;; See comment above the TFM counterpart.
+(define-condition-report (condition spurious-l0-omega-char-info)
+  "char-info structure for a non-existent character is not blank~A~%~A"
+  (let ((char-info (value condition)))
+    ;; #### WARNING: EQL below because we might be comparing with NIL.
+    (cond ((or (eql (lig/kern-index char-info) 0)
+	       (eql (next-char char-info) 0)
+	       (eql (exten-index char-info) 0)
+	       (> (rfu&tag condition) 3))
+	   (format nil " (RFU/TAG byte = 0b~B)" (rfu&tag condition)))
+	  ((zerop (rfu&tag condition))
+	   (format nil " (remainder byte = ~A)" (remainder condition)))
+	  (t "")))
+  (value condition))
+
 (defun read-l0-omega-char-info ()
   "Read one char-info from *STREAM* into a new CHAR-INFO instance.
 If the char-info denotes a non-existent character (that is, it is has a width
@@ -136,7 +161,8 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		     (zerop (italic-index char-info))
 		     (zerop rfu&tag)
 		     (zerop remainder)))
-      (warn 'spurious-char-info :value char-info))
+      (warn 'spurious-l0-omega-char-info
+	    :rfu&tag rfu&tag :remainder remainder :value char-info))
     char-info))
 
 
@@ -197,6 +223,6 @@ This structure is used to store decoded information from the lig/kern table
    :skip (read-u16 nil)
    :next (read-u16 nil)
    :op (read-u16 nil)
-   :remainder (read-u16 nil)))
+   :rmd (read-u16 nil)))
 
 ;;; intermediate.lisp ends here
