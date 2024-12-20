@@ -83,7 +83,7 @@ width-index of 0) is not completely zero'ed out."))
 	  ((eql (next-char char-info) 0) " (tag = 2)")
 	  ((eql (exten-index char-info) 0) " (tag = 3)")
 	  ((zerop (tag condition))
-	   (format nil " (remainder byte = ~A)" (remainder condition)))
+	   (format nil " (remainder = ~A)" (remainder condition)))
 	  (t "")))
   (value condition))
 
