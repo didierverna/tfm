@@ -53,6 +53,14 @@ This structure is used to store decoded information from the char-info table
 
 (define-condition spurious-char-info (tfm-compliance-warning)
   ((section :initform 11) ; slot merge
+   (tag
+    :documentation "The original tag."
+    :initarg :tag
+    :accessor tag)
+   (remainder
+    :documentation "The original remainder."
+    :initarg :remainder
+    :accessor remainder)
    (value
     :documentation "The culprit char-info structure."
     :initarg :value
@@ -70,10 +78,12 @@ width-index of 0) is not completely zero'ed out."))
 (define-condition-report (condition spurious-char-info)
   "char-info structure for a non-existent character is not blank~A~%~A"
   (let ((char-info (value condition)))
-    ;; #### WARNING: no ZEROP below because we might be comparing with NIL.
+    ;; #### WARNING: EQL below because we might be comparing with NIL.
     (cond ((eql (lig/kern-index char-info) 0) " (tag = 1)")
 	  ((eql (next-char char-info) 0) " (tag = 2)")
 	  ((eql (exten-index char-info) 0) " (tag = 3)")
+	  ((zerop (tag condition))
+	   (format nil " (remainder byte = ~A)" (remainder condition)))
 	  (t "")))
   (value condition))
 
@@ -100,7 +110,8 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		(and (zerop h&d)
 		     (zerop i&t)
 		     (zerop remainder)))
-      (warn 'spurious-char-info :value char-info))
+      (warn 'spurious-char-info
+	    :tag tag :remainder remainder :value char-info))
     char-info))
 
 (defun read-l0-omega-char-info ()
@@ -162,11 +173,15 @@ This structure is used to store decoded information from the exten table
 ;; Ligature/Kerning Instructions
 ;; ==========================================================================
 
+;; #### NOTE: we use 'rmd' below to avoid colliding with the REMAINDER generic
+;; function, and the REM standard function. Never use structs actually. Even
+;; less so with null conc-names!
+
 (defstruct (lig/kern :conc-name)
   "The Lig/Kern structure.
 This structure is used to store decoded information from the lig/kern table
 (see TeX: the Program [545])."
-  skip next op remainder)
+  skip next op rmd)
 
 (defun read-lig/kern ()
   "Read one lig/kern from *stream* into a new LIG/KERN instance."
@@ -174,7 +189,7 @@ This structure is used to store decoded information from the lig/kern table
    :skip (read-u8)
    :next (read-u8)
    :op (read-u8)
-   :remainder (read-u8)))
+   :rmd (read-u8)))
 
 (defun read-l0-omega-lig/kern ()
   "Read one lig/kern from *stream* into a new LIG/KERN instance."
