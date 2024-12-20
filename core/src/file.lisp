@@ -247,7 +247,7 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
 		  (setf (ligature character
 				  (code-character (next lig/kern) font))
 			(make-ligature
-			 (code-character (remainder lig/kern) font)
+			 (code-character (rmd lig/kern) font)
 			 (when (member opcode '(0 1 5)) t)
 			 (when (member opcode '(0 2 6)) t)
 			 (cond ((member opcode '(0 1 2 3)) 0)
@@ -258,7 +258,7 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
 		(discard-kerning "Discard this kerning instruction.")
 	      (setf (kerning character (code-character (next lig/kern) font))
 		    (tref kerns (+ (* 256 (- (op lig/kern) 128))
-				   (remainder lig/kern))))))
+				   (rmd lig/kern))))))
     :if (>= (skip lig/kern) 128)
       :return t
     ;; #### NOTE: because of the way the next instruction is computed below,
@@ -281,7 +281,7 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
     (%run-ligature/kerning-program
      character
      (if (> (skip lig/kern) 128)
-       (+ (* 256 (op lig/kern)) (remainder lig/kern))
+       (+ (* 256 (op lig/kern)) (rmd lig/kern))
        index)
      lig/kerns
      kerns)))
@@ -521,7 +521,7 @@ DISCARD-EXTENSION-RECIPE."
 	  (if (boundary-character font)
 	    (%run-ligature/kerning-program
 	     (boundary-character font)
-	     (+ (* 256 (op lig/kern)) (remainder lig/kern))
+	     (+ (* 256 (op lig/kern)) (rmd lig/kern))
 	     lig/kerns
 	     kerns)
 	    (with-simple-restart

@@ -127,11 +127,15 @@ This structure is used to store decoded information from the exten table
 ;; Ligature/Kerning Instructions
 ;; ==========================================================================
 
+;; #### NOTE: we use 'rmd' below to avoid colliding with the REMAINDER generic
+;; function, and the REM standard function. Never use structs actually. Even
+;; less so with null conc-names!
+
 (defstruct (lig/kern :conc-name)
   "The Lig/Kern structure.
 This structure is used to store decoded information from the lig/kern table
 (see TeX: the Program [545])."
-  skip next op remainder)
+  skip next op rmd)
 
 (defun read-lig/kern ()
   "Read one lig/kern from *stream* into a new LIG/KERN instance."
@@ -139,6 +143,6 @@ This structure is used to store decoded information from the lig/kern table
    :skip (read-u8)
    :next (read-u8)
    :op (read-u8)
-   :remainder (read-u8)))
+   :rmd (read-u8)))
 
 ;;; intermediate.lisp ends here
