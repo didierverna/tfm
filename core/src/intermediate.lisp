@@ -61,8 +61,20 @@ This structure is used to store decoded information from the char-info table
 It signals that a char-info for a non-existent character (that is, with a
 width-index of 0) is not completely zero'ed out."))
 
+;; #### NOTE: without specific knowledge of Lisp or the TFM library itself,
+;; some cases of a spurious char info may be confusing to read. In particular,
+;; a non-zero tag will entail a numerical value for lig/kern-index, next-char,
+;; or exten-index, but if the value is 0, people may not realize that it
+;; should have been NIL instead. Because of this, the condition's report will
+;; give some more detail in that situation.
 (define-condition-report (condition spurious-char-info)
-  "char-info structure for a non-existent character is not blank~%~A"
+  "char-info structure for a non-existent character is not blank~A~%~A"
+  (let ((char-info (value condition)))
+    ;; #### WARNING: no ZEROP below because we might be comparing with NIL.
+    (cond ((eql (lig/kern-index char-info) 0) " (tag = 1)")
+	  ((eql (next-char char-info) 0) " (tag = 2)")
+	  ((eql (exten-index char-info) 0) " (tag = 3)")
+	  (t "")))
   (value condition))
 
 
