@@ -38,21 +38,21 @@
     :documentation "The recipe's top character, or NIL."
     :initform nil
     :initarg :top-character
-    :accessor top-character)
+    :reader top-character)
    (middle-character
     :documentation "The recipe's middle character, or NIL."
     :initform nil
     :initarg :middle-character
-    :accessor middle-character)
+    :reader middle-character)
    (bottom-character
     :documentation "The recipe's bottom character, or NIL."
     :initform nil
     :initarg :bottom-character
-    :accessor bottom-character)
+    :reader bottom-character)
    (repeated-character
     :documentation "The recipe's repeated character."
     :initarg :repeated-character
-    :accessor repeated-character))
+    :reader repeated-character))
   (:documentation "The Extension Recipe class.
 This class represents decoded information for extensible characters. Within
 the context of this library, the expression \"extension recipe\" denotes an
