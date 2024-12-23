@@ -376,11 +376,10 @@ warning."
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when documentation (list documentation))))
 
-(defmacro map-accessors (var object accessors &body body)
-  "Map BODY on OBJECT ACCESSORS, each in turn available as VAR."
-  `(progn ,@(mapcar (lambda (accessor)
-		      `(with-accessors ((,var ,accessor)) ,object
-			   ,@body))
-	      accessors)))
+(defmacro map-slots (var object slots &body body)
+  "Map BODY on OBJECT SLOTS, each in turn available as VAR."
+  `(progn ,@(mapcar (lambda (slot)
+		      `(with-slots ((,var ,slot)) ,object ,@body))
+	      slots)))
 
 ;;; util.lisp ends here

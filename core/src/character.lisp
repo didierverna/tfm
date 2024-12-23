@@ -80,16 +80,6 @@ The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
 ;; Character Metrics
 ;; ==========================================================================
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (define-constant +character-metrics-dimension-accessors+
-      '(width height depth italic-correction)
-    "The list of dimension accessor names in the CHARACTER-METRICS class."))
-
-(defmacro map-character-metrics-dimension-accessors (var character &body body)
-  "Map BODY on CHARACTER metrics dimension accessors available as VAR."
-  `(map-accessors ,var ,character ,+character-metrics-dimension-accessors+
-     ,@body))
-
 (defclass character-metrics ()
   ((code
     :documentation "The character's numerical code."
@@ -104,19 +94,19 @@ The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initarg :width
-    :accessor width)
+    :reader width)
    (height
     :documentation "The character's height.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initarg :height
-    :accessor height)
+    :reader height)
    (depth
     :documentation "The character's depth.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initarg :depth
-    :accessor depth)
+    :reader depth)
    (italic-correction
     :documentation
     "The character's italic correction.
@@ -124,7 +114,7 @@ TeX uses this value for regular characters followed by the command \/, and
 also in math mode for superscript placement. It is expressed in design size
 units, or in TeX point units if the font is frozen."
     :initarg :italic-correction
-    :accessor italic-correction)
+    :reader italic-correction)
    (next-character
     :documentation "The next character in a character list.
 This slot is non-null only if the character is part of a chain of characters
@@ -162,6 +152,16 @@ metrics instances are created."
     :height height
     :depth depth
     :italic-correction italic-correction))
+
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +character-metrics-dimension-slots+
+      '(width height depth italic-correction)
+    "The list of dimension slot names in the CHARACTER-METRICS class."))
+
+(defmacro map-character-metrics-dimension-slots (var character &body body)
+  "Map BODY on CHARACTER metrics dimension slots available as VAR."
+  `(map-slots ,var ,character ,+character-metrics-dimension-slots+ ,@body))
 
 
 ;; ---------------------------------
