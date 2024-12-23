@@ -177,7 +177,7 @@ metrics instances are created."
   ((value
     :documentation "The non extensible character."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Not Extensible usage error.
 It signals an attempt at accessing the extension recipe of a non extensible
 character."))

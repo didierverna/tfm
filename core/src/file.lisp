@@ -38,7 +38,7 @@
    (value
     :documentation "The invalid design size."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Design Size compliance error.
 It signals that a design size is too small (< 1pt)."))
 
@@ -52,7 +52,7 @@ It signals that a design size is too small (< 1pt)."))
    (value
     :documentation "The invalid original design size."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Original Design Size compliance warning.
 It signals that, although overridden explicitly, an original design size was
 too small (< 1pt)."))
@@ -163,7 +163,7 @@ If so, decrease LENGTH by NEEDED afterwards."
 ;; ==========================================================================
 
 (define-condition tfm-table-error (tfm-compliance-error)
-  ((name :documentation "The table's name." :initarg :name :accessor name))
+  ((name :documentation "The table's name." :initarg :name :reader name))
   (:documentation "The TFM table errors root condition.
 This is the root condition for errors related to TFM tables."))
 
@@ -172,11 +172,11 @@ This is the root condition for errors related to TFM tables."))
    (value
     :documentation "The invalid index."
     :initarg :value
-    :accessor value)
+    :reader value)
    (largest
     :documentation "The largest index."
     :initarg :largest
-    :accessor largest))
+    :reader largest))
   (:documentation "The Invalid Table Index compliance error.
 It signals that a table index is greater than its largest value."))
 
@@ -209,7 +209,7 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
    (value
     :documentation "The invalid ligature opcode."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
 
@@ -322,7 +322,7 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
    (value
     :documentation "The invalid first table value."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Table Start compliance error.
 It signals that the first value in a TFM table is not 0."))
 
@@ -348,7 +348,7 @@ without a boundary character being defined")
    (value
     :documentation "The cyclic character list."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Character List Cycle compliance error.
 It signals that a cycle was found in a list of ascending character sizes."))
 
@@ -362,11 +362,11 @@ It signals that a cycle was found in a list of ascending character sizes."))
    (value
     :documentation "The ligature introducing a cycle."
     :initarg :value
-    :accessor value)
+    :reader value)
    (characters
     :documentation "The cons of characters involved in the ligature."
     :initarg :characters
-    :accessor characters))
+    :reader characters))
   (:documentation "The Ligature Cycle compliance error.
 It signals that a ligature introduces a cycle for a cons of characters."))
 
@@ -684,11 +684,11 @@ Return remaining LENGTH.")
   ((declared-size
     :documentation "The declared file size, in bytes."
     :initarg :declared-size
-    :accessor declared-size)
+    :reader declared-size)
    (actual-size
     :documentation "The actual file size, in bytes."
     :initarg :actual-size
-    :accessor actual-size))
+    :reader actual-size))
   (:documentation "The File Size Mixin condition.
 It is used in both errors and warnings to report different declared and
 actual file sizes."))
@@ -723,7 +723,7 @@ It signals that the file size is longer than expected."))
    (value
     :documentation "The invalid header length."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Header Length compliance error.
 It signals that a header length is too small (< 2 words)."))
 
@@ -734,8 +734,8 @@ It signals that a header length is too small (< 2 words)."))
 
 (define-condition invalid-character-range (tfm-compliance-error)
   ((section :initform 8) ; slot merge
-   (bc :documentation "The smallest character code." :initarg :bc :accessor bc)
-   (ec :documentation "The largest character code." :initarg :ec :accessor ec))
+   (bc :documentation "The smallest character code." :initarg :bc :reader bc)
+   (ec :documentation "The largest character code." :initarg :ec :reader ec))
   (:documentation "The Invalid Character Range compliance error.
 It signals that BC-1 > EC, or that EC > 255."))
 
@@ -750,47 +750,47 @@ It signals that BC-1 > EC, or that EC > 255."))
    (lf
     :documentation "The declared length of the file."
     :initarg :lf
-    :accessor lf)
+    :reader lf)
    (lh
     :documentation "The declared length of the file header."
     :initarg :lh
-    :accessor lh)
+    :reader lh)
    (nc
     :documentation "EC - BC + 1."
     :initarg :nc
-    :accessor nc)
+    :reader nc)
    (nw
     :documentation "The declared length of the width table."
     :initarg :nw
-    :accessor nw)
+    :reader nw)
    (nh
     :documentation "The declared length of the height table."
     :initarg :nh
-    :accessor nh)
+    :reader nh)
    (nd
     :documentation "The declared length of the depth table."
     :initarg :nd
-    :accessor nd)
+    :reader nd)
    (ni
     :documentation "The declared length of the italic correction table."
     :initarg :ni
-    :accessor ni)
+    :reader ni)
    (nl
     :documentation "The declared length of the lig/kern table."
     :initarg :nl
-    :accessor nl)
+    :reader nl)
    (nk
     :documentation "The declared length of the kern table."
     :initarg :nk
-    :accessor nk)
+    :reader nk)
    (ne
     :documentation "The declared length of the extensible character table."
     :initarg :ne
-    :accessor ne)
+    :reader ne)
    (np
     :documentation "The declared length of the parameters section."
     :initarg :np
-    :accessor np))
+    :reader np))
   (:documentation "The Section Lengths compliance error.
 It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 
@@ -816,15 +816,15 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
    (value
     :documentation "The invalid table length."
     :initarg :value
-    :accessor value)
+    :reader value)
    (smallest
     :documentation "The smallest table length."
     :initarg :smallest
-    :accessor smallest)
+    :reader smallest)
    (largest
     :documentation "The largest table length."
     :initarg :largest
-    :accessor largest))
+    :reader largest))
   (:documentation "The Invalid Table Length compliance error.
 It signals that a declared TFM table's length is out of range."))
 
@@ -937,8 +937,8 @@ length, signal an INVALID-SECTION-LENGTHS error."
 ;; ==========================================================================
 
 (define-condition extended-tfm (tfm-warning)
-  ((value :documentation "The TFM extension." :initarg :value :accessor value)
-   (file :documentation "The extended TFM file." :initarg :file :accessor file))
+  ((value :documentation "The TFM extension." :initarg :value :reader value)
+   (file :documentation "The extended TFM file." :initarg :file :reader file))
   (:documentation "The Extended TFM warning.
 It signals that a file contains extended TFM data (OFM or JFM) rather than
 plain TFM data."))

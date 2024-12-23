@@ -55,15 +55,15 @@ This structure is used to store decoded information from the char-info table
    (tag
     :documentation "The original tag."
     :initarg :tag
-    :accessor tag)
+    :reader tag)
    (remainder
     :documentation "The original remainder."
     :initarg :remainder
-    :accessor remainder)
+    :reader remainder)
    (value
     :documentation "The culprit char-info structure."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Spurious Char Info compliance warning.
 It signals that a char-info for a non-existent character (that is, with a
 width-index of 0) is not completely zero'ed out."))

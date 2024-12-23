@@ -159,7 +159,7 @@ This is the root condition for errors related to the use of the library."))
 
 (define-condition u16-overflow (tfm-compliance-error)
   ((section :initform 8) ; slot merge
-   (value :documentation "The faulty value." :initarg :value :accessor value))
+   (value :documentation "The faulty value." :initarg :value :reader value))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
 
@@ -190,7 +190,7 @@ If >= 2^15, signal a U16-OVERFLOW error."
 
 (define-condition fix-word-overflow (tfm-compliance-error)
   ((section :initform 9) ; slot merge
-   (value :documentation "The faulty value." :initarg :value :accessor value))
+   (value :documentation "The faulty value." :initarg :value :reader value))
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
 
@@ -243,11 +243,11 @@ This is a mixin for all conditions related to padded strings."))
    (value
     :documentation "The invalid length."
     :initarg :value
-    :accessor value)
+    :reader value)
    (pad
     :documentation "The maximum length."
     :initarg :pad
-    :accessor pad))
+    :reader pad))
   (:documentation "The Invalid Padded String Length compliance error.
 It signals that the declared length of a padded string is greater than its
 maximum."))
@@ -260,7 +260,7 @@ maximum."))
 
 (define-condition invalid-padded-string (tfm-compliance-error padded-string)
   ((section :initform 10) ; slot merge
-   (value :documentation "The invalid string." :initarg :value :accessor value))
+   (value :documentation "The invalid string." :initarg :value :reader value))
   (:documentation "The Invalid Padded String compliance error.
 It signals that a padded string is not in BCPL format (it contains parentheses
 or non-ASCII characters)."))
@@ -273,7 +273,7 @@ non-ASCII characters)"
 
 (define-condition padded-string-overflow (tfm-compliance-warning padded-string)
   ((value :documentation "The string's overflow."
-	  :initarg :value :accessor value))
+	  :initarg :value :reader value))
   (:documentation "The Padded String Overflow compliance warning.
 It signals that a padded string contains non null characters after its
 declared length."))

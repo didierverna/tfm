@@ -311,7 +311,7 @@ If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
   ((value
     :documentation "The invalid character code."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Character Code compliance error.
 It signals a reference to a character code which does not exist in the font
 being loaded."))
@@ -346,11 +346,11 @@ retrieved by this function."
   ((character1
     :documentation "The first character."
     :initarg :character1
-    :accessor character1)
+    :reader character1)
    (character2
     :documentation "The second character."
     :initarg :character2
-    :accessor character2))
+    :reader character2))
   (:documentation "The Different Fonts usage error.
 It signals an attempt at retrieving a ligature or kerning for two characters
 from different fonts."))
