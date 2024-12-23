@@ -200,7 +200,7 @@ This is the additional space to put at the end of sentences."
 Parameters are expressed in design size units, or in TeX point units if the
 font is frozen."
     :initform nil
-    :accessor parameters)
+    :reader parameters)
    (min-code
     :documentation
     "The font's smallest character code, or NIL if the font is empty."
