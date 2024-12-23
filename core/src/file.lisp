@@ -936,8 +936,7 @@ plain TFM data."))
   (file condition)
   (value condition))
 
-
-(defun load-font (file &rest arguments &key design-size freeze)
+(defun load-font (file &rest keys &key design-size freeze &aux lf)
   "Load FILE into a new font, and return it.
 - If provided, DESIGN-SIZE overrides the font's original value. It must be a
   real greater or equal to 1.
@@ -952,14 +951,12 @@ CANCEL-LOADING, in which case this function simply returns NIL."
   (declare (ignore design-size freeze))
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
-    (let ((lf (with-simple-restart (cancel-loading "Cancel loading this font.")
-		(read-u16))))
-      (cond ((zerop lf)
-	     (warn 'extended-tfm :value "OFM" :file file))
-	    ((or (= lf 9) (= lf 11))
-	     (warn 'extended-tfm :value "JFM" :file file))
-	    ((numberp lf)
-	     (with-simple-restart (cancel-loading "Cancel loading this font.")
-	       (apply #'load-tfm-font lf arguments)))))))
+    (setq lf (with-simple-restart (cancel-loading "Cancel loading this font.")
+	       (read-u16)))
+    (case lf
+      (0      (warn 'extended-tfm :value "OFM" :file file))
+      ((9 11) (warn 'extended-tfm :value "JFM" :file file))
+      (t      (with-simple-restart (cancel-loading "Cancel loading this font.")
+		(apply #'load-tfm-font lf keys))))))
 
 ;;; file.lisp ends here
