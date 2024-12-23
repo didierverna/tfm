@@ -107,66 +107,66 @@ along with potential scaling information."
     :documentation "The file from which the font was loaded, or NIL."
     :initform nil
     :initarg :file
-    :accessor file)
+    :reader file)
    (checksum
     :documentation "The font's checksum, as provided by Metafont."
-    :accessor checksum)
+    :reader checksum)
    (frozen
     :documentation "Whether the font is frozen."
     :initform nil
-    :accessor frozen)
+    :reader frozen)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :initform nil
     :accessor design-size)
    (original-design-size
     :documentation "The font's original design size, in units of TeX points."
-    :accessor original-design-size)
+    :reader original-design-size)
    (encoding
     :documentation "The font's character coding scheme (a BCPL string), or NIL."
     :initform nil
-    :accessor encoding)
+    :reader encoding)
    (family
     :documentation "The font's family (a BCPL string), or NIL."
     :initform nil
-    :accessor family)
+    :reader family)
    (7bits-safe
     :documentation "Whether the font is 7 bits safe (0 or 1), or NIL.
 When 1, it means that no character of code lesser than 128 can lead to a
 character of code greater than 128 by ways of ligatures or extensible
 recipes."
     :initform nil
-    :accessor 7bits-safe)
+    :reader 7bits-safe)
    (face-number
     :documentation "The font's face number, or NIL."
     :initform nil
-    :accessor face-number)
+    :reader face-number)
    (weight
     :documentation "The font's weight (:medium, :bold, :light), or NIL.
 When available, it is decoded from the font face number."
     :initform nil
-    :accessor weight)
+    :reader weight)
    (slope
     :documentation "The font's slope (:roman, :italic), or NIL.
 When available, it is decoded from the font face number."
     :initform nil
-    :accessor slope)
+    :reader slope)
    (expansion
     :documentation
     "The font's expansion (:regular, :condensed, :extended), or NIL.
 When available, it is decoded from the font face number."
     :initform nil
-    :accessor expansion)
+    :reader expansion)
    (face-code
     :documentation "The font's 3-letters face code, or NIL.
 When available, it is the concatenation of the upcased first letters of the
 font's weight, slope, and expansion."
     :initform nil
-    :accessor face-code)
+    :reader face-code)
    (slant
     :documentation "The font's slant (a scalar ratio)."
     :initform 0
-    :accessor slant)
+    :reader slant)
    (interword-space
     :documentation "The font's normal interword space.
 It is expressed in design size units, or in TeX point units if the font is
@@ -214,35 +214,35 @@ font is frozen."
     :documentation
     "The font's smallest character code, or NIL if the font is empty."
     :initform nil
-    :accessor min-code)
+    :reader min-code)
    (max-code
     :documentation
     "The font's largest character code, or NIL if the font is empty."
     :initform nil
-    :accessor max-code)
+    :reader max-code)
    (characters
     :documentation "The font's characters.
 This is a hash table associating character codes with characters."
     :initform (make-hash-table :test #'eq)
-    :accessor characters)
+    :reader characters)
    (character-count
     :documentation "The font's number of characters.
 The character count does not include the boundary character, unless that
 character really exists in the font (has non-zerop metrics)."
-    :accessor character-count)
+    :reader character-count)
    (ligatures
     :documentation "The font's ligatures.
 This is a hash table associating conses of characters with the corresponding
 ligature."
     :initform (make-hash-table :test #'equal)
-    :accessor ligatures)
+    :reader ligatures)
    (kernings
     :documentation "The font's kernings.
 This is a hash table associating conses of characters with the corresponding
 kerning. They are expressed in design size units, or in TeX point units if
 the font is frozen."
     :initform (make-hash-table :test #'equal)
-    :accessor kernings)
+    :reader kernings)
    (boundary-character
     :documentation "The font's boundary character, or NIL.
 This character is also accessible by code, like normal ones. However, it is
@@ -251,7 +251,7 @@ TeX: the Program [545]). Finally, this character is not included in the
 character count, unless it exists for real in the font (has non-zero
 metrics)."
     :initform nil
-    :accessor boundary-character))
+    :reader boundary-character))
   (:documentation "The TeX Font Metrics class.
 This class represents decoded font information. Within the context of this
 library, the term \"font\" denotes an instance of this class, or of one of its
@@ -424,7 +424,7 @@ If FONT is already frozen, this function does nothing and returns NIL.
 Otherwise, it returns T."
   (unless (frozen font)
     (scale font (design-size font))
-    (setf (frozen font) t)))
+    (setf (slot-value font 'frozen) t)))
 
 (defun unfreeze (font)
   "Unfreeze FONT.
@@ -433,7 +433,7 @@ If FONT is not frozen, this function does nothing and returns NIL. Otherwise,
 it returns T."
   (when (frozen font)
     (scale font (/ 1 (design-size font)))
-    (setf (frozen font) nil)
+    (setf (slot-value font 'frozen) nil)
     t))
 
 

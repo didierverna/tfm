@@ -80,16 +80,16 @@ However, if FONT's design size was explicitly overridden, only signal an
 INVALID-ORIGINAL-DESIGN-SIZE warning."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller,
   ;; LOAD-TFM-FONT.
-  (setf (checksum font) (read-u32))
+  (setf (slot-value font 'checksum) (read-u32))
   (decf length)
-  (setf (original-design-size font) (read-fix-word nil))
+  (setf (slot-value font 'original-design-size) (read-fix-word nil))
   (unless (>= (original-design-size font) 1)
     (if (design-size font)
       (warn 'invalid-original-design-size :value (original-design-size font))
       (restart-case
 	  (error 'invalid-design-size :value (original-design-size font))
 	(set-to-ten () :report "Set it to 10pt."
-	  (setf (original-design-size font) 10)))))
+	  (setf (slot-value font 'original-design-size) 10)))))
   (unless (design-size font)
     (setf (design-size font) (original-design-size font)))
   (decf length)
@@ -103,7 +103,8 @@ If so, decrease LENGTH by NEEDED afterwards."
 	       `(when (>= length ,needed) ,@body (decf length ,needed))))
     (with-condition-context
 	(padded-string padded-string-context :name "character encoding scheme")
-      (checking-length 10 (setf (encoding font) (read-padded-string 40))))
+      (checking-length 10
+	(setf (slot-value font 'encoding) (read-padded-string 40))))
     (when (encoding font)
       ;; #### NOTE: we don't upcase the BCPL strings, but tftopl does, so it's
       ;; probably better to do string comparisons on upcased versions. Also,
@@ -115,34 +116,42 @@ If so, decrease LENGTH by NEEDED afterwards."
 	     (change-class font 'math-extension-font))))
     (with-condition-context
 	(padded-string padded-string-context :name "font identifier")
-      (checking-length 5 (setf (family font) (read-padded-string 20))))
+      (checking-length 5
+	(setf (slot-value font 'family) (read-padded-string 20))))
     (checking-length 1
       (let ((word (read-u32)))
-	(setf (7bits-safe font) (ldb (byte 1 31) word))
+	(setf (slot-value font '7bits-safe) (ldb (byte 1 31) word))
 	(let ((face (ldb (byte 8 0) word)))
-	  (setf (face-number font) face)
+	  (setf (slot-value font 'face-number) face)
 	  (when (< face 18)
-	    (setf (face-code font) (make-string 3))
+	    (setf (slot-value font 'face-code) (make-string 3))
 	    (case face
 	      ((0 1  6  7 12 13)
-	       (setf (weight font) :medium (aref (face-code font) 0) #\M))
+	       (setf (slot-value font 'weight) :medium
+		     (aref (face-code font) 0) #\M))
 	      ((2 3  8  9 14 15)
-	       (setf (weight font) :bold (aref (face-code font) 0) #\B))
+	       (setf (slot-value font 'weight) :bold
+		     (aref (face-code font) 0) #\B))
 	      ((4 5 10 11 16 17)
-	       (setf (weight font) :light (aref (face-code font) 0) #\L)))
+	       (setf (slot-value font 'weight) :light
+		     (aref (face-code font) 0) #\L)))
 	    (case face
 	      ((0 2 4 6 8 10 12 14 16)
-	       (setf (slope font) :roman (aref (face-code font) 1) #\R))
+	       (setf (slot-value font 'slope)  :roman
+		     (aref (face-code font) 1) #\R))
 	      ((1 3 5 7 9 11 13 15 17)
-	       (setf (slope font) :bold (aref (face-code font) 1) #\I)))
+	       (setf (slot-value font 'slope)  :bold
+		     (aref (face-code font) 1) #\I)))
 	    (case face
 	      ((0  1  2  3  4  5)
-	       (setf (expansion font) :regular (aref (face-code font) 2) #\R))
+	       (setf (slot-value font 'expansion) :regular
+		     (aref (face-code font) 2)    #\R))
 	      ((6  7  8  9  10 11)
-	       (setf (expansion font) :condensed (aref (face-code font) 2) #\C))
+	       (setf (slot-value font 'expansion) :condensed
+		     (aref (face-code font) 2)    #\C))
 	      ((12 13 14 15 16 17)
-	       (setf (expansion font) :extended
-		     (aref (face-code font) 2) #\E))))))))
+	       (setf (slot-value font 'expansion) :extended
+		     (aref (face-code font) 2)    #\E))))))))
   ;; #### TODO: if applicable, maybe store the remainder somewhere instead of
   ;; just discarding it.
   (loop :repeat length :do (read-u32)))
@@ -496,7 +505,8 @@ DISCARD-EXTENSION-RECIPE."
 			     0))))))
     ;; #### NOTE: this count doesn't (and shouldn't) include a zero'ed out
     ;; boundary character potentially added below.
-    (setf (character-count font) (hash-table-count (characters font)))
+    (setf (slot-value font 'character-count)
+	  (hash-table-count (characters font)))
 
     ;; Now that we have all the characters registered, we can start processing
     ;; mutual references.
@@ -509,7 +519,7 @@ DISCARD-EXTENSION-RECIPE."
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
 	  (let ((code (next lig/kern)))
-	    (setf (boundary-character font)
+	    (setf (slot-value font 'boundary-character)
 		  (or (code-character code font nil)
 		      (setf (code-character font)
 			    (make-character-metrics code font 0 0 0 0)))))))
@@ -641,7 +651,7 @@ Return remaining LENGTH.")
     (:method (length font)
       "Parse the 7 regular FONT parameters. Return remaining LENGTH."
       (when (>= length 1)
-	(setf (slant font) (read-fix-word nil))
+	(setf (slot-value font 'slant) (read-fix-word nil))
 	(decf length))
       (map-font-dimension-accessors slot font read-parameter)
       length)
@@ -662,7 +672,7 @@ Return remaining LENGTH.")
 	(let ((array (make-array length)))
 	  (loop :for i :from 0 :upto (1- length)
 		:do (setf (aref array i) (read-fix-word)))
-	  (setf (parameters font) array))))))
+	  (setf (slot-value font 'parameters) array))))))
 
 
 
@@ -890,7 +900,9 @@ length, signal an INVALID-SECTION-LENGTHS error."
     (unless (and (<= (1- bc) ec) (<= ec 255))
       (error 'invalid-character-range :bc bc :ec ec))
     (setq nc (+ ec (- bc) 1))
-    (unless (zerop nc) (setf (min-code font) bc (max-code font) ec))
+    (unless (zerop nc)
+      (setf (slot-value font 'min-code) bc
+	    (slot-value font 'max-code) ec))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(256 16 16 64 256)
