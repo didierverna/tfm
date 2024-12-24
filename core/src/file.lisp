@@ -564,7 +564,8 @@ DISCARD-EXTENSION-RECIPE."
 			 (with-simple-restart
 			     (discard-next-character
 			      "Discard the next character.")
-			   (setf (next-character (code-character code font))
+			   (setf (slot-value (code-character code font)
+					     'next-character)
 				 (code-character (next-char char-info) font))))
 			((exten-index char-info)
 			 ;; And neither about those in the extension recipe
@@ -572,7 +573,8 @@ DISCARD-EXTENSION-RECIPE."
 			 (with-simple-restart
 			     (discard-extension-recipe
 			      "Discard this extension recipe.")
-			   (setf (extension-recipe (code-character code font))
+			   (setf (slot-value (code-character code font)
+					     'extension-recipe)
 				 (font-extension-recipe
 				  (tref extens (exten-index char-info))
 				  font))))))))
@@ -597,11 +599,11 @@ DISCARD-EXTENSION-RECIPE."
 			       (error 'character-list-cycle :value seen)
 			     (discard-next-character ()
 			       :report "Discard the cyclic next character."
-			       (setf (next-character character) nil)))
+			       (setf (slot-value character 'next-character)
+				     nil)))
 		     :else
 		       :do (push (next-character character) seen)
-		       :and :do (setq character
-				      (next-character character)))))
+		       :and :do (setq character (next-character character)))))
 	   (characters font))
 
   ;; 6. Check for ligature cycles, ligature by ligature. Again, this is

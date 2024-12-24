@@ -122,14 +122,14 @@ of ascending size, and not the last one (see TeX: the Program [544]). It is
 mutually exclusive with the EXTENSION-RECIPE slot, and also with the existence
 of a ligature or kerning program for this character."
     :initform nil
-    :accessor next-character)
+    :reader next-character)
    (extension-recipe
     :documentation "The character's extension recipe, or NIL.
 This slot is non-null only if this character is extensible (see TeX: the
 Program [544]). It is mutually exclusive with the NEXT-CHARACTER slot, and
 also with the existence of a ligature or kerning program for this character."
     :initform nil
-    :accessor extension-recipe))
+    :reader extension-recipe))
   (:documentation "The Character Metrics class.
 This class represents decoded character information. Within the context of
 this library, the term \"character\" denotes an instance of this class."))
