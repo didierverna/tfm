@@ -84,7 +84,7 @@
     :invalid-character-code :value
     :get-character
     :different-fonts :character1 :character2
-    :ligature :kerning
+    :ligature :kern
     :freeze :unfreeze
     :math-symbols-font
     :num1 :num2 :num3 :denom1 :denom2 :sup1 :sup2 :sup3 :sub1 :sub2
@@ -101,7 +101,7 @@
     :tfm-table-error :name
     :invalid-table-index :value :largest
     :invalid-ligature-opcode :value
-    :abort-lig/kern-program :discard-ligature :discard-kerning
+    :abort-lig/kern-program :discard-ligature :discard-kern
     :abort-lig/kern-program
     :invalid-table-start :value
     :no-boundary-character

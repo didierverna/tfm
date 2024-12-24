@@ -234,11 +234,11 @@ INVALID-LIGATURE-OPCODE error. This error is immediately restartable with
 DISCARD-LIGATURE.
 
 If an invalid index into KERNS is encountered, signal an INVALID-TABLE-INDEX
-error. This error is immediately restartable with DISCARD-KERNING.
+error. This error is immediately restartable with DISCARD-KERN.
 
 Finally, if an invalid character code is encountered, signal an
 INVALID-CHARACTER-CODE error. Depending on the context, this error is
-immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
+immediately restartable with DISCARD-LIGATURE or DISCARD-KERN."
   (loop
     :for lig/kern
       := (with-simple-restart
@@ -263,7 +263,7 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
 				       ((= opcode 11) 2)))))))
 	    ;; kerning instruction
 	    (with-simple-restart
-		(discard-kerning "Discard this kerning instruction.")
+		(discard-kern "Discard this kerning instruction.")
 	      (set-kern character (code-character (next lig/kern) font)
 			(tref kerns (+ (* 256 (- (op lig/kern) 128))
 				       (rmd lig/kern))))))

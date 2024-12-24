@@ -229,7 +229,7 @@ ligature."
    (kerns
     :documentation "The font's kerns.
 This is a hash table associating conses of characters with the corresponding
-kerning. They are expressed in design size units, or in TeX point units if
+kern. They are expressed in design size units, or in TeX point units if
 the font is frozen."
     :initform (make-hash-table :test #'equal)
     :reader kerns)
@@ -383,7 +383,7 @@ retrieved by this function."
     :initarg :character2
     :reader character2))
   (:documentation "The Different Fonts usage error.
-It signals an attempt at retrieving a ligature or kerning for two characters
+It signals an attempt at retrieving a ligature or kern for two characters
 from different fonts."))
 
 (define-condition-report (condition different-fonts)
@@ -400,8 +400,8 @@ DIFFERENT-FONTS error."
     (error 'different-fonts :character1 character1 :character2 character2))
   (gethash (cons character1 character2) (ligatures (font character1))))
 
-(defun kerning (character1 character2)
-  "Return kerning for CHARACTER1 and CHARACTER2, or NIL.
+(defun kern (character1 character2)
+  "Return kern for CHARACTER1 and CHARACTER2, or NIL.
 If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
 DIFFERENT-FONTS error."
   (unless (eq (font character1) (font character2))
