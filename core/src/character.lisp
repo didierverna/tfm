@@ -33,6 +33,9 @@
 ;; Extension Recipes
 ;; ==========================================================================
 
+;; #### NOTE: extension recipes are considered internal. Character metrics
+;; instances provide pseudo-accessors to extension recipe components.
+
 (defclass extension-recipe ()
   ((top-character
     :documentation "The recipe's top character, or NIL."

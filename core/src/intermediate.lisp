@@ -108,8 +108,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		(and (zerop h&d)
 		     (zerop i&t)
 		     (zerop remainder)))
-      (warn 'spurious-char-info
-	    :tag tag :remainder remainder :value char-info))
+      (warn 'spurious-char-info :tag tag :remainder remainder :value char-info))
     char-info))
 
 

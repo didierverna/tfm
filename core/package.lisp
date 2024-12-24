@@ -46,15 +46,23 @@
     :nickname-package
 
     ;; From src/util.lisp:
-    :tfm :tfm-warning :tfm-error :tfm-compliance :tfm-usage
+    :context :context-string
+    :tfm :context :tfm-warning :tfm-error
+    :tfm-compliance :section
+    :tfm-usage
     :tfm-compliance-warning :tfm-compliance-error
     :tfm-usage-warning :tfm-usage-error
     :u16-overflow :value
-    :fix-word-overflow :value :set-to-zero
+    :fix-word-overflow :value
+    :set-to-zero
+    :padded-string
     :invalid-padded-string-length :value :pad
     :invalid-padded-string :value
     :padded-string-overflow :value
-    :read-maximum-length :keep-string :fix-string :discard-string
+    :read-maximum-length :discard-string :keep-string :fix-string
+
+    ;; From src/intermediate.lisp:
+    :spurious-char-info :tag :remainder :value
 
     ;; From src/character.lisp:
     :character-metrics
@@ -64,12 +72,15 @@
 
     ;; From src/font.lisp:
     :ligature :composite :delete-before :delete-after :pass-over
-    :font :name :file :checksum :frozen :design-size :original-design-size
+    :font :file :name :checksum :frozen :design-size :original-design-size
     :encoding :family :7bits-safe :face-number :weight :slope :expansion
     :face-code
     :slant :interword-space :interword-stretch :interword-shrink :ex :em
     :extra-space :parameters :min-code :max-code :character-count
     :boundary-character
+    :invalid-custom-name :value
+    :invalid-custom-design-size :value
+    :set-to-file-name :set-to-original
     :invalid-character-code :value
     :get-character
     :different-fonts :character1 :character2
@@ -83,21 +94,25 @@
     :big-op-spacing5
 
     ;; From src/file.lisp:
-    :invalid-design-size :value :set-to-ten
-    :name
+    :invalid-design-size :value
+    :invalid-original-design-size :value
+    :padded-string-context :name
+    :set-to-ten
+    :tfm-table-error :name
     :invalid-table-index :value :largest
     :invalid-ligature-opcode :value
     :abort-lig/kern-program :discard-ligature :discard-kerning
     :abort-lig/kern-program
-    :spurious-char-info :value
     :invalid-table-start :value
     :no-boundary-character
     :character-list-cycle :value
     :ligature-cycle :value :characters
+    :table-context :name :index :size
+    :char-info-table-context :code
     :set-to-zero :abort-lig/kern-program
     :discard-next-character :discard-extension-recipe
     :discard-next-character :discard-ligature
-    :declared-size :actual-size
+    :file-size-mixin :declared-size :actual-size
     :file-underflow :file-overflow
     :invalid-header-length :value
     :invalid-character-range :bc :ec
