@@ -253,21 +253,20 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
 		  (discard-ligature "Discard this ligature instruction.")
 		(if (or (= opcode 4) (and (> opcode 7) (not (= opcode 11))))
 		  (error 'invalid-ligature-opcode :value opcode)
-		  (setf (ligature character
-				  (code-character (next lig/kern) font))
-			(make-ligature
-			 (code-character (rmd lig/kern) font)
-			 (when (member opcode '(0 1 5)) t)
-			 (when (member opcode '(0 2 6)) t)
-			 (cond ((member opcode '(0 1 2 3)) 0)
-			       ((member opcode '(5 6 7)) 1)
-			       ((= opcode 11) 2)))))))
+		  (set-ligature character (code-character (next lig/kern) font)
+				(make-ligature
+				 (code-character (rmd lig/kern) font)
+				 (when (member opcode '(0 1 5)) t)
+				 (when (member opcode '(0 2 6)) t)
+				 (cond ((member opcode '(0 1 2 3)) 0)
+				       ((member opcode '(5 6 7)) 1)
+				       ((= opcode 11) 2)))))))
 	    ;; kerning instruction
 	    (with-simple-restart
 		(discard-kerning "Discard this kerning instruction.")
-	      (setf (kerning character (code-character (next lig/kern) font))
-		    (tref kerns (+ (* 256 (- (op lig/kern) 128))
-				   (rmd lig/kern))))))
+	      (set-kern character (code-character (next lig/kern) font)
+			(tref kerns (+ (* 256 (- (op lig/kern) 128))
+				       (rmd lig/kern))))))
     :if (>= (skip lig/kern) 128)
       :return t
     ;; #### NOTE: because of the way the next instruction is computed below,

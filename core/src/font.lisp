@@ -410,18 +410,17 @@ DIFFERENT-FONTS error."
 
 
 ;; #### NOTE: we don't currently bother to check that the two characters
-;; belong to the same font. These functions are internal only (although the
-;; symbols are exported, damn you CL), so let's just say I trust my own code
-;; for now.
-(defun (setf ligature) (ligature character1 character2)
+;; belong to the same font. These functions are internal only, so let's just
+;; say I trust my own code for now.
+(defun set-ligature (character1 character2 ligature)
   "Set LIGATURE for CHARACTER1 and CHARACTER2."
   (setf (gethash (cons character1 character2) (ligatures (font character1)))
 	ligature))
 
-(defun (setf kerning) (kerning character1 character2)
-  "Set KERNING for CHARACTER1 and CHARACTER2."
+(defun set-kern (character1 character2 kern)
+  "Set KERN for CHARACTER1 and CHARACTER2."
   (setf (gethash (cons character1 character2) (kernings (font character1)))
-	kerning))
+	kern))
 
 
 ;; --------
@@ -444,7 +443,7 @@ DIFFERENT-FONTS error."
 		 (setf slot (* slot factor))))
 	     (characters font))
     (maphash (lambda (pair kern)
-	       (setf (kerning (car pair) (cdr pair)) (* kern factor)))
+	       (set-kern (car pair) (cdr pair) (* kern factor)))
 	     (kernings font))))
 
 (defun freeze (font)
