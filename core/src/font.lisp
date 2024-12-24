@@ -87,19 +87,17 @@ STATE is a list of characters, the first two being subject to LIGATURE."
 ;; -----
 
 (defclass font ()
-  ((name
-    :documentation "The font's name.
-When the font is loaded from a file, it defaults to the file's base name,
-along with potential scaling information."
-    :initarg :name
-    :accessor name)
-   (file
-    :documentation "The file from which the font was loaded, or NIL."
-    :initform nil
+  ((file
+    :documentation "The font's file."
     :initarg :file
     :reader file)
+   (name
+    :documentation "The font's name."
+    :initform nil
+    :initarg :name
+    :reader name)
    (checksum
-    :documentation "The font's checksum, as provided by Metafont."
+    :documentation "The font's checksum."
     :reader checksum)
    (frozen
     :documentation "Whether the font is frozen."
@@ -108,6 +106,7 @@ along with potential scaling information."
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :initform nil
+    :initarg :design-size
     :accessor design-size)
    (original-design-size
     :documentation "The font's original design size, in units of TeX points."
@@ -258,6 +257,53 @@ subclasses."))
     (when (frozen font) (princ " (frozen)" stream))))
 
 
+(define-condition invalid-custom-name (tfm-usage-error)
+  ((value
+    :documentation "The invalid custom name."
+    :initarg :value
+    :reader value))
+  (:documentation "The Invalid Custom Name usage error.
+It signals that a custom name is not a non-empty string."))
+
+(define-condition-report (condition invalid-custom-name)
+  "custom name ~S is invalid (should be a non-empty string)" (value condition))
+
+
+(define-condition invalid-custom-design-size (tfm-usage-error)
+  ((value
+    :documentation "The invalid custom design size."
+    :initarg :value
+    :reader value))
+  (:documentation "The Invalid Custom Design Size usage error.
+It signals that a custom design size is not a real greater or equal to 1."))
+
+(define-condition-report (condition invalid-custom-design-size)
+  "custom design size ~A is invalid (should be a real greater or equal to 1)"
+  (value condition))
+
+
+;; #### NOTE: we're not currently so pedantic as to check that the font's file
+;; has a non-empty base name.
+(defmethod initialize-instance :after ((font font) &key)
+  "Check the validity of FONT's name and design-size.
+- If the font's name is not a non-empty string, signal and INVALID-CUSTOM-NAME
+  error. This error is immediately restartable with SET-TO-FILE-NAME.
+- IF the font's design-size is not NIL or a real greater or equal to 1, signal
+  an INVALID-CUSTOM-DESIGN-SIZE error. This error is immediately restartable
+  with SET-TO-ORIGINAL."
+  (with-slots (file name design-size) font
+    (if (null name)
+      (setq name (pathname-name file))
+      (unless (and (stringp name) (not (zerop (length name))))
+	(restart-case (error 'invalid-custom-name :value name)
+	  (set-to-file-name () :report "Use the font file's base name."
+	    (setq name (pathname-name file))))))
+    (unless (typep design-size '(or null (real 1)))
+      (restart-case (error 'invalid-custom-design-size :value design-size)
+	(set-to-original () :report "Use the font's design size."
+	  (setq design-size nil))))))
+
+
 (defmethod (setf design-size) :before (design-size font)
   "Unscale FONT if frozen."
   (when (frozen font) (scale font (/ 1 (design-size font)))))
@@ -267,30 +313,11 @@ subclasses."))
   (when (frozen font) (scale font (design-size font))))
 
 (defmethod (setf design-size) :around (design-size font)
-  "Check that DESIGN-SIZE is a real greater or equal to 1."
-  (check-type design-size (real 1))
+  "Check that DESIGN-SIZE is a real greater or equal to 1.
+Otherwise, signal and INVALID-CUSTOM-DESIGN-SIZE error."
+  (unless (typep design-size '(real 1))
+    (error 'invalid-custom-design-size :value design-size))
   (call-next-method design-size font))
-
-
-;; #### NOTE: this error is not currently exported, because it cannot in fact
-;; be triggered yet (by the public API).
-(define-condition anonymous-font (tfm-usage-error)
-  ()
-  (:documentation "The Anonymous Font usage error.
-It signals an attempt at creating a font with no name."))
-
-(define-condition-report (condition anonymous-font)
-  "all fonts must be named.")
-
-
-(defmethod initialize-instance :before ((font font) &key name)
-  "Check that FONT has a name, or signal an ANONYMOUS-FONT error."
-  (unless name (error 'anonymous-font)))
-
-(defun make-font (name &rest initargs)
-  "Make a new NAMEd FONT instance, and return it.
-If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
-  (apply #'make-instance 'font :name name initargs))
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)

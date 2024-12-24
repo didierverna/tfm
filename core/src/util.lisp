@@ -382,4 +382,12 @@ warning."
 		      `(with-slots ((,var ,slot)) ,object ,@body))
 	      slots)))
 
+#i(remove-keys 1)
+(defun remove-keys (keys &rest removed)
+  "Return a new property list from KEYS without REMOVED ones."
+  (loop :for key :in keys :by #'cddr
+	:for val :in (cdr keys) :by #'cddr
+	:unless (member key removed)
+	  :nconc (list key val)))
+
 ;;; util.lisp ends here
