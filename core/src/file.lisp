@@ -222,7 +222,7 @@ It signals that a ligature opcode is invalid."))
     (character index lig/kerns kerns &aux (font (font character)))
   "Run a ligature/kerning program for CHARACTER.
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array. Running the
-program eventually creates ligatures or kernings for CHARACTER and some other
+program eventually creates ligatures or kerns for CHARACTER and some other
 character.
 
 If an invalid index into LIG/KERNS is encountered, signal an

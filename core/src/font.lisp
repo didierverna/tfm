@@ -226,13 +226,13 @@ This is a hash table associating conses of characters with the corresponding
 ligature."
     :initform (make-hash-table :test #'equal)
     :reader ligatures)
-   (kernings
-    :documentation "The font's kernings.
+   (kerns
+    :documentation "The font's kerns.
 This is a hash table associating conses of characters with the corresponding
 kerning. They are expressed in design size units, or in TeX point units if
 the font is frozen."
     :initform (make-hash-table :test #'equal)
-    :reader kernings)
+    :reader kerns)
    (boundary-character
     :documentation "The font's boundary character, or NIL.
 This character is also accessible by code, like normal ones. However, it is
@@ -406,7 +406,7 @@ If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
 DIFFERENT-FONTS error."
   (unless (eq (font character1) (font character2))
     (error 'different-fonts :character1 character1 :character2 character2))
-  (gethash (cons character1 character2) (kernings (font character1))))
+  (gethash (cons character1 character2) (kerns (font character1))))
 
 
 ;; #### NOTE: we don't currently bother to check that the two characters
@@ -419,7 +419,7 @@ DIFFERENT-FONTS error."
 
 (defun set-kern (character1 character2 kern)
   "Set KERN for CHARACTER1 and CHARACTER2."
-  (setf (gethash (cons character1 character2) (kernings (font character1)))
+  (setf (gethash (cons character1 character2) (kerns (font character1)))
 	kern))
 
 
@@ -444,7 +444,7 @@ DIFFERENT-FONTS error."
 	     (characters font))
     (maphash (lambda (pair kern)
 	       (set-kern (car pair) (cdr pair) (* kern factor)))
-	     (kernings font))))
+	     (kerns font))))
 
 (defun freeze (font)
   "Freeze FONT.
