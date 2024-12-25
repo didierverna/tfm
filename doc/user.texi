@@ -170,6 +170,11 @@ Common Lisp
 @findex \cls\@r{, accessor, }\name\
 @end macro
 
+@macro clsrindex{cls,name}
+@findex \name\@r{ (}\cls\ @r{reader)}
+@findex \cls\@r{, reader, }\name\
+@end macro
+
 @c Reader functions subindex
 @macro rfsubindex{func}
 @findex @r{Reader, }\func\
@@ -473,7 +478,7 @@ Add @var{NICKNAME} (@code{:tfm} by default) to the
 @section TFM Files
 The main entry point to @tfm{} is @code{load-font}, the function which
 allows you to load a @code{tfm} file in memory.
-@defun load-font FILE
+@defun load-font FILE &key NAME DESIGN-SIZE FREEZE
 Load @var{FILE} into a new font, and return it.
 @end defun
 
@@ -481,6 +486,12 @@ Load @var{FILE} into a new font, and return it.
 support searching for TFM files in common or standard places (such as
 @TeX{}Live installations), so you need to know where those files are
 located, and provide a specific pathname.
+
+@var{NAME} lets you override the font's name, which is set to
+@var{FILE}'s base name by default.
+
+For an explanation of @var{DESIGN-SIZE} and @var{FREEZE}, see
+@ref{Scaling and Freezing}.
 
 @cindex TFM
 @cindex Format, TFM
@@ -496,14 +507,13 @@ currently support them. If OFM or JFM contents is detected,
 
 @deftp {Warning} extended-tfm
 @warnsubindex{extended-tfm}@c
-Accessors:
 @itemize
 @item
-@clsaindex{extended-tfm,file}@c
-@code{file}: the argument to @code{load-font} (a pathname designator).
-@item
-@clsaindex{extended-tfm,value}@c
+@clsrindex{extended-tfm,value}@c
 @code{value}: currently either @code{"OFM"} or @code{"JFM"}.
+@item
+@clsrindex{extended-tfm,file}@c
+@code{file}: the @var{FILE} argument to @code{load-font}.
 @end itemize
 @end deftp
 
@@ -519,7 +529,6 @@ frequent one is simply called @code{font}. @TeX{}, however, recognizes
 two special font categories for which the corresponding classes are
 @code{math-symbols-font}, and @code{math-extension-font}. Both of these
 classes are subclasses of @code{font}.
-
 
 @node Font Information, Character Information, TFM Files, Normal Use
 @section Font Information
