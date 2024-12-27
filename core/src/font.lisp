@@ -258,15 +258,14 @@ subclasses."))
 
 
 (define-condition invalid-custom-name (tfm-usage-error)
-  ((value
-    :documentation "The invalid custom name."
-    :initarg :value
-    :reader value))
+  ((name :documentation "The invalid custom name."
+	 :initarg :name :reader name))
   (:documentation "The Invalid Custom Name usage error.
 It signals that a custom name is not a non-empty string."))
 
 (define-condition-report (condition invalid-custom-name)
-  "custom name ~S is invalid (should be a non-empty string)" (value condition))
+    "custom name ~S is invalid (should be a non-empty string)"
+  (name condition))
 
 
 (define-condition invalid-custom-design-size (tfm-usage-error)
@@ -295,7 +294,7 @@ It signals that a custom design size is not a real greater or equal to 1."))
     (if (null name)
       (setq name (pathname-name file))
       (unless (and (stringp name) (not (zerop (length name))))
-	(restart-case (error 'invalid-custom-name :value name)
+	(restart-case (error 'invalid-custom-name :name name)
 	  (use-file-base-name () :report "Use the font file's base name."
 	    (setq name (pathname-name file))))))
     (unless (typep design-size '(or null (real 1)))
@@ -350,17 +349,15 @@ with USE-ORIGINAL-DESIGN-SIZE."
 ;; characters that don't exist in the font (remember that we do add a fake
 ;; boundary character if needed, so even this one can be retrieved).
 (define-condition invalid-character-code (tfm-compliance-error)
-  ((value
+  ((code
     :documentation "The invalid character code."
-    :initarg :value
-    :reader value))
+    :initarg :code :reader code))
   (:documentation "The Invalid Character Code compliance error.
 It signals a reference to a character code which does not exist in the font
 being loaded."))
 
 (define-condition-report (condition invalid-character-code)
-  "character code ~A is invalid."
-  (value condition))
+    "character code ~A is invalid." (code condition))
 
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
@@ -372,7 +369,7 @@ retrieved by this function."
   (or (gethash code (characters font))
       ;; #### NOTE: recovering from here directly would make little sense, so
       ;; it's rather the job of the callers to provide sensible restarts.
-      (when errorp (error 'invalid-character-code :value code))))
+      (when errorp (error 'invalid-character-code :code code))))
 
 (defun (setf code-character) (character font)
   "Make FONT's CHARACTER accessible by its code."
