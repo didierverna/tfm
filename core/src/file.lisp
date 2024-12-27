@@ -936,6 +936,7 @@ plain TFM data."))
 
 (defun load-font (file &rest keys &key name design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
+- FILE must be a pathname designator.
 - The font's name (FILE's base name by default) may be overridden with NAME
   (a non-empty string).
 - The font's original design size may be overridden with DESIGN-SIZE
@@ -943,7 +944,7 @@ plain TFM data."))
 - When FREEZE (NIL by default), freeze the font immediately after loading it.
   See the eponymous function for more information.
 
-Only actual TFM data is currently supported. If OFM or JFM data is detected,
+Only plain TFM data is currently supported. If OFM or JFM data is detected,
 this function signals an EXTENDED-TFM warning and returns NIL.
 
 While loading TFM data, any signalled condition is restartable with
