@@ -169,20 +169,18 @@ This is the root condition for errors related to TFM tables."))
 
 (define-condition invalid-table-index (tfm-table-error)
   ((section :initform 8) ; slot merge
-   (value
+   (index
     :documentation "The invalid index."
-    :initarg :value
-    :reader value)
+    :initarg :value :reader value)
    (largest
     :documentation "The largest index."
-    :initarg :largest
-    :reader largest))
+    :initarg :largest :reader largest))
   (:documentation "The Invalid Table Index compliance error.
 It signals that a table index is greater than its largest value."))
 
 (define-condition-report (condition invalid-table-index)
   "index ~A in ~A table is invalid (largest is ~A)"
-  (value condition)
+  (index condition)
   (name condition)
   (largest condition))
 
@@ -192,7 +190,7 @@ It signals that a table index is greater than its largest value."))
 If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
   (unless (< index (length table))
     (error 'invalid-table-index
-      :value index :largest (1- (length table)) :name name))
+      :index index :largest (1- (length table)) :name name))
   (aref table index))
 
 (defmacro tref (table index)
@@ -206,16 +204,14 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
 
 (define-condition invalid-ligature-opcode (tfm-compliance-error)
   ((section :initform 13) ; slot merge
-   (value
-    :documentation "The invalid ligature opcode."
-    :initarg :value
-    :reader value))
+   (opcode :documentation "The invalid ligature opcode."
+	   :initarg :opcode :reader opcode))
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
 
 (define-condition-report (condition invalid-ligature-opcode)
   "ligature opcode ~A is invalid"
-  (value condition))
+  (opcode condition))
 
 
 (defun %run-ligature/kerning-program
@@ -252,7 +248,7 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERN."
 	      (with-simple-restart
 		  (discard-ligature "Discard this ligature instruction.")
 		(if (or (= opcode 4) (and (> opcode 7) (not (= opcode 11))))
-		  (error 'invalid-ligature-opcode :value opcode)
+		  (error 'invalid-ligature-opcode :opcode opcode)
 		  (set-ligature character (code-character (next lig/kern) font)
 				(make-ligature
 				 (code-character (rmd lig/kern) font)
@@ -318,16 +314,14 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
 
 (define-condition invalid-table-start (tfm-table-error)
   ((section :initform 11) ; slot merge
-   (value
-    :documentation "The invalid first table value."
-    :initarg :value
-    :reader value))
+   (start :documentation "The invalid first table value."
+	  :initarg :start :reader start))
   (:documentation "The Invalid Table Start compliance error.
 It signals that the first value in a TFM table is not 0."))
 
 (define-condition-report (condition invalid-table-start)
   "first value ~A in ~A table is invalid (should be 0)"
-  (value condition)
+  (start condition)
   (name condition))
 
 
@@ -344,16 +338,14 @@ without a boundary character being defined")
 
 (define-condition character-list-cycle (tfm-compliance-error)
   ((section :initform 12) ; slot merge
-   (value
-    :documentation "The cyclic character list."
-    :initarg :value
-    :reader value))
+   (character-list :documentation "The cyclic character list."
+		   :initarg :character-list :reader character-list))
   (:documentation "The Character List Cycle compliance error.
 It signals that a cycle was found in a list of ascending character sizes."))
 
 (define-condition-report (condition character-list-cycle)
   "found a cycle in character list ~A"
-  (value condition))
+  (character-list condition))
 
 
 (define-condition ligature-cycle (tfm-compliance-error)
@@ -462,7 +454,7 @@ DISCARD-EXTENSION-RECIPE."
 	  :do (let ((start (read-fix-word)))
 		(unless (zerop start)
 		  (restart-case
-		      (error 'invalid-table-start :value start :name name)
+		      (error 'invalid-table-start :start start :name name)
 		    (set-to-zero () :report "Set to 0."
 		      (setq start 0))))
 		(vector-push start array))
@@ -594,7 +586,8 @@ DISCARD-EXTENSION-RECIPE."
 		     :while (next-character character)
 		     :if (member (next-character character) seen)
 		       :do (restart-case
-			       (error 'character-list-cycle :value seen)
+			       (error 'character-list-cycle
+				 :character-list seen)
 			     (discard-next-character ()
 			       :report "Discard the cyclic next character."
 			       (setf (slot-value character 'next-character)
