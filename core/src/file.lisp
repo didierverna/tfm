@@ -407,8 +407,7 @@ entries in the 8 tables, that is, the char infos, widths, heights, depths,
 italic corrections, lig/kern instructions, kerns, and extens respectively.
 
 If a char info structure with a width index of 0 is not completely zero'ed
-out, signal an INVALID-CHAR-INFO error. This error is immediately restartable
-with SET-TO-ZERO.
+out, signal an SPURIOUS-CHAR-INFO warning.
 
 If the first entry in the widths, heights, depths, or italic corrections table
 is not 0, signal an INVALID-TABLE-START error. This error is immediately
