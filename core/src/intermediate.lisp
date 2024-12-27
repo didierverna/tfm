@@ -52,18 +52,15 @@ This structure is used to store decoded information from the char-info table
 
 (define-condition spurious-char-info (tfm-compliance-warning)
   ((section :initform 11) ; slot merge
+   (char-info
+    :documentation "The culprit char-info structure."
+    :initarg :char-info :reader char-info)
    (tag
     :documentation "The original tag."
-    :initarg :tag
-    :reader tag)
+    :initarg :tag :reader tag)
    (remainder
     :documentation "The original remainder."
-    :initarg :remainder
-    :reader remainder)
-   (value
-    :documentation "The culprit char-info structure."
-    :initarg :value
-    :reader value))
+    :initarg :remainder :reader remainder))
   (:documentation "The Spurious Char Info compliance warning.
 It signals that a char-info for a non-existent character (that is, with a
 width-index of 0) is not completely zero'ed out."))
@@ -76,7 +73,7 @@ width-index of 0) is not completely zero'ed out."))
 ;; give some more detail in that situation.
 (define-condition-report (condition spurious-char-info)
   "char-info structure for a non-existent character is not blank~A~%~A"
-  (let ((char-info (value condition)))
+  (let ((char-info (char-info condition)))
     ;; #### WARNING: EQL below because we might be comparing with NIL.
     (cond ((eql (lig/kern-index char-info) 0) " (tag = 1)")
 	  ((eql (next-char char-info) 0) " (tag = 2)")
@@ -84,7 +81,7 @@ width-index of 0) is not completely zero'ed out."))
 	  ((zerop (tag condition))
 	   (format nil " (remainder = ~A)" (remainder condition)))
 	  (t "")))
-  (value condition))
+  (char-info condition))
 
 (defun read-char-info ()
   "Read one char-info from *STREAM* into a new CHAR-INFO instance.
@@ -108,7 +105,8 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		(and (zerop h&d)
 		     (zerop i&t)
 		     (zerop remainder)))
-      (warn 'spurious-char-info :tag tag :remainder remainder :value char-info))
+      (warn 'spurious-char-info
+	:char-info char-info :tag tag :remainder remainder))
     char-info))
 
 
