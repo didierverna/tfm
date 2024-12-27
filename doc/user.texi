@@ -1053,12 +1053,12 @@ ones.
 
 @findex load-font
 @fkindex{load-font,name}@c
-@restartindex{set-to-file-name}@c
+@restartindex{use-file-base-name}@c
 If a custom font name is provided via the @kwd{name} keyword argument to
 @code{load-font} (@pxref{Loading Fonts}), and the value is not a
 non-empty string, an @code{invalid-custom-name} usage error is
 signalled. This error is associated with a specific restart called
-@code{set-to-file-name} which, as its name suggests, will switch back
+@code{use-file-base-name} which, as its name suggests, will switch back
 to the default behavior and use the font file's base name instead.
 @deftp {Usage Error} invalid-custom-name
 @usageerrsubindex{invalid-custom-name}
@@ -1073,7 +1073,7 @@ Slot readers:
 @findex load-font
 @fkindex{load-font,design-size}@c
 @clsaindex{font,design-size}@c
-@restartindex{set-to-original}@c
+@restartindex{use-original-design-size}@c
 If a custom design size is provided via the @kwd{design-size} keyword
 argument to @code{load-font} (@pxref{Loading Fonts}), or by calling the
 @code{(setf design-size)} font writer (@pxref{Scaling}), and the value
@@ -1081,8 +1081,8 @@ is not a real greater or equal to 1, an
 @code{invalid-custom-design-size} usage error is signalled. When the
 font 's original design size is itself valid or not yet known (in the
 case of initialization), this error is associated with a specific
-restart called @code{set-to-original} which, as its name suggests, will
-discard the custom value.
+restart called @code{use-original-design-size} which, as its name
+suggests, will discard the custom value.
 @deftp {Usage Error} invalid-custom-design-size
 @usageerrsubindex{invalid-custom-design-size}
 Slot readers:

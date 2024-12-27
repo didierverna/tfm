@@ -287,20 +287,20 @@ It signals that a custom design size is not a real greater or equal to 1."))
 (defmethod initialize-instance :after ((font font) &key)
   "Check the validity of FONT's name and design-size.
 - If the font's name is not a non-empty string, signal and INVALID-CUSTOM-NAME
-  error. This error is immediately restartable with SET-TO-FILE-NAME.
+  error. This error is immediately restartable with USE-FILE-BASE-NAME.
 - IF the font's design-size is not NIL or a real greater or equal to 1, signal
   an INVALID-CUSTOM-DESIGN-SIZE error. This error is immediately restartable
-  with SET-TO-ORIGINAL."
+  with USE-ORIGINAL-DESIGN-SIZE."
   (with-slots (file name design-size) font
     (if (null name)
       (setq name (pathname-name file))
       (unless (and (stringp name) (not (zerop (length name))))
 	(restart-case (error 'invalid-custom-name :value name)
-	  (set-to-file-name () :report "Use the font file's base name."
+	  (use-file-base-name () :report "Use the font file's base name."
 	    (setq name (pathname-name file))))))
     (unless (typep design-size '(or null (real 1)))
       (restart-case (error 'invalid-custom-design-size :value design-size)
-	(set-to-original () :report "Use the font's design size."
+	(use-original-design-size () :report "Use the font's design size."
 	  ;; #### NOTE: at this time, the original design size is not yet
 	  ;; known. NIL simply indicates that no custom value was provided at
 	  ;; initialization time.
@@ -319,13 +319,14 @@ It signals that a custom design size is not a real greater or equal to 1."))
   "Check that DESIGN-SIZE is a real greater or equal to 1.
 Otherwise, signal and INVALID-CUSTOM-DESIGN-SIZE error. When the font's
 original design size is itself valid, this error is immediately restartable
-with SET-TO-ORIGINAL."
+with USE-ORIGINAL-DESIGN-SIZE."
   (unless (typep design-size '(real 1))
     (restart-case (error 'invalid-custom-design-size :value design-size)
-      (set-to-original () :report "Use the font's original design size."
-			  :test (lambda (condition)
-				  (declare (ignore condition))
-				  (typep (original-design-size font) '(real 1)))
+      (use-original-design-size ()
+	:report "Use the font's original design size."
+	:test (lambda (condition)
+		(declare (ignore condition))
+		(typep (original-design-size font) '(real 1)))
 	(setq design-size (original-design-size font)))))
   (call-next-method design-size font))
 
