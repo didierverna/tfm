@@ -177,17 +177,16 @@ metrics instances are created."
   (when (extension-recipe character) t))
 
 (define-condition not-extensible (tfm-usage-error)
-  ((value
+  ((char
     :documentation "The non extensible character."
-    :initarg :value
-    :reader value))
+    :initarg :char :reader char))
   (:documentation "The Not Extensible usage error.
 It signals an attempt at accessing the extension recipe of a non extensible
 character."))
 
 (define-condition-report (condition not-extensible)
   "character ~A is not extensible."
-  (value condition))
+  (char condition))
 
 
 (defmacro define-extension-recipe-pseudo-accessor (name)
@@ -195,7 +194,7 @@ character."))
      ,(format nil "Return extensible CHARACTER's ~A.
 If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
 	name)
-     (unless (extensiblep character) (error 'not-extensible :value character))
+     (unless (extensiblep character) (error 'not-extensible :char character))
      (,name (extension-recipe character))))
 
 (define-extension-recipe-pseudo-accessor top-character)
