@@ -33,7 +33,7 @@ strict digraph {
   "spurious-char-info" -> "cancel-loading";
   "invalid-character-code" -> "cancel-loading";
   "invalid-character-code" -> "discard-extension-recipe" -> "cancel-loading";
-  "invalid-character-code" -> "discard-kerning" -> "cancel-loading";
+  "invalid-character-code" -> "discard-kern" -> "cancel-loading";
   "invalid-character-code" -> "discard-ligature" -> "cancel-loading";
   "invalid-character-code" -> "discard-next-character" -> "cancel-loading";
   "no-boundary-character" -> "abort-lig/kern-program" -> "cancel-loading";
@@ -41,7 +41,7 @@ strict digraph {
   "invalid-ligature-opcode" -> "discard-ligature" -> "cancel-loading";
   "invalid-table-index" -> "abort-lig/kern-program" -> "cancel-loading";
   "invalid-table-index" -> "discard-extension-recipe" -> "cancel-loading";
-  "invalid-table-index" -> "discard-kerning" -> "cancel-loading";
+  "invalid-table-index" -> "discard-kern" -> "cancel-loading";
   "invalid-table-index" -> "set-to-zero" -> "cancel-loading";
   "invalid-table-start" -> "set-to-zero" -> "cancel-loading";
   "ligature-cycle" -> "discard-ligature" -> "cancel-loading";
