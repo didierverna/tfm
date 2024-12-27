@@ -240,27 +240,25 @@ This is a mixin for all conditions related to padded strings."))
 (define-condition invalid-padded-string-length
     (tfm-compliance-error padded-string)
   ((section :initform 10) ; slot merge
-   (value
+   (len
     :documentation "The invalid length."
-    :initarg :value
-    :reader value)
+    :initarg :len :reader len)
    (pad
-    :documentation "The maximum length."
-    :initarg :pad
-    :reader pad))
+    :documentation "The string's maximum length."
+    :initarg :pad :reader pad))
   (:documentation "The Invalid Padded String Length compliance error.
 It signals that the declared length of a padded string is greater than its
 maximum."))
 
 (define-condition-report (condition invalid-padded-string-length)
   "declared padded string length ~A is greater than its maximum ~A"
-  (value condition)
+  (len condition)
   (1- (pad condition)))
 
 
 (define-condition invalid-padded-string (tfm-compliance-error padded-string)
   ((section :initform 10) ; slot merge
-   (value :documentation "The invalid string." :initarg :value :reader value))
+   (str :documentation "The invalid string." :initarg :str :reader str))
   (:documentation "The Invalid Padded String compliance error.
 It signals that a padded string is not in BCPL format (it contains parentheses
 or non-ASCII characters)."))
@@ -268,19 +266,19 @@ or non-ASCII characters)."))
 (define-condition-report (condition invalid-padded-string)
   "padded string ~S is not in BCPL format (it contains parentheses and/or ~
 non-ASCII characters)"
-  (value condition))
+  (str condition))
 
 
 (define-condition padded-string-overflow (tfm-compliance-warning padded-string)
-  ((value :documentation "The string's overflow."
-	  :initarg :value :reader value))
+  ((overflow :documentation "The string's overflow."
+	     :initarg :overflow :reader overflow))
   (:documentation "The Padded String Overflow compliance warning.
 It signals that a padded string contains non null characters after its
 declared length."))
 
 (define-condition-report (condition padded-string-overflow)
   "padded string contains non-null overflow characters (~S)"
-  (value condition))
+  (overflow condition))
 
 (defmethod print-object :after ((condition padded-string-overflow) stream)
   "Advertise padded string overflow CONDITION's relevant documentation."
@@ -291,8 +289,7 @@ See §87 of the PLtoTF documentation, or “TeX Font Metrics Files”
 (David Fuchs, TUGBoat, Volume 2, №1) for more information.")))
 
 
-(defun read-padded-string
-    (pad &aux (length (read-u8)) string)
+(defun read-padded-string (pad &aux (length (read-u8)) string)
   "Read a padded string out of PAD bytes from *STREAM*.
 The first byte in *STREAM* indicates the actual length of the string.
 
@@ -308,7 +305,7 @@ and non-ASCII characters with question marks), or DISCARD-STRING.
 If the string is not padded with zeros, signal a PADDED-STRING-OVERFLOW
 warning."
   (unless (< length pad)
-    (restart-case (error 'invalid-padded-string-length :value length :pad pad)
+    (restart-case (error 'invalid-padded-string-length :len length :pad pad)
       (read-maximum-length () :report "Read the maximum possible length."
 	(setq length (1- pad)))
       (discard-string () :report "Discard the string."
@@ -325,7 +322,7 @@ warning."
 			 (or (< (char-code character) 32)
 			     (> (char-code character) 126)))
 		       string))
-      (restart-case (error 'invalid-padded-string :value string)
+      (restart-case (error 'invalid-padded-string :str string)
 	(keep-string () :report "Keep it anyway.")
 	(fix-string () :report "Fix it using /'s and ?'s."
 	  (loop :for i :from 0 :upto (1- (length string))
@@ -361,7 +358,7 @@ warning."
 	      ;; encoding agrees at least with ASCII.
 	      :do (setf (aref tail i) (code-char (read-u8))))
 	(when (find-if-not #'zerop tail :key #'char-code)
-	  (warn 'padded-string-overflow :value tail)))))
+	  (warn 'padded-string-overflow :overflow tail)))))
   string)
 
 
