@@ -301,6 +301,9 @@ It signals that a custom design size is not a real greater or equal to 1."))
     (unless (typep design-size '(or null (real 1)))
       (restart-case (error 'invalid-custom-design-size :value design-size)
 	(set-to-original () :report "Use the font's design size."
+	  ;; #### NOTE: at this time, the original design size is not yet
+	  ;; known. NIL simply indicates that no custom value was provided at
+	  ;; initialization time.
 	  (setq design-size nil))))))
 
 
@@ -314,9 +317,16 @@ It signals that a custom design size is not a real greater or equal to 1."))
 
 (defmethod (setf design-size) :around (design-size font)
   "Check that DESIGN-SIZE is a real greater or equal to 1.
-Otherwise, signal and INVALID-CUSTOM-DESIGN-SIZE error."
+Otherwise, signal and INVALID-CUSTOM-DESIGN-SIZE error. When the font's
+original design size is itself valid, this error is immediately restartable
+with SET-TO-ORIGINAL."
   (unless (typep design-size '(real 1))
-    (error 'invalid-custom-design-size :value design-size))
+    (restart-case (error 'invalid-custom-design-size :value design-size)
+      (set-to-original () :report "Use the font's original design size."
+			  :test (lambda (condition)
+				  (declare (ignore condition))
+				  (typep (original-design-size font) '(real 1)))
+	(setq design-size (original-design-size font)))))
   (call-next-method design-size font))
 
 
