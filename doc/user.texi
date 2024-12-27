@@ -154,6 +154,11 @@ Common Lisp
 @c Functions index
 @c ---------------
 
+@c Function arguments
+@macro faindex{func,arg}
+@findex \func\@r{, argument, }\arg\
+@end macro
+
 @c Function options
 @macro foindex{func,opt}
 @findex \func\@r{, option, }\opt\
@@ -247,6 +252,20 @@ Common Lisp
 @tpindex @r{Error, usage, }\cond\
 @end macro
 
+@c Compliance Error subindex
+@macro complianceerrsubindex{cond}
+@tpindex @r{Compliance error, }\cond\
+@tpindex @r{Error, }\cond\
+@tpindex @r{Error, compliance, }\cond\
+@end macro
+
+@c Compliance Warning subindex
+@macro compliancewarnsubindex{cond}
+@tpindex @r{Compliance warning, }\cond\
+@tpindex @r{Warning, }\cond\
+@tpindex @r{Warning, compliance, }\cond\
+@end macro
+
 @c Restarts
 @macro restartindex{restart}
 @tpindex \restart\@r{ (restart)}
@@ -300,7 +319,7 @@ except that this permission notice may be translated as well.
 @c ====================================================================
 @titlepage
 @title The TFM User Manual
-@subtitle @TeX{} Font Metrics, Version @value{VERSION}
+@subtitle @TeX{} Font Metric, Version @value{VERSION}
 @author Didier Verna <@email{didier@@didierverna.net}>
 @page
 @vskip 0pt plus 1filll
@@ -369,7 +388,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 @c ====================================================================
 @node Introduction, Installation, Copying, Top
 @chapter Introduction
-TFM (for @TeX{} Font Metrics) is the standard font description format
+TFM (for @TeX{} Font Metric) is the standard font description format
 used by @TeX{}. The @tfm{} library parses and decodes TFM files into an
 abstract data structure, providing easy access to the corresponding font
 information in Common Lisp.
@@ -453,7 +472,7 @@ Type @command{make uninstall} to uninstall the library.
 
 
 @c ====================================================================
-@c Normal Usage
+@c Normal Use
 @c ====================================================================
 @node Normal Use, Abnormal Situations, Installation, Top
 @chapter Normal Use
@@ -461,66 +480,77 @@ Type @command{make uninstall} to uninstall the library.
 @tfm{} itself resides in a package called @t{net.didierverna.tfm}. You
 can automatically nickname this package with the following function.
 @cindex Package, nicknames
-@defun nickname-package [NICKNAME]
-Add @var{NICKNAME} (@code{:tfm} by default) to the
-@code{:net.didierverna.tfm} package.
+@defun nickname-package &optional NICKNAME
+@foindex{nickname-package,nickname}@c
+Add @var{NICKNAME} (@kwd{tfm} by default) to the
+@kwd{net.didierverna.tfm} package.
 @end defun
 
 @menu
-* TFM Files::                   Loading a font
-* Font Information::            Global properties
-* Character Information::       Code, box dimensions, etc.
-* Ligatures and Kernings::      For pairs of characters
+* Loading Fonts::               TFM files
+* Font Properties::             General information
+* Working with Characters::     Metrics, ligatures, and kerns
 * Scaling and Freezing::        Limiting the cost of arithmetics
 @end menu
 
-@node TFM Files, Font Information, Normal Use, Normal Use
-@section TFM Files
-The main entry point to @tfm{} is @code{load-font}, the function which
-allows you to load a @code{tfm} file in memory.
+
+@c -------------
+@c Loading Fonts
+@c -------------
+@node Loading Fonts, Font Properties, Normal Use, Normal Use
+@section Loading Fonts
+In order to load a font into memory, use the function @code{load-font}
+as follows.
 @defun load-font FILE &key NAME DESIGN-SIZE FREEZE
+@faindex{load-font,file}@c
+@fkindex{load-font,name}@c
+@fkindex{load-font,design-size}@c
+@fkindex{load-font,freeze}@c
 Load @var{FILE} into a new font, and return it.
-@end defun
-
-@var{FILE} must be a pathname designator. Currently, @tfm{} doesn't
-support searching for TFM files in common or standard places (such as
-@TeX{}Live installations), so you need to know where those files are
-located, and provide a specific pathname.
-
+@itemize
+@item
+@var{FILE} must be a pathname designator.
+@item
 @var{NAME} lets you override the font's name, which is set to
 @var{FILE}'s base name by default.
-
-For an explanation of @var{DESIGN-SIZE} and @var{FREEZE}, see
-@ref{Scaling and Freezing}.
+@item
+For an explanation of @var{DESIGN-SIZE} and @var{FREEZE}, @pxref{Scaling
+and Freezing}.
+@end itemize
+@end defun
 
 @cindex TFM
 @cindex Format, TFM
 @cindex OFM
+@cindex Omega
 @cindex Format, OFM
+@cindex Format, Omega
 @cindex JFM
 @cindex Format, JFM
-Some @code{tfm} files actually contain OFM or JFM data rather than just
-plain TFM. @tfm{} is able to detect those extensions, but doesn't
-currently support them. If OFM or JFM contents is detected,
-@code{load-font} signals an @code{extended-tfm} warning, and returns
-@nil{}.
-
+@tfm{} detects the actual font format by analyzing the first bytes in
+the file (no assumptions are made based on the file's location or
+extension). Only plain TFM fonts are currently supported. If OFM (Omega)
+or JFM data is detected, @code{load-font} signals an @code{extended-tfm}
+warning, and returns @nil{}.
 @deftp {Warning} extended-tfm
 @warnsubindex{extended-tfm}@c
+Readable slots:
 @itemize
 @item
 @clsrindex{extended-tfm,value}@c
 @code{value}: currently either @code{"OFM"} or @code{"JFM"}.
 @item
 @clsrindex{extended-tfm,file}@c
+@findex load-font
 @code{file}: the @var{FILE} argument to @code{load-font}.
 @end itemize
 @end deftp
 
 @cindex Font
-Otherwise, if everything goes well (but see @ref{Abnormal Situations}),
-the return value is an instance of some font class. In the context of
-this library, the term ``font'' denotes such an instance.
+If the font format is supported and loaded without any problems  (but
+@pxref{Abnormal Situations}), the return value of @code{load-font} is an
+instance of some font class. In the context of this library, the term
+``font'' denotes such an instance.
 @clsindex{font}@c
 @clsindex{math-symbols-font}@c
 @clsindex{math-extension-font}@c
@@ -530,44 +560,66 @@ two special font categories for which the corresponding classes are
 @code{math-symbols-font}, and @code{math-extension-font}. Both of these
 classes are subclasses of @code{font}.
 
-@node Font Information, Character Information, TFM Files, Normal Use
-@section Font Information
-General font information decoded from the TFM data can be individually
-retrieved via a number of font accessors described below.
+
+@c ---------------
+@c Font Properties
+@c ---------------
+@node Font Properties, Working with Characters, Loading Fonts, Normal Use
+@section Font Properties
+Once a font is loaded, you have access to a number of properties through
+the slot readers described in the following sections.
+
+@menu
+* General Information::         Global properties
+* Xerox PARC Headers::          Typeface description
+* Parameters::                  Geometry, spacing, and more
+* Character Information::       Character-related properties
+@end menu
+
+@node General Information, Xerox PARC Headers, Font Properties, Font Properties
+@subsection General Information
 @itemize
 @item
-@clsaindex{font,name}@c
-@code{name}: computed by @tfm{} as base name of the file the font was
-loaded from (for example @code{"cmr10"}).
+@clsrindex{font,file}@c
+@findex load-font
+@code{file}: the @var{FILE} argument that was given to @code{load-font}
+(@pxref{Loading Fonts}).
 @item
-@clsaindex{font,file}@c
-@code{file}: the argument to @code{load-font}.
+@clsrindex{font,name}@c
+@findex load-font
+@code{name}: either the @var{NAME} argument that was given to @code{load-font}
+(@pxref{Loading Fonts}), or the font file base name (for example
+@code{"cmr10"}).
 @item
-@clsaindex{font,checksum}@c
-@code{checksum}: part of the TFM format, provided by Metafont.
-@item
-@clsaindex{font,frozen}@c
+@clsrindex{font,frozen}@c
 @code{frozen}: whether the font is frozen (@pxref{Freezing}).
+@item
+@clsrindex{font,checksum}@c
+@code{checksum}: the font's checksum (this is a value provided by
+Metafont).
 @item
 @cindex @TeX{} point unit
 @cindex Unit, @TeX{} point
 @cindex Design size unit
 @cindex Unit, design size
 @clsaindex{font,design-size}@c
-@code{design-size}: in units of @TeX{} point. For example, the design
-size of @t{cmr10} (the Computer Modern 10pt roman font) is 10. Apart
-from the @emph{slant} (see below), all other dimensions are given in
-design size units, not @TeX{} point units (unless the font has been
-frozen; @xref{Freezing}). See also @ref{Scaling} for ways to override
-the font's original design size.
+@code{design-size}: the font's design size in units of @TeX{} point. For
+example, the design size of @t{cmr10} (the Computer Modern 10pt roman
+font) is 10. Apart from the @emph{slant} (see below), all other
+dimensions are given in design size units, @emph{not} in @TeX{} point
+units (unless the font has been frozen; @pxref{Freezing}). See also
+@ref{Scaling} for ways to override the font's original design size.
 @item
-@clsaindex{font,original-design-size}@c
-@code{original-design-size}: the fon't original design size.
+@clsrindex{font,original-design-size}@c
+@code{original-design-size}: since the font's design size may be changed
+(see @xref{Scaling}), the original value is kept here.
 @end itemize
 
+@node Xerox PARC Headers, Parameters, General Information, Font Properties
+@subsection Xerox PARC Headers
 @tfm{} is able to decode Xerox PARC headers when provided (see @TeX{}
 Font Metric Files, @i{David Fuchs, TUGboat Volume 2, n.1, pages 12--16}
-and PLtoPF[9,10]). The following information is extracted from them, and
+and PLtoTF[9,10]). The following information is extracted from them, and
 defaults to @nil{} otherwise. Note that when a header of sufficient
 length is available, it is in fact impossible to tell for sure whether
 it is a Xerox PARC one or not. @tfm{} simply assumes it is. As no other
@@ -577,124 +629,126 @@ if a header size is greater than that of a Xerox PARC one, @tfm{}
 discards what's left of it.
 @itemize
 @item
-@clsaindex{font,encoding}@c
-@code{encoding}: the font's character coding scheme if known (an
-informal BCPL string, that is, plain ASCII and no parentheses). The
-class @tfm{} instantiates when loading a font depends on this string
-(@pxref{TFM Files}), and in particular, on the specific (case
-insensitive) values @code{"TeX math symbols"} and @code{"TeX math
-extension"}.
+@clsrindex{font,encoding}@c
+@code{encoding}: the font's character coding scheme (an informal BCPL
+string, that is, plain ASCII and no parentheses). The class @tfm{}
+instantiates when loading a font depends on this string (@pxref{Loading
+Fonts}), and in particular, on the specific (case insensitive) values
+@code{"TeX math symbols"} and @code{"TeX math extension"}.
 @item
-@clsaindex{font,family}@c
-@code{family}: another BCPL string, if known (for example @code{"CMR"}).
+@clsrindex{font,family}@c
+@code{family}: another BCPL string (for example @code{"CMR"}).
 @item
-@clsaindex{font,7bits-safe}@c
-@code{7bits-safe} 0 or 1 if known. When 1, it means that no character of
-code lesser than 128 can lead to a character of code greater than 128 by
-ways of ligatures or extension recipes.
+@clsrindex{font,7bits-safe}@c
+@code{7bits-safe}: 0 or 1. When 1, it means that no character of code
+lesser than 128 can lead to a character of code greater than 128 by ways
+of ligatures or extension recipes.
 @item
-@clsaindex{font,face-number}@c
-@code{face-number} a number identifying the font, if known.
+@clsrindex{font,face-number}@c
+@code{face-number} a number identifying the font.
 @item
-@clsaindex{font,weight}@c
-@clsaindex{font,slope}@c
-@clsaindex{font,expansion}@c
-@clsaindex{font,face-code}@c
+@clsrindex{font,weight}@c
+@clsrindex{font,slope}@c
+@clsrindex{font,expansion}@c
+@clsrindex{font,face-code}@c
 @code{weight}, @code{slope}, @code{expansion}, and @code{face-code}:
 decoded from, and filled in when @code{face-number} is lesser than 18
 (see also TFtoPL[10]). The weight is @kwd{medium}, @kwd{bold}, or
 @kwd{light}. The slope is @kwd{roman} or @kwd{italic}. The expansion is
 @kwd{regular}, @kwd{condensed}, or @kwd{extended}. Finally, the face
 code is the concatenation of the upcased first letters of these values.
-For example, @code{"MRR"} stands for ``medium roman regular''.
+For example, @code{"MRR"} stands for ``Medium Roman Regular''.
 @end itemize
 
+@node Parameters, Character Information, Xerox PARC Headers, Font Properties
+@subsection Parameters
 A font also contains a number of properties extracted from the so-called
 ``parameters'' section. They all default to 0.
 @itemize @bullet
 @item
-@clsaindex{font,slant}@c
-@code{slant}: a scalar ratio (not in design size units; that's the only
-exception).
+@clsrindex{font,slant}@c
+@code{slant}: a scalar ratio (@emph{not} in design size units; that's
+the only exception).
 @item
-@clsaindex{font,interword-space}@c
-@clsaindex{font,interword-stretch}@c
-@clsaindex{font,interword-shrink}@c
+@cindex Glue
+@clsrindex{font,interword-space}@c
+@clsrindex{font,interword-stretch}@c
+@clsrindex{font,interword-shrink}@c
 @code{interword-space}, @code{interword-stretch}, and
 @code{interword-shrink}: the font's normal interword ``glue'' as three
 separate values.
 @item
-@clsaindex{font,ex}@c
-@clsaindex{font,em}@c
+@clsrindex{font,ex}@c
+@clsrindex{font,em}@c
 @code{em} and @code{ex}: @TeX{}'s usual font-dependent units.
 @item
-@clsaindex{font,extra-space}@c
+@clsrindex{font,extra-space}@c
 @code{extra-space}: the font's additional space to put at the end of
 sentences.
 @end itemize
 
-@TeX{} math symbols and extension fonts have respectively 15 and 6
-additional parameters which are also accessible.
+@TeX{} math symbols and extension fonts have 15 and 6 additional
+parameters respectively.
 @itemize
 @item
 @clsindex{math-symbols-font}@c
-@clsaindex{math-symbols-font,num1}@c
-@clsaindex{math-symbols-font,num2}@c
-@clsaindex{math-symbols-font,num3}@c
-@clsaindex{math-symbols-font,denom1}@c
-@clsaindex{math-symbols-font,denom2}@c
-@clsaindex{math-symbols-font,sup1}@c
-@clsaindex{math-symbols-font,sup2}@c
-@clsaindex{math-symbols-font,sup3}@c
-@clsaindex{math-symbols-font,sub1}@c
-@clsaindex{math-symbols-font,sub2}@c
-@clsaindex{math-symbols-font,subdrop}@c
-@clsaindex{math-symbols-font,supdrop}@c
-@clsaindex{math-symbols-font,delim1}@c
-@clsaindex{math-symbols-font,delim2}@c
-@clsaindex{math-symbols-font,axis-height}@c
+@clsrindex{math-symbols-font,num1}@c
+@clsrindex{math-symbols-font,num2}@c
+@clsrindex{math-symbols-font,num3}@c
+@clsrindex{math-symbols-font,denom1}@c
+@clsrindex{math-symbols-font,denom2}@c
+@clsrindex{math-symbols-font,sup1}@c
+@clsrindex{math-symbols-font,sup2}@c
+@clsrindex{math-symbols-font,sup3}@c
+@clsrindex{math-symbols-font,sub1}@c
+@clsrindex{math-symbols-font,sub2}@c
+@clsrindex{math-symbols-font,subdrop}@c
+@clsrindex{math-symbols-font,supdrop}@c
+@clsrindex{math-symbols-font,delim1}@c
+@clsrindex{math-symbols-font,delim2}@c
+@clsrindex{math-symbols-font,axis-height}@c
 @code{num1..3}, @code{denom1..2}, @code{sup1..3}, @code{sub1..2},
 @code{subdrop}, @code{supdrop}, @code{delim1..2}, and @code{axis-height}
 are available in the @code{math-symbols-font} subclass.
 @item
 @clsindex{math-extension-font}@c
-@clsaindex{math-extension-font,default-rule-thickness}@c
-@clsaindex{math-extension-font,big-op-spacing1}@c
-@clsaindex{math-extension-font,big-op-spacing2}@c
-@clsaindex{math-extension-font,big-op-spacing3}@c
-@clsaindex{math-extension-font,big-op-spacing4}@c
-@clsaindex{math-extension-font,big-op-spacing5}@c
+@clsrindex{math-extension-font,default-rule-thickness}@c
+@clsrindex{math-extension-font,big-op-spacing1}@c
+@clsrindex{math-extension-font,big-op-spacing2}@c
+@clsrindex{math-extension-font,big-op-spacing3}@c
+@clsrindex{math-extension-font,big-op-spacing4}@c
+@clsrindex{math-extension-font,big-op-spacing5}@c
 @code{default-rule-thickness} and @code{big-op-spacing1..5} are
 available in the @code{math-extension-font} subclass.
 @end itemize
 
-@clsaindex{font,parameters}@c
-Finally, if the font has any parameters left, they are collected in an
-array of numeric values, accessible via the @code{parameters} function.
+@clsrindex{font,parameters}@c
+Finally, if the font has any parameters left, they are collected in
+@code{parameters}, an array of numeric values (also expressed in design
+size units).
 
-
-@node Character Information, Ligatures and Kernings, Font Information, Normal Use
-@section Character Information
+@node Character Information,  , Parameters, Font Properties
+@subsection Character Information
 @cindex Character code
-A TFM font contains at most 256 characters, represented by numerical
-codes (called @emph{character codes}). Some general information about
-the font's characters is available through the following accessors.
+TFM fonts contain at most 256 characters, represented by numerical codes
+(called @emph{character codes}). The following character-related
+information is available in all font instances.
 @itemize
 @item
-@clsaindex{font,min-code}@c
-@clsaindex{font,max-code}@c
+@clsrindex{font,min-code}@c
+@clsrindex{font,max-code}@c
 @code{min-code} and @code{max-code}: respectively the smallest and
-greatest character codes for this font.
+greatest character codes for this font, or @nil{} if the font is empty.
 @item
-@clsaindex{font,character-count}@c
+@clsrindex{font,character-count}@c
 @code{character-count}: the number of characters defined in this font.
 Note that some characters between @code{min-code} and @code{max-code}
 may not be defined, so the character count may be smaller than
-@emph{max-code - min-code + 1}. Also, the character count doesn't
+@emph{max-code - min-code + 1}. Also, the character count does @emph{not}
 include a potential boundary character (see below), unless it exists for
 real in the font (it has non-zero metrics).
 @item
-@clsaindex{font,boundary-character}@c
+@clsrindex{font,boundary-character}@c
 @code{boundary-character}: the font's boundary character if defined, or
 @nil{}. The boundary character is the only character the code of which
 is allowed to be outside the @emph{[min-code,max-code]} range. If this
@@ -702,50 +756,73 @@ character doesn't exist for real in the font, it has zero metrics and is
 not included in the character count.
 @end itemize
 
-The characters in a font are individually accessible by their code,
-thanks to the following function (when this function returns @nil{}, it
-means that no character is defined for the code in question).
+
+@c -----------------------
+@c Working with Characters
+@c -----------------------
+@node Working with Characters, Scaling and Freezing, Font Properties, Normal Use
+@section Working with Characters
+Apart from the general font properties described in the previous
+section, font instances give you access to the characters themselves,
+and to ligatures and kerning information when applicable.
+
+@menu
+* Character Metrics::           Bounding boxes, etc.
+* Ligatures::                   Composite characters
+* Kerns::                       Specific spacing for pairs of characters
+@end menu
+
+@node Character Metrics, Ligatures, Working with Characters, Working with Characters
+@subsection Character Metrics
+@cindex Character code
+The characters in a font are individually accessible by their character
+code, thanks to the following function. When this function returns
+@nil{}, it means that there is no character for that code in the font.
 @defun get-character CODE FONT
+@faindex{get-character,code}@c
+@faindex{get-character,font}@c
 Return @var{FONT}'s @var{CODE} character, or @nil{}.
 @end defun
 
 @cindex Character
 @clsindex{character-metrics}@c
-This function actually returns an instance of a class called
-@code{character-metrics}, which contains character-specific data. In the
-context of this library, the term ``character'' denotes an instance of
-this class. The following accessors return the different character
-properties available.
+This function returns an instance of a class called
+@code{character-metrics}, which contains character-specific information.
+In the context of this library, the term ``character'' denotes an
+instance of this class. Once a character is retrieved, you have access
+to a number of properties through the slot readers described below.
 @itemize
 @item
-@clsaindex{character-metrics,code}@c
+@clsrindex{character-metrics,code}@c
 @findex get-character
-@code{code}: the character @code{code} which makes it accessible from
-the font instance (see the function @code{get-character}).
+@code{code}: the character's code (the @var{CODE} argument given to
+@code{get-character}).
 @item
-@clsaindex{character-metrics,font}@c
-@code{font}: the font the character belongs to.
+@clsrindex{character-metrics,font}@c
+@findex get-character
+@code{font}: the character's font (the @var{FONT} argument given to
+@code{get-character}).
 @item
-@clsaindex{character-metrics,width}@c
-@clsaindex{character-metrics,height}@c
-@clsaindex{character-metrics,depth}@c
-@code{width}, @code{height}, and @code{depth}: the character box
-dimensions, in design size units (but see @ref{Freezing}).
+@clsrindex{character-metrics,width}@c
+@clsrindex{character-metrics,height}@c
+@clsrindex{character-metrics,depth}@c
+@code{width}, @code{height}, and @code{depth}: the dimensions of the
+character's bounding box, in design size units (but see @ref{Freezing}).
 @item
-@clsaindex{character-metrics,italic-correction}@c
+@clsrindex{character-metrics,italic-correction}@c
 @code{italic-correction}: the character's italic correction, in design
 size units (but see @ref{Freezing}). @TeX{} uses this value for regular
 characters followed by the command @code{\/}, and also in math mode for
 superscript placement.
 @item
 @cindex Character list
-@clsaindex{character-metrics,next-character}@c
+@clsrindex{character-metrics,next-character}@c
 @code{next-character}: the next character in a character list, or
 @nil{}. If non-@nil{}, this character is part of a chain of characters
 of ascending size, and not the last one (see @TeX{}: the Program [544]).
 It is mutually exclusive with the existence of an extension recipe (see
-below), and also with the existence of a ligature or kerning program for
-this character (@pxref{Ligatures and Kernings}).
+below), and also with the existence of a ligature or kern for this
+character (@pxref{Ligatures} and @ref{Kerns}).
 @end itemize
 
 @cindex Extensible character
@@ -754,90 +831,100 @@ Some characters are said to be ``extensible'' (meaning that they are
 constructed out of up to four components, themselves characters). To
 test whether a character is extensible, use the following function.
 @defun extensiblep CHARACTER
+@faindex{extensiblep,character}@c
 Return @code{T} if @var{CHARACTER} has an extension recipe.
 @end defun
-@clsaindex{character-metrics,top-character}@c
-@clsaindex{character-metrics,middle-character}@c
-@clsaindex{character-metrics,bottom-character}@c
-@clsaindex{character-metrics,repeated-character}@c
+
+@clsrindex{character-metrics,top-character}@c
+@clsrindex{character-metrics,middle-character}@c
+@clsrindex{character-metrics,bottom-character}@c
+@clsrindex{character-metrics,repeated-character}@c
 When a character is extensible, the four components of the extension
-recipe may be retrieved with the @code{top-}, @code{middle-},
-@code{bottom-}, and @code{repeated-character} accessors. These functions
-return a character, or @nil{} if the corresponding component isn't used
-in the recipe. Note however that a repeated character always exists in
-an extension recipe (so only the top, middle, and bottom characters may
-be @nil{}).
+recipe are provided through the @code{top-}, @code{middle-},
+@code{bottom-}, and @code{repeated-character} properties. These
+properties are characters themselves, or @nil{} if the corresponding
+component isn't used in the recipe. Note however that a repeated
+character always exists in an extension recipe (so only the top, middle,
+and bottom characters may be @nil{}).
 
-
-@node Ligatures and Kernings, Scaling and Freezing, Character Information, Normal Use
-@section Ligatures and Kernings
-The TFM format encodes so called ``ligature / kerning programs'',
-allowing font designers to specify particular spacing between
-characters, or character replacements. Ligatures and kernings depend on
-@emph{pairs} of characters. @tfm{} decodes this information and stores
-it in a more accessible fashion.
-
-@menu
-* Kernings::                    Specific spacing
-* Ligatures::                   Composite characters
-@end menu
-
-@node Kernings, Ligatures, Ligatures and Kernings, Ligatures and Kernings
-@subsection Kernings
-@cindex Kerning
-In order to get kerning information for some pair of characters in a
-font, use the following function.
-
-@defun kerning CHARACTER1 CHARACTER2
-Return kerning for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.@*
-Both characters must belong to the same font.
-@end defun
-
-The kerning, if it exists, is in design size units (but see
-@ref{Freezing}).
-
-@node Ligatures,  , Kernings, Ligatures and Kernings
+@node Ligatures, Kerns, Character Metrics, Working with Characters
 @subsection Ligatures
 @cindex Ligature
-In order to get ligature information for some pair of characters in a
-font, use the following function.
-
+The @tfm{} library provides easy access to ligature information via the
+following function.
 @defun ligature CHARACTER1 CHARACTER2
-Return ligature for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.@*
-Both characters must belong to the same font.
+@faindex{ligature,character1}@c
+@faindex{ligature,character2}@c
+Return ligature for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.
 @end defun
 
-@clsindex{ligature}@c
-Unless there's no such ligature, the value returned by this function is
-an instance of a class called @code{ligature}. In the context of this
-library, the term ``ligature'' denotes an instance of this class.
+Note that no font information is necessary to look ligatures up, because
+every character remembers the font it belongs to (@pxref{Character
+Metrics}). On the other hand, both @var{CHARACTER1} and @var{CHARACTER2}
+must belong to the same font.
 
-A ligature contains four bits of information accessible as described below.
+@clsindex{ligature}@c
+When there exists a ligature for those two characters, the value
+returned by this function is an instance of a class called
+@code{ligature}. In the context of this library, the term ``ligature''
+denotes an instance of this class.
+
+A ligature instance contains four properties available through the
+following slot readers.
 @itemize
 @item
-@clsaindex{ligature,composite}@c
+@clsrindex{ligature,composite}@c
 @code{composite}: the character to insert between the two original ones.
 @item
-@clsaindex{ligature,delete-before}@c
-@clsaindex{ligature,delete-after}@c
+@clsrindex{ligature,delete-before}@c
+@clsrindex{ligature,delete-after}@c
 @code{delete-before} and @code{delete-after}: whether to delete the
 characters before and after the composite.
 @item
-@clsaindex{ligature,pass-over}@c
+@clsrindex{ligature,pass-over}@c
 @code{pass-over}: the number of characters to skip in order to reach the
 next one, once the ligature has been made.
 @end itemize
 
+Finally, note that ligatures involving more than two characters may be
+reconstructed simply by chaining binary ligatures. For example, ``ffi''
+is the ligature between ``ff'''s composite character and ``i''.
 
-@node Scaling and Freezing,  , Ligatures and Kernings, Normal Use
+@node Kerns,  , Ligatures, Working with Characters
+@subsection Kerns
+@cindex Kerning
+@cindex Kern
+In order to get kerning information for some pair of characters in a
+font, use the following function.
+@defun kern CHARACTER1 CHARACTER2
+@faindex{kern,character1}@c
+@faindex{kern,character2}@c
+Return kern for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.
+@end defun
+
+Note that no font information is necessary to look kerns up, because
+every character remembers the font it belongs to (@pxref{Character
+Metrics}). On the other hand, both @var{CHARACTER1} and @var{CHARACTER2}
+must belong to the same font.
+
+When there exists a kern for those two characters, the value returned by
+this function is a scalar expressed in design size units (but see
+@ref{Freezing}).
+
+
+@c --------------------
+@c Scaling and Freezing
+@c --------------------
+@node Scaling and Freezing,  , Working with Characters, Normal Use
 @section Scaling and Freezing
-As we have seen, all dimensions in a TFM file are expressed in design
-size units. The idea is to make it simple for @TeX{} to scale a font.
-Indeed, when a @TeX{} user does @code{\font\foo=cmr10 at 12pt} or
-@code{\font\foo=cmr10 scaled 1200}, all @TeX{} has to do is change the
-font's design size. The drawback, on the other hand, is that in order to
-actually use the various font dimensions, they need to be multiplied by
-the design size in question every time.
+As previously mentioned (@pxref{General Information}), all dimensions in
+a TFM file are expressed in design size units. The idea is to make it
+simple for @TeX{} to scale a font. Indeed, when a @TeX{} user does
+@code{\font\foo=cmr10 at 12pt} or @code{\font\foo=cmr10 scaled 1200},
+all @TeX{} has to do is change the font's design size. The drawback, on
+the other hand, is that in order to actually use the various font
+dimensions, they need to be multiplied by the design size in question
+every time.
 
 @menu
 * Scaling::                     Changing the design size
@@ -852,60 +939,55 @@ the design size in question every time.
 @clsaindex{font,design-size}@c
 @tfm{} allows you to modify the design size of a font in two different
 ways. The first option is to override the original design size at
-load-time, by calling @code{load-font} with the @kwd{design-size} key.
-For example, @code{(load-font "cmr10.tfm" :design-size 12)} will load
-the 10pt Computer Modern roman font at a design size of 12pt. The other
-option is to change the design size of a font later on, simply by using
-the @code{design-size} writer, for example like this: @code{(setf
-(design-size font) 12)}.
+load-time, by calling @code{load-font} with the @kwd{design-size}
+keyword argument. For example, @code{(load-font "cmr10.tfm" :design-size
+12)} will load the 10pt Computer Modern roman font at a design size of
+12pt. The other option is to change the design size of a font later on,
+simply by using the @code{design-size} writer, for example like this:
+@code{(setf (design-size font) 12)}.
 
-@clsaindex{font,original-design-size}@c
+@clsrindex{font,original-design-size}@c
 Note that you can always revert the font to the original design size,
-since that value is remembered (@pxref{Font Information}).
+since that value is remembered (@pxref{Font Properties}).
 
-In any case, the design size must in principle be expressed in @TeX{}
-point units, and must be greater or equal to 1. One exception to this
-rule is if you are @emph{not} working with @TeX{} points. In such a
-situation, you could probably hack your own custom design size in, to
-express the font's various metrics in another unit of measurement.
+In any case, the design size must be greater or equal to 1. In
+principle, it is also supposed to be expressed in @TeX{} point units,
+although outside of @TeX{} itself, it probably doesn't matter much.
 
 @node Freezing,  , Scaling, Scaling and Freezing
 @subsection Freezing
 @cindex Font freezing
 @cindex Freezing
-If you want to save some arithmetic operations, you may want to
-@emph{freeze} the font. Freezing means that all dimensions normally
-expressed in design size units will be converted to @TeX{} point units
-once and for all (by multiplying them by the design size in question).
-This includes character metrics, kerns, interword space @etc{}
-Everything. That way, you won't have to do the multiplication by
-yourself every time a dimension is accessed.
+If you find yourself accessing font metric information very frequently,
+you may want to save some arithmetic operations by @emph{freezing} the
+font. Freezing means that all dimensions normally expressed in design
+size units will be converted to @TeX{} point units once and for all (by
+multiplying them by the current design size). This includes character
+metrics, kerns, interword space, @etc{} Everything. That way, you won't
+have to do the multiplication by yourself every time a dimension is
+accessed.
 
 @fkindex{load-font,freeze}@c
-Again, there are two ways to freeze a font. The first option is to do it
-at load-time, by calling @code{load-font} with the @kwd{freeze} key (a
-Boolean). For instance, after calling @code{(load-font "cmr10.tfm"
-:design-size 12 :freeze t)}, @code{(em font)} will return 12.000034
-instead of 1.0000029.
+As for scaling, there are two ways to freeze a font. The first option is
+to do it at load time, by calling @code{load-font} with the @kwd{freeze}
+keyword argument (a Boolean). For instance, after calling
+@code{(load-font "cmr10.tfm" :design-size 12 :freeze t)}, @code{(em
+font)} will return 12.000034 instead of 1.0000029. You may also freeze a
+font at any later time, by using the @code{freeze} function.
 
-The other way to freeze a font is to do it later on, by using the
-@code{freeze} function.
 @defun freeze FONT
-Freeze @var{FONT}.
-
-Freezing a font means that all dimensions normally expressed in design size
-units are multiplied by it, so as to lead values in @TeX{} point units.
-If @var{FONT} is already frozen, this function does nothing and returns
-@nil{}. Otherwise, it returns @code{t}.
+@faindex{freeze,font}@c
+Freeze @var{FONT}.@*
+If @var{FONT} is already frozen, do nothing and return @nil. Otherwise,
+return @code{t}.
 @end defun
 
-You can unfreeze a font at any time with the following function.
+You can also unfreeze a font at any time with the following function.
 @defun unfreeze FONT
-Unfreeze @var{FONT}.
-
-Unfreezing means performing the inverse of what @code{freeze} does.
-If @var{FONT} is not frozen, this function does nothing and returns
-@nil{}. Otherwise, it returns @code{t}.
+@faindex{unfreeze,font}@c
+Unfreeze @var{FONT}.@*
+If @var{FONT} is not frozen, do nothing and return @nil. Otherwise,
+return @code{t}.
 @end defun
 
 Finally, note that if you change the design size of a frozen font, the
@@ -919,9 +1001,9 @@ the change.
 @c ====================================================================
 @node Abnormal Situations, Other Considerations, Normal Use, Top
 @chapter Abnormal Situations
-@tindex extended-tfm
+@tpindex extended-tfm
 @warnsubindex{extended-tfm}@c
-We already mentioned the @code{extended-tfm} warning in @ref{TFM Files}.
+We already mentioned the @code{extended-tfm} warning in @ref{Loading Fonts}.
 In fact, @tfm{} comes with a rich ontology of conditions (and restarts)
 that give you full control on the behavior to adopt when facing abnormal
 situations.
@@ -965,57 +1047,98 @@ already mentioned @code{extended-tfm} warning):
 
 @node Erroneous Usage, TFM Compliance Problems, Conditions Overview, Abnormal Situations
 @section Erroneous Usage
-Because the @tfm{}'s public API is so small, there are only two usage
-conditions, so we'll start with those ones. Neither of these conditions
-is restartable at the level of @tfm{}.
+Because @tfm{}'s public API is so small, there are only four usage error
+conditions (and currently no usage warnings), so we'll start with those
+ones.
 
-@c #### NOTE: we don't currently describe the anonymous-font error
-@c because there's no way to make an anonymous font from the public API
-@c right now.
+@findex load-font
+@fkindex{load-font,name}@c
+@restartindex{set-to-file-name}@c
+If a custom font name is provided via the @kwd{name} keyword argument to
+@code{load-font} (@pxref{Loading Fonts}), and the value is not a
+non-empty string, an @code{invalid-custom-name} usage error is
+signalled. This error is associated with a specific restart called
+@code{set-to-file-name} which, as its name suggests, will switch back
+to the default behavior and use the font file's base name instead.
+@deftp {Usage Error} invalid-custom-name
+@usageerrsubindex{invalid-custom-name}
+Slot readers:
+@itemize
+@item
+@clsrindex{invalid-custom-name,value}
+@code{value}: the invalid custom name.
+@end itemize
+@end deftp
 
-@clsaindex{character-metrics,top-character}@c
-@clsaindex{character-metrics,middle-character}@c
-@clsaindex{character-metrics,bottom-character}@c
-@clsaindex{character-metrics,repeated-character}@c
+@findex load-font
+@fkindex{load-font,design-size}@c
+@clsaindex{font,design-size}@c
+@restartindex{set-to-original}@c
+If a custom design size is provided via the @kwd{design-size} keyword
+argument to @code{load-font} (@pxref{Loading Fonts}), or by calling the
+@code{(setf design-size)} font writer (@pxref{Scaling}), and the value
+is not a real greater or equal to 1, an
+@code{invalid-custom-design-size} usage error is signalled. When the
+font 's original design size is itself valid or not yet known (in the
+case of initialization), this error is associated with a specific
+restart called @code{set-to-original} which, as its name suggests, will
+discard the custom value.
+@deftp {Usage Error} invalid-custom-design-size
+@usageerrsubindex{invalid-custom-design-size}
+Slot readers:
+@itemize
+@item
+@clsrindex{invalid-custom-design-size,value}
+@code{value}: the invalid custom design size.
+@end itemize
+@end deftp
+
+@clsrindex{character-metrics,top-character}@c
+@clsrindex{character-metrics,middle-character}@c
+@clsrindex{character-metrics,bottom-character}@c
+@clsrindex{character-metrics,repeated-character}@c
 @findex extensiblep
 An attempt at accessing the top, middle, bottom, or repeated character
 of a non extensible character will signal a @code{not-extensible} usage
 error. Remember that you can check a character's extensibility with the
-@code{extensiblep} predicate.
+@code{extensiblep} predicate (@pxref{Character Metrics}). There is no
+specific restart associated with this error.
 @deftp {Usage Error} not-extensible
 @usageerrsubindex{not-extensible}
-Accessor:
+Slot readers:
 @itemize
 @item
-@clsaindex{not-extensible,value}@c
+@clsrindex{not-extensible,value}@c
 @code{value}: the character being accessed.
 @end itemize
 @end deftp
 
 @findex ligature
-@findex kerning
-An attempt at retrieving a ligature or kerning for two characters from
-different fonts will signal a @code{different-fonts} usage error.
+@findex kern
+An attempt at retrieving a ligature or kern for two characters from
+different fonts will signal a @code{different-fonts} usage error. There
+is no specific restart associated with this error.
 @deftp {Usage Error} different-fonts
 @usageerrsubindex{different-fonts}
-Accessors:
+Slot readers:
 @itemize
 @item
-@clsaindex{different-fonts,character1}@c
-@clsaindex{different-fonts,character2}@c
+@clsrindex{different-fonts,character1}@c
+@clsrindex{different-fonts,character2}@c
 @code{character1} and @code{character2}: the two characters involved.
 @end itemize
 @end deftp
 
-Finally, an attempt at changing the design size of a font to something
-that is not a real greater or equal to 1 will just signal a type error.
-
-
 @node TFM Compliance Problems,  , Erroneous Usage, Abnormal Situations
 @section TFM Compliance Problems
 @tfm{} is very thorough in the checks it performs while reading TFM
-data, to the point that it could probably be used as a validation tool.
-Every compliance problem detected will be signalled with a warning or an
+data, to the point that it is now used as a validation tool for fonts in
+the @TeX{} Live distribution. See
+@url{https://texlive.info/tfm-validate/} (the code for this is the
+@uref{https://github.com/didierverna/tfm-validate,,@code{tfm-validate}}
+library).
+
+Every detected compliance problem will be signalled with a warning or an
 error, depending on the seriousness of the problem (in fact, only two
 compliance conditions are warnings currently; all others being errors).
 At the same time, @tfm{} also tries to offer a way out of problematic
@@ -1047,20 +1170,28 @@ specific code path in the library. Different code paths may have
 different restarts with the same name when it makes sense, but eponymous
 restarts are ``merged'' into a single node in the graph.
 
+@tpindex invalid-custom-design-size
+@usageerrsubindex{invalid-custom-design-size}@c
+@tpindex invalid-design-size
+@complianceerrsubindex{invalid-design-size}@c
+@tpindex invalid-original-design-size
+@compliancewarnsubindex{invalid-original-design-size}@c
 @fkindex{load-font,design-size}@c
 One particular case deserves some additional bits of information though.
 You will notice the existence of both an @code{invalid-design-size}
 @emph{error}, and an @code{invalid-original-design-size} @emph{warning}.
-Remember that these do not concern user-provided design sizes, which may
-only trigger a type error (@pxref{Erroneous Usage}). In the default
-case, the @code{invalid-design-size} error is signalled when a TFM file
-is not compliant. If, however, you have call @code{load-font} with an
-alternative @kwd{design-size}, you are effectively overriding the
-original value, which will not be used. In that case, only a warning
-is signalled: the @code{invalid-original-design-size} warning. Finally,
-please consider that leaving that warning alone means that an invalid
-original design size will be kept around in the font, so if you plan on
-using it later on, you're looking for trouble.
+These conditions only relate to the font's original design size,
+@emph{not} user-provided ones (@pxref{Scaling}) for which the associated
+error is @code{invalid-custom-design-size} (@pxref{Erroneous Usage}). In
+the default case, the @code{invalid-design-size} error is signalled when
+a TFM file is not compliant. If, however, you have call @code{load-font}
+with the @kwd{design-size} keyword argument (@pxref{Loading Fonts}), you
+are effectively overriding the original value, which will not be used.
+In that case, only a warning is signalled: the
+@code{invalid-original-design-size} warning. Finally, please consider
+that leaving that warning alone means that an invalid original design
+size will be kept around in the font, so if you plan on using it later
+on, you're looking for trouble. 
 
 @page
 @ifinfo
@@ -1145,7 +1276,7 @@ The first thing you can do to access the current version number of
 
 @defun version &optional (TYPE :number)
 Return the current version number of @tfm{}. @var{TYPE} can be one of
-@code{:number}, @code{:short} or @code{:long}. For @code{:number}, the
+@kwd{number}, @kwd{short} or @kwd{long}. For @kwd{number}, the
 returned value is a fixnum. Otherwise, it is a string.
 @end defun
 
@@ -1162,8 +1293,8 @@ A minor version number, stored in the parameter
 @item
 @pvindex{*release-status*}
 A release status stored in the parameter @code{*release-status*}. The
-status of a release can be @code{:alpha}, @code{:beta}, @code{:rc}
-(standing for ``release candidate'') or @code{:patchlevel}. These are in
+status of a release can be @kwd{alpha}, @kwd{beta}, @kwd{rc}
+(standing for ``release candidate'') or @kwd{patchlevel}. These are in
 effect 4 levels of expected stability.
 @item
 @pvindex{*release-status-level*}
@@ -1184,19 +1315,19 @@ Catalogue}.
 Here is how the @code{version} function computes its value.
 @itemize
 @item
-A version @code{:number} is computed as @emph{major * 10000 + minor *
+A version @kwd{number} is computed as @emph{major * 10000 + minor *
 100 + patchlevel}, effectively leaving two digits for each level. Note
 that alpha, beta and release candidate status are ignored in version
 numbers (this is as if the corresponding status level was considered to
 be always 0). Only stable releases have their level taken into account.
 @item
-A @code{:short} version will appear like this for unstable releases:
+A @kwd{short} version will appear like this for unstable releases:
 1.3a4, 2.5b8 or 4.2rc1. Remember that alpha, beta or release candidate
 levels start at 1. Patchlevels for stable releases start at 0 but 0 is
 ignored in the output. So for instance, version 4.3.2 will appear as-is,
 while version 1.3.0 will appear as just 1.3.
 @item
-A @code{:long} version is expanded from the short one, and includes the
+A @kwd{long} version is expanded from the short one, and includes the
 release name. For instance, 1.3 alpha 4 "Artificial Uncial", 2.5 beta 8
 "Rotunda", 4.2 release candidate 1 "Romantic Rustic" or 4.3.2 "Square
 Capitals". As for the short version, a patchlevel of 0 is ignored in the
