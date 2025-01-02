@@ -56,18 +56,18 @@
     :fix-word-overflow :value
     :set-to-zero
     :padded-string
-    :invalid-padded-string-length :value :pad
-    :invalid-padded-string :value
-    :padded-string-overflow :value
+    :invalid-padded-string-length :len :pad
+    :invalid-padded-string :str
+    :padded-string-overflow :overflow
     :read-maximum-length :discard-string :keep-string :fix-string
 
     ;; From src/intermediate.lisp:
-    :spurious-char-info :tag :remainder :value
+    :spurious-char-info :char-info :tag :remainder
 
     ;; From src/character.lisp:
     :character-metrics
     :code :font :width :height :depth :italic-correction :next-character
-    :extensiblep :not-extensible :value
+    :extensiblep :not-extensible :chr
     :top-character :middle-character :bottom-character :repeated-character
 
     ;; From src/font.lisp:
@@ -78,10 +78,10 @@
     :slant :interword-space :interword-stretch :interword-shrink :ex :em
     :extra-space :parameters :min-code :max-code :character-count
     :boundary-character
-    :invalid-custom-name :value
+    :invalid-custom-name :name
     :invalid-custom-design-size :value
-    :set-to-file-name :set-to-original
-    :invalid-character-code :value
+    :use-file-base-name :use-original-design-size
+    :invalid-character-code :code
     :get-character
     :different-fonts :character1 :character2
     :ligature :kern
@@ -99,19 +99,17 @@
     :padded-string-context :name
     :set-to-ten
     :tfm-table-error :name
-    :invalid-table-index :value :largest
-    :invalid-ligature-opcode :value
+    :invalid-table-index :index :largest
+    :invalid-ligature-opcode :opcode
     :abort-lig/kern-program :discard-ligature :discard-kern
-    :abort-lig/kern-program
-    :invalid-table-start :value
+    :invalid-table-start :start
     :no-boundary-character
-    :character-list-cycle :value
+    :character-list-cycle :character-list
     :ligature-cycle :value :characters
     :table-context :name :index :size
     :char-info-table-context :code
     :set-to-zero :abort-lig/kern-program
-    :discard-next-character :discard-extension-recipe
-    :discard-next-character :discard-ligature
+    :discard-next-character :discard-extension-recipe :discard-ligature
     :file-size-mixin :declared-size :actual-size
     :file-underflow :file-overflow
     :invalid-header-length :value
