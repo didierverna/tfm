@@ -2,7 +2,7 @@
 
 @c user.texi --- User manual
 
-@c Copyright (C) 2019-2021, 2024 Didier Verna
+@c Copyright (C) 2019-2021, 2024, 2025 Didier Verna
 
 @c Author: Didier Verna <didier@didierverna.net>
 
@@ -537,8 +537,8 @@ warning, and returns @nil{}.
 Readable slots:
 @itemize
 @item
-@clsrindex{extended-tfm,value}@c
-@code{value}: currently either @code{"OFM"} or @code{"JFM"}.
+@clsrindex{extended-tfm,fmt}@c
+@code{fmt}: currently either @code{"OFM"} or @code{"JFM"}.
 @item
 @clsrindex{extended-tfm,file}@c
 @findex load-font
@@ -807,13 +807,14 @@ to a number of properties through the slot readers described below.
 @clsrindex{character-metrics,height}@c
 @clsrindex{character-metrics,depth}@c
 @code{width}, @code{height}, and @code{depth}: the dimensions of the
-character's bounding box, in design size units (but see @ref{Freezing}).
+character's bounding box, normally expressed in design size units (but
+see @ref{Freezing}).
 @item
 @clsrindex{character-metrics,italic-correction}@c
-@code{italic-correction}: the character's italic correction, in design
-size units (but see @ref{Freezing}). @TeX{} uses this value for regular
-characters followed by the command @code{\/}, and also in math mode for
-superscript placement.
+@code{italic-correction}: the character's italic correction, normally
+expressed in design size units (but see @ref{Freezing}). @TeX{} uses
+this value for regular characters followed by the command @code{\/}, and
+also in math mode for superscript placement.
 @item
 @cindex Character list
 @clsrindex{character-metrics,next-character}@c
@@ -852,9 +853,9 @@ and bottom characters may be @nil{}).
 @cindex Ligature
 The @tfm{} library provides easy access to ligature information via the
 following function.
-@defun ligature CHARACTER1 CHARACTER2
-@faindex{ligature,character1}@c
-@faindex{ligature,character2}@c
+@defun get-ligature CHARACTER1 CHARACTER2
+@faindex{get-ligature,character1}@c
+@faindex{get-ligature,character2}@c
 Return ligature for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.
 @end defun
 
@@ -896,9 +897,9 @@ is the ligature between ``ff'''s composite character and ``i''.
 @cindex Kern
 In order to get kerning information for some pair of characters in a
 font, use the following function.
-@defun kern CHARACTER1 CHARACTER2
-@faindex{kern,character1}@c
-@faindex{kern,character2}@c
+@defun get-kern CHARACTER1 CHARACTER2
+@faindex{get-kern,character1}@c
+@faindex{get-kern,character2}@c
 Return kern for @var{CHARACTER1} and @var{CHARACTER2}, or @nil{}.
 @end defun
 
@@ -908,8 +909,8 @@ Metrics}). On the other hand, both @var{CHARACTER1} and @var{CHARACTER2}
 must belong to the same font.
 
 When there exists a kern for those two characters, the value returned by
-this function is a scalar expressed in design size units (but see
-@ref{Freezing}).
+this function is a scalar normally expressed in design size units (but
+see @ref{Freezing}).
 
 
 @c --------------------
@@ -918,13 +919,13 @@ this function is a scalar expressed in design size units (but see
 @node Scaling and Freezing,  , Working with Characters, Normal Use
 @section Scaling and Freezing
 As previously mentioned (@pxref{General Information}), all dimensions in
-a TFM file are expressed in design size units. The idea is to make it
-simple for @TeX{} to scale a font. Indeed, when a @TeX{} user does
-@code{\font\foo=cmr10 at 12pt} or @code{\font\foo=cmr10 scaled 1200},
-all @TeX{} has to do is change the font's design size. The drawback, on
-the other hand, is that in order to actually use the various font
-dimensions, they need to be multiplied by the design size in question
-every time.
+a TFM file are normally expressed in design size units. The idea is to
+make it simple for @TeX{} to scale a font. Indeed, when a @TeX{} user
+does @code{\font\foo=cmr10 at 12pt} or @code{\font\foo=cmr10 scaled
+1200}, all @TeX{} has to do is change the font's design size. The
+drawback, on the other hand, is that in order to actually use the
+various font dimensions, they need to be multiplied by the design size
+in question every time.
 
 @menu
 * Scaling::                     Changing the design size
@@ -1065,8 +1066,8 @@ to the default behavior and use the font file's base name instead.
 Slot readers:
 @itemize
 @item
-@clsrindex{invalid-custom-name,value}
-@code{value}: the invalid custom name.
+@clsrindex{invalid-custom-name,name}
+@code{name}: the invalid custom name.
 @end itemize
 @end deftp
 
@@ -1108,8 +1109,8 @@ specific restart associated with this error.
 Slot readers:
 @itemize
 @item
-@clsrindex{not-extensible,value}@c
-@code{value}: the character being accessed.
+@clsrindex{not-extensible,chr}@c
+@code{chr}: the character being accessed.
 @end itemize
 @end deftp
 
