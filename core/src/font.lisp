@@ -669,23 +669,28 @@ DIFFERENT-FONTS error."
 ;; --------
 
 (defun freeze (font)
-  "Freeze FONT.
+  "Freeze FONT, and return it.
 Freezing a font means that all dimensions normally expressed in design size
 units are multiplied by it, so as to lead values in TeX point units.
-If FONT is already frozen, this function does nothing and returns NIL.
-Otherwise, it returns T."
-  (unless (frozen font)
-    (scale font (design-size font))
-    (setf (slot-value font 'frozen) t)))
+If FONT is already frozen, this function does nothing.
+Otherwise, it returns T as a second value." 
+  (cond ((frozen font)
+	 font)
+	(t
+	 (scale font (design-size font))
+	 (setf (slot-value font 'frozen) t)
+	 (values font t))))
 
 (defun unfreeze (font)
-  "Unfreeze FONT.
+  "Unfreeze FONT and return it.
 Unfreezing means performing the inverse of what FREEZE does.
-If FONT is not frozen, this function does nothing and returns NIL. Otherwise,
-it returns T."
-  (when (frozen font)
-    (scale font (/ 1 (design-size font)))
-    (setf (slot-value font 'frozen) nil)
-    t))
+If FONT is not frozen, this function does nothing.
+Otherwise, it returns T as a second value."
+  (cond ((frozen font)
+	 (scale font (/ 1 (design-size font)))
+	 (setf (slot-value font 'frozen) nil)
+	 (values font t))
+	(t
+	 font)))
 
 ;;; font.lisp ends here
