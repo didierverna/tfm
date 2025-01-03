@@ -41,7 +41,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.4 "Eiad Concrete"
-@set COPYRIGHT_YEARS 2018--2021, 2024
+@set COPYRIGHT_YEARS 2018--2021, 2024, 2025
 @setchapternewpage odd
 @documentdescription
 The TFM User Manual for version @value{VERSION}.

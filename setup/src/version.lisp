@@ -1,6 +1,6 @@
 ;;; version.lisp --- TFM version management
 
-;; Copyright (C) 2019-2021, 2024 Didier Verna
+;; Copyright (C) 2019-2021, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -31,7 +31,7 @@
 
 
 ;; Copyright years
-(defvar *copyright-years* "2018-2021, 2024"
+(defvar *copyright-years* "2018-2021, 2024, 2025"
   "A string denoting the copyright years for the whole project.")
 
 
