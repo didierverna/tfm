@@ -978,17 +978,17 @@ font at any later time, by using the @code{freeze} function.
 
 @defun freeze FONT
 @faindex{freeze,font}@c
-Freeze @var{FONT}.@*
-If @var{FONT} is already frozen, do nothing and return @nil. Otherwise,
-return @code{t}.
+Freeze @var{FONT} and return it.@*
+If @var{FONT} is already frozen, do nothing. Otherwise, return @code{t}
+as a second value.
 @end defun
 
 You can also unfreeze a font at any time with the following function.
 @defun unfreeze FONT
 @faindex{unfreeze,font}@c
-Unfreeze @var{FONT}.@*
-If @var{FONT} is not frozen, do nothing and return @nil. Otherwise,
-return @code{t}.
+Unfreeze @var{FONT} and return it.@*
+If @var{FONT} is not frozen, do nothing. Otherwise, return @code{t} as a
+second value.
 @end defun
 
 Finally, note that if you change the design size of a frozen font, the
