@@ -350,10 +350,10 @@ It signals that a cycle was found in a list of ascending character sizes."))
 
 (define-condition ligature-cycle (tfm-compliance-error)
   ((section :initform 13) ; slot merge
-   (value
+   (ligature
     :documentation "The ligature introducing a cycle."
-    :initarg :value
-    :reader value)
+    :initarg :ligature
+    :reader ligature)
    (characters
     :documentation "The cons of characters involved in the ligature."
     :initarg :characters
@@ -615,8 +615,8 @@ DISCARD-EXTENSION-RECIPE."
 				 seen)
 		      (restart-case
 			  (error 'ligature-cycle
-				 :value first-ligature
-				 :characters characters)
+			    :ligature first-ligature
+			    :characters characters)
 			(discard-ligature ()
 			  :report "Discard the ligature."
 			  (remhash characters (ligatures font))

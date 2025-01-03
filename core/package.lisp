@@ -105,7 +105,7 @@
     :invalid-table-start :value
     :no-boundary-character
     :character-list-cycle :character-list
-    :ligature-cycle :value :characters
+    :ligature-cycle :ligature :characters
     :table-context :name :index :size
     :char-info-table-context :code
     :set-to-zero :abort-lig/kern-program
