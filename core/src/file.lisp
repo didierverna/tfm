@@ -362,8 +362,8 @@ It signals that a cycle was found in a list of ascending character sizes."))
 It signals that a ligature introduces a cycle for a cons of characters."))
 
 (define-condition-report (condition ligature-cycle)
-  "ligature ~A introduces a cycle for characters ~A"
-  (value condition)
+    "ligature ~A introduces a cycle for characters ~A"
+  (ligature condition)
   (characters condition))
 
 
