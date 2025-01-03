@@ -60,6 +60,7 @@ conditions are signalled."))
     (setq upcase nil))
   (apply #'format stream "~:[~@?~;~@(~@?~)~]." upcase format-string arguments))
 
+#i(define-condition-report 2)
 (defmacro define-condition-report
     ((condition type) format-string &rest arguments)
   "Define a context-aware report function for a CONDITION of TYPE.
@@ -92,8 +93,10 @@ initialized with INITARGS."
 ;; ==========================================================================
 
 (define-condition tfm ()
-  ((context :documentation "The context in which the condition was signalled."
-	    :initform nil :reader context))
+  ((context
+    :documentation "The context in which the condition was signalled."
+    :initform nil
+    :reader context))
   (:documentation "The TFM root condition."))
 
 
@@ -107,8 +110,11 @@ initialized with INITARGS."
 
 
 (define-condition tfm-compliance (tfm)
-  ((section :documentation "The related TFtoPL section."
-	    :allocation :class :initform nil :reader section))
+  ((section
+    :documentation "The related TFtoPL section."
+    :allocation :class
+    :initform nil
+    :reader section))
   (:documentation "The TFM Compliance root condition.
 This is the mixin for conditions related to TFM compliance."))
 
@@ -164,7 +170,7 @@ This is the root condition for errors related to the use of the library."))
 It signals that an unsigned 16 bits integer is greater than 2^15."))
 
 (define-condition-report (condition u16-overflow)
-  "unsigned 16 bits integer ~A is greater than 2^15"
+    "unsigned 16 bits integer ~A is greater than 2^15"
   (value condition))
 
 (defun read-u16 ()
@@ -195,7 +201,7 @@ If >= 2^15, signal a U16-OVERFLOW error."
 It signals that a fix word is outside ]-16,+16[."))
 
 (define-condition-report (condition fix-word-overflow)
-  "fix word ~A (~A) is outside ]-16,+16["
+    "fix word ~A (~A) is outside ]-16,+16["
   (value condition)
   (float (value condition)))
 
@@ -242,16 +248,18 @@ This is a mixin for all conditions related to padded strings."))
   ((section :initform 10) ; slot merge
    (value
     :documentation "The invalid length."
-    :initarg :value :reader value)
+    :initarg :value
+    :reader value)
    (pad
     :documentation "The string's maximum length."
-    :initarg :pad :reader pad))
+    :initarg :pad
+    :reader pad))
   (:documentation "The Invalid Padded String Length compliance error.
 It signals that the declared length of a padded string is greater than its
 maximum."))
 
 (define-condition-report (condition invalid-padded-string-length)
-  "declared padded string length ~A is greater than its maximum ~A"
+    "declared padded string length ~A is greater than its maximum ~A"
   (value condition)
   (1- (pad condition)))
 
@@ -264,20 +272,22 @@ It signals that a padded string is not in BCPL format (it contains parentheses
 or non-ASCII characters)."))
 
 (define-condition-report (condition invalid-padded-string)
-  "padded string ~S is not in BCPL format (it contains parentheses and/or ~
+    "padded string ~S is not in BCPL format (it contains parentheses and/or ~
 non-ASCII characters)"
   (str condition))
 
 
 (define-condition padded-string-overflow (tfm-compliance-warning padded-string)
-  ((overflow :documentation "The string's overflow."
-	     :initarg :overflow :reader overflow))
+  ((overflow
+    :documentation "The string's overflow."
+    :initarg :overflow
+    :reader overflow))
   (:documentation "The Padded String Overflow compliance warning.
 It signals that a padded string contains non null characters after its
 declared length."))
 
 (define-condition-report (condition padded-string-overflow)
-  "padded string contains non-null overflow characters (~S)"
+    "padded string contains non-null overflow characters (~S)"
   (overflow condition))
 
 (defmethod print-object :after ((condition padded-string-overflow) stream)

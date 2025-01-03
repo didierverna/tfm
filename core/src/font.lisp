@@ -78,6 +78,7 @@ STATE is a list of characters, the first two being subject to LIGATURE."
 
 
 
+
 ;; ==========================================================================
 ;; Base Font
 ;; ==========================================================================
@@ -258,8 +259,10 @@ subclasses."))
 
 
 (define-condition invalid-custom-name (tfm-usage-error)
-  ((name :documentation "The invalid custom name."
-	 :initarg :name :reader name))
+  ((name
+    :documentation "The invalid custom name."
+    :initarg :name
+    :reader name))
   (:documentation "The Invalid Custom Name usage error.
 It signals that a custom name is not a non-empty string."))
 
@@ -277,7 +280,7 @@ It signals that a custom name is not a non-empty string."))
 It signals that a custom design size is not a real greater or equal to 1."))
 
 (define-condition-report (condition invalid-custom-design-size)
-  "custom design size ~A is invalid (should be a real greater or equal to 1)"
+    "custom design size ~A is invalid (should be a real greater or equal to 1)"
   (value condition))
 
 
@@ -351,13 +354,15 @@ with USE-ORIGINAL-DESIGN-SIZE."
 (define-condition invalid-character-code (tfm-compliance-error)
   ((code
     :documentation "The invalid character code."
-    :initarg :code :reader code))
+    :initarg :code
+    :reader code))
   (:documentation "The Invalid Character Code compliance error.
 It signals a reference to a character code which does not exist in the font
 being loaded."))
 
 (define-condition-report (condition invalid-character-code)
-    "character code ~A is invalid." (code condition))
+    "character code ~A is invalid."
+  (code condition))
 
 
 ;; #### NOTE: this is the internal API, used while loading TFM data.
@@ -395,7 +400,7 @@ It signals an attempt at retrieving a ligature or kern for two characters
 from different fonts."))
 
 (define-condition-report (condition different-fonts)
-  "characters ~A and ~A don't belong to the same font."
+    "characters ~A and ~A don't belong to the same font."
   (character1 condition)
   (character2 condition))
 

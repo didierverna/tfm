@@ -1,6 +1,6 @@
 ;;; intermediate.lisp --- Low level, intermediate data structures
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -54,13 +54,16 @@ This structure is used to store decoded information from the char-info table
   ((section :initform 11) ; slot merge
    (char-info
     :documentation "The culprit char-info structure."
-    :initarg :char-info :reader char-info)
+    :initarg :char-info
+    :reader char-info)
    (tag
     :documentation "The original tag."
-    :initarg :tag :reader tag)
+    :initarg :tag
+    :reader tag)
    (remainder
     :documentation "The original remainder."
-    :initarg :remainder :reader remainder))
+    :initarg :remainder
+    :reader remainder))
   (:documentation "The Spurious Char Info compliance warning.
 It signals that a char-info for a non-existent character (that is, with a
 width-index of 0) is not completely zero'ed out."))
@@ -72,7 +75,7 @@ width-index of 0) is not completely zero'ed out."))
 ;; should have been NIL instead. Because of this, the condition's report will
 ;; give some more detail in that situation.
 (define-condition-report (condition spurious-char-info)
-  "char-info structure for a non-existent character is not blank~A~%~A"
+    "char-info structure for a non-existent character is not blank~A~%~A"
   (let ((char-info (char-info condition)))
     ;; #### WARNING: EQL below because we might be comparing with NIL.
     (cond ((eql (lig/kern-index char-info) 0) " (tag = 1)")
@@ -111,6 +114,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 
 
 
+
 ;; ==========================================================================
 ;; Extensible Recipes
 ;; ==========================================================================
@@ -131,6 +135,7 @@ This structure is used to store decoded information from the exten table
 
 
 
+
 ;; ==========================================================================
 ;; Ligature/Kerning Instructions
 ;; ==========================================================================

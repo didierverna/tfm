@@ -43,7 +43,7 @@
 It signals that a design size is too small (< 1pt)."))
 
 (define-condition-report (condition invalid-design-size)
-  "~Apt design size is too small (< 1pt)"
+    "~Apt design size is too small (< 1pt)"
   (value condition))
 
 
@@ -58,7 +58,7 @@ It signals that, although overridden explicitly, an original design size was
 too small (< 1pt)."))
 
 (define-condition-report (condition invalid-original-design-size)
-  "~Apt original design size was too small (< 1pt)"
+    "~Apt original design size was too small (< 1pt)"
   (value condition))
 
 
@@ -171,10 +171,12 @@ This is the root condition for errors related to TFM tables."))
   ((section :initform 8) ; slot merge
    (index
     :documentation "The invalid index."
-    :initarg :value :reader value)
+    :initarg :value
+    :reader value)
    (largest
     :documentation "The largest index."
-    :initarg :largest :reader largest))
+    :initarg :largest
+    :reader largest))
   (:documentation "The Invalid Table Index compliance error.
 It signals that a table index is greater than its largest value."))
 
@@ -204,8 +206,10 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
 
 (define-condition invalid-ligature-opcode (tfm-compliance-error)
   ((section :initform 13) ; slot merge
-   (opcode :documentation "The invalid ligature opcode."
-	   :initarg :opcode :reader opcode))
+   (opcode
+    :documentation "The invalid ligature opcode."
+    :initarg :opcode
+    :reader opcode))
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
 
@@ -314,13 +318,15 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
 
 (define-condition invalid-table-start (tfm-table-error)
   ((section :initform 11) ; slot merge
-   (value :documentation "The invalid first table value."
-	  :initarg :value :reader value))
+   (value
+    :documentation "The invalid first table value."
+    :initarg :value
+    :reader value))
   (:documentation "The Invalid Table Start compliance error.
 It signals that the first value in a TFM table is not 0."))
 
 (define-condition-report (condition invalid-table-start)
-  "first value ~A in ~A table is invalid (should be 0)"
+    "first value ~A in ~A table is invalid (should be 0)"
   (value condition)
   (name condition))
 
@@ -332,19 +338,21 @@ It signals that a boundary character ligature/kerning program was found,
 without a boundary character being defined."))
 
 (define-condition-report (condition no-boundary-character)
-  "found a boundary character ligature/kerning program,~
+    "found a boundary character ligature/kerning program,~
 without a boundary character being defined")
 
 
 (define-condition character-list-cycle (tfm-compliance-error)
   ((section :initform 12) ; slot merge
-   (character-list :documentation "The cyclic character list."
-		   :initarg :character-list :reader character-list))
+   (character-list
+    :documentation "The cyclic character list."
+    :initarg :character-list
+    :reader character-list))
   (:documentation "The Character List Cycle compliance error.
 It signals that a cycle was found in a list of ascending character sizes."))
 
 (define-condition-report (condition character-list-cycle)
-  "found a cycle in character list ~A"
+    "found a cycle in character list ~A"
   (character-list condition))
 
 
@@ -368,11 +376,18 @@ It signals that a ligature introduces a cycle for a cons of characters."))
 
 
 (defclass table-context (context)
-  ((name :documentation "The table name." :initarg :name :reader name)
-   (index :documentation "The index in the table."
-	  :initarg :index :reader index)
-   (size :documentation "The table size."
-	 :initarg :size :reader size))
+  ((name
+    :documentation "The table name."
+    :initarg :name
+    :reader name)
+   (index
+    :documentation "The index in the table."
+    :initarg :index
+    :reader index)
+   (size
+    :documentation "The table size."
+    :initarg :size
+    :reader size))
   (:documentation "The Table Context class."))
 
 (defmethod context-string ((context table-context))
@@ -383,8 +398,10 @@ It signals that a ligature introduces a cycle for a cons of characters."))
     (1- (size context))))
 
 (defclass char-info-table-context (table-context)
-  ((code :documentation "The corresponding character code."
-	 :initarg :code :reader code))
+  ((code
+    :documentation "The corresponding character code."
+    :initarg :code
+    :reader code))
   (:documentation "The Char Info Table Context class."))
 
 (defmethod context-string ((context char-info-table-context))
@@ -629,6 +646,7 @@ DISCARD-EXTENSION-RECIPE."
 
 
 
+
 ;; ==========================================================================
 ;; Parameters Section
 ;; ==========================================================================
@@ -670,6 +688,7 @@ Return remaining LENGTH.")
 
 
 
+
 ;; ==========================================================================
 ;; Preamble
 ;; ==========================================================================
@@ -693,7 +712,7 @@ actual file sizes."))
 It signals that the file size is shorter than expected."))
 
 (define-condition-report (condition file-underflow)
-  "declared file size ~A is greater than actual ~A bytes"
+    "declared file size ~A is greater than actual ~A bytes"
   (declared-size condition)
   (actual-size condition))
 
@@ -707,7 +726,7 @@ It signals that the file size is shorter than expected."))
 It signals that the file size is longer than expected."))
 
 (define-condition-report (condition file-overflow)
-  "declared file size ~A is less than actual ~A bytes"
+    "declared file size ~A is less than actual ~A bytes"
   (declared-size condition)
   (actual-size condition))
 
@@ -722,7 +741,7 @@ It signals that the file size is longer than expected."))
 It signals that a header length is too small (< 2 words)."))
 
 (define-condition-report (condition invalid-header-length)
-  "~A word~:P header length is too small (< 2 words)"
+    "~A word~:P header length is too small (< 2 words)"
   (value condition))
 
 
@@ -734,7 +753,7 @@ It signals that a header length is too small (< 2 words)."))
 It signals that BC-1 > EC, or that EC > 255."))
 
 (define-condition-report (condition invalid-character-range)
-  "character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)"
+    "character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)"
   (bc condition)
   (ec condition))
 
@@ -789,7 +808,7 @@ It signals that BC-1 > EC, or that EC > 255."))
 It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 
 (define-condition-report (condition invalid-section-lengths)
-  "section lengths don't satisfy ~
+    "section lengths don't satisfy ~
 ~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
 + ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)"
   (lf condition)
@@ -823,7 +842,7 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 It signals that a declared TFM table's length is out of range."))
 
 (define-condition-report (condition invalid-table-length)
-  "~A table length ~A is invalid (should be in [~A,~A])"
+    "~A table length ~A is invalid (should be in [~A,~A])"
   (name condition)
   (value condition)
   (smallest condition)
@@ -876,8 +895,8 @@ length, signal an INVALID-SECTION-LENGTHS error."
 	       ;; seem to be any kind of interesting information in there
 	       ;; (contrary to padded strings).
 	       (warn 'file-overflow
-		     :actual-size actual-size
-		     :declared-size declared-size)))))
+		 :actual-size actual-size
+		 :declared-size declared-size)))))
     (unless (>= lh 2) (error 'invalid-header-length :value lh))
     (unless (and (<= (1- bc) ec) (<= ec 255))
       (error 'invalid-character-range :bc bc :ec ec))
@@ -892,11 +911,11 @@ length, signal an INVALID-SECTION-LENGTHS error."
 			  "extens")
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
-		       :value length :smallest min :largest max :name name))
+		  :value length :smallest min :largest max :name name))
     (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
       (error 'invalid-section-lengths
-	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
-	     :ne ne :np np))
+	:lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
+	:ne ne :np np))
 
     ;; 2. Parse the header section.
     (parse-header lh font)
@@ -911,6 +930,7 @@ length, signal an INVALID-SECTION-LENGTHS error."
 
 
 
+
 ;; ==========================================================================
 ;; Entry Point
 ;; ==========================================================================
@@ -923,7 +943,7 @@ It signals that a file contains extended TFM data (OFM or JFM) rather than
 plain TFM data."))
 
 (define-condition-report (condition extended-tfm)
-  "file ~A contains ~A data (not supported yet)"
+    "file ~A contains ~A data (not supported yet)"
   (file condition)
   (fmt condition))
 
