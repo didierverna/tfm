@@ -1,6 +1,6 @@
 ;;; character.lisp --- Character Information
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -193,7 +193,7 @@ character."))
      ,(format nil "Return extensible CHARACTER's ~A.
 If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
 	name)
-     (unless (extensiblep character) (error 'not-extensible :char character))
+     (unless (extensiblep character) (error 'not-extensible :chr character))
      (,name (extension-recipe character))))
 
 (define-extension-recipe-pseudo-accessor top-character)
