@@ -1,6 +1,6 @@
 ;;; util.lisp --- General Utilities
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -240,9 +240,9 @@ This is a mixin for all conditions related to padded strings."))
 (define-condition invalid-padded-string-length
     (tfm-compliance-error padded-string)
   ((section :initform 10) ; slot merge
-   (len
+   (value
     :documentation "The invalid length."
-    :initarg :len :reader len)
+    :initarg :value :reader value)
    (pad
     :documentation "The string's maximum length."
     :initarg :pad :reader pad))
@@ -252,7 +252,7 @@ maximum."))
 
 (define-condition-report (condition invalid-padded-string-length)
   "declared padded string length ~A is greater than its maximum ~A"
-  (len condition)
+  (value condition)
   (1- (pad condition)))
 
 
@@ -305,7 +305,7 @@ and non-ASCII characters with question marks), or DISCARD-STRING.
 If the string is not padded with zeros, signal a PADDED-STRING-OVERFLOW
 warning."
   (unless (< length pad)
-    (restart-case (error 'invalid-padded-string-length :len length :pad pad)
+    (restart-case (error 'invalid-padded-string-length :value length :pad pad)
       (read-maximum-length () :report "Read the maximum possible length."
 	(setq length (1- pad)))
       (discard-string () :report "Discard the string."

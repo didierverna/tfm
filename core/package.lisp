@@ -56,7 +56,7 @@
     :fix-word-overflow :value
     :set-to-zero
     :padded-string
-    :invalid-padded-string-length :len :pad
+    :invalid-padded-string-length :value :pad
     :invalid-padded-string :str
     :padded-string-overflow :overflow
     :read-maximum-length :discard-string :keep-string :fix-string
@@ -102,7 +102,7 @@
     :invalid-table-index :index :largest
     :invalid-ligature-opcode :opcode
     :abort-lig/kern-program :discard-ligature :discard-kern
-    :invalid-table-start :start
+    :invalid-table-start :value
     :no-boundary-character
     :character-list-cycle :character-list
     :ligature-cycle :value :characters
@@ -116,7 +116,7 @@
     :invalid-character-range :bc :ec
     :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
     :invalid-table-length :value :smallest :largest
-    :extended-tfm :value :file
+    :extended-tfm :fmt :file
     :load-font :cancel-loading))
 
 

@@ -1,6 +1,6 @@
 ;;; file.lisp --- Parsing and decoding
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -314,14 +314,14 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
 
 (define-condition invalid-table-start (tfm-table-error)
   ((section :initform 11) ; slot merge
-   (start :documentation "The invalid first table value."
-	  :initarg :start :reader start))
+   (value :documentation "The invalid first table value."
+	  :initarg :value :reader value))
   (:documentation "The Invalid Table Start compliance error.
 It signals that the first value in a TFM table is not 0."))
 
 (define-condition-report (condition invalid-table-start)
   "first value ~A in ~A table is invalid (should be 0)"
-  (start condition)
+  (value condition)
   (name condition))
 
 
@@ -454,7 +454,7 @@ DISCARD-EXTENSION-RECIPE."
 	  :do (let ((start (read-fix-word)))
 		(unless (zerop start)
 		  (restart-case
-		      (error 'invalid-table-start :start start :name name)
+		      (error 'invalid-table-start :value start :name name)
 		    (set-to-zero () :report "Set to 0."
 		      (setq start 0))))
 		(vector-push start array))
@@ -915,7 +915,7 @@ length, signal an INVALID-SECTION-LENGTHS error."
 ;; ==========================================================================
 
 (define-condition extended-tfm (tfm-warning)
-  ((value :documentation "The TFM extension." :initarg :value :reader value)
+  ((fmt :documentation "The unsupported format." :initarg :fmt :reader fmt)
    (file :documentation "The extended TFM file." :initarg :file :reader file))
   (:documentation "The Extended TFM warning.
 It signals that a file contains extended TFM data (OFM or JFM) rather than
@@ -924,7 +924,7 @@ plain TFM data."))
 (define-condition-report (condition extended-tfm)
   "file ~A contains ~A data (not supported yet)"
   (file condition)
-  (value condition))
+  (fmt condition))
 
 (defun load-font (file &rest keys &key name design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
@@ -947,8 +947,8 @@ CANCEL-LOADING, in which case this function simply returns NIL."
     (setq lf (with-simple-restart (cancel-loading "Cancel loading this font.")
 	       (read-u16)))
     (case lf
-      (0      (warn 'extended-tfm :value "OFM" :file file))
-      ((9 11) (warn 'extended-tfm :value "JFM" :file file))
+      (0      (warn 'extended-tfm :fmt "OFM" :file file))
+      ((9 11) (warn 'extended-tfm :fmt "JFM" :file file))
       (t      (with-simple-restart (cancel-loading "Cancel loading this font.")
 		(setq font (load-tfm-font
 			    (apply #'make-instance 'font
