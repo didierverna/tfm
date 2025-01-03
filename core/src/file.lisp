@@ -600,31 +600,32 @@ DISCARD-EXTENSION-RECIPE."
   ;; 6. Check for ligature cycles, ligature by ligature. Again, this is
   ;; perhaps not the most efficient way to do it and maybe I should study the
   ;; algorithm used in TFtoPL[88..], but we don't care right now.
-  (maphash (lambda (characters first-ligature)
-	     (loop :with state := (list (car characters) (cdr characters))
-		   :with seen := (list state)
-		   :with ligature := first-ligature
-		   :while ligature
-		   :do (setq state (apply-ligature ligature state))
-		   :do (cond ((= (length state) 1)
-			      (setq ligature nil))
-			     ((member-if (lambda (elt)
-					   (and (eq (car state) (car elt))
-						(eq (cadr state) (cadr elt))))
-					 seen)
-			      (restart-case
-				  (error 'ligature-cycle
-				    :value first-ligature
-				    :characters characters)
-				(discard-ligature ()
-				  :report "Discard the ligature."
-				  (remhash characters (ligatures font))
-				  (setq ligature nil))))
-			     (t
-			      (push state seen)
-			      (setq ligature
-				    (ligature (car state) (cadr state)))))))
-	   (ligatures font)))
+  (maphash
+   (lambda (characters first-ligature)
+     (loop :with state := (list (car characters) (cdr characters))
+	   :with seen := (list state)
+	   :with ligature := first-ligature
+	   :while ligature
+	   :do (setq state (apply-ligature ligature state))
+	   :do (cond ((= (length state) 1)
+		      (setq ligature nil))
+		     ((member-if (lambda (elt)
+				   (and (eq (car state) (car elt))
+					(eq (cadr state) (cadr elt))))
+				 seen)
+		      (restart-case
+			  (error 'ligature-cycle
+				 :value first-ligature
+				 :characters characters)
+			(discard-ligature ()
+			  :report "Discard the ligature."
+			  (remhash characters (ligatures font))
+			  (setq ligature nil))))
+		     (t
+		      (push state seen)
+		      (setq ligature
+			    (get-ligature (car state) (cadr state)))))))
+   (ligatures font)))
 
 
 

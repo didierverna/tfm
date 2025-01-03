@@ -1,6 +1,6 @@
 ;;; font.lisp --- Font Information
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -400,7 +400,7 @@ from different fonts."))
   (character2 condition))
 
 
-(defun ligature (character1 character2)
+(defun get-ligature (character1 character2)
   "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
 If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
 DIFFERENT-FONTS error."
@@ -408,7 +408,7 @@ DIFFERENT-FONTS error."
     (error 'different-fonts :character1 character1 :character2 character2))
   (gethash (cons character1 character2) (ligatures (font character1))))
 
-(defun kern (character1 character2)
+(defun get-kern (character1 character2)
   "Return kern for CHARACTER1 and CHARACTER2, or NIL.
 If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
 DIFFERENT-FONTS error."
