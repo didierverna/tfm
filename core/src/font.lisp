@@ -309,43 +309,9 @@ It signals that a custom design size is not a real greater or equal to 1."))
 	  (setq design-size nil))))))
 
 
-(defmethod (setf design-size) :before (design-size font)
-  "Unscale FONT if frozen."
-  (when (frozen font) (scale font (/ 1 (design-size font)))))
-
-(defmethod (setf design-size) :after (design-size font)
-  "Rescale FONT if frozen."
-  (when (frozen font) (scale font (design-size font))))
-
-(defmethod (setf design-size) :around (design-size font)
-  "Check that DESIGN-SIZE is a real greater or equal to 1.
-Otherwise, signal and INVALID-CUSTOM-DESIGN-SIZE error. When the font's
-original design size is itself valid, this error is immediately restartable
-with USE-ORIGINAL-DESIGN-SIZE."
-  (unless (typep design-size '(real 1))
-    (restart-case (error 'invalid-custom-design-size :value design-size)
-      (use-original-design-size ()
-	:report "Use the font's original design size."
-	:test (lambda (condition)
-		(declare (ignore condition))
-		(typep (original-design-size font) '(real 1)))
-	(setq design-size (original-design-size font)))))
-  (call-next-method design-size font))
-
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (define-constant +font-dimension-slots+
-      '(interword-space interword-stretch interword-shrink ex em extra-space)
-    "The list of dimension slot names in the FONT class."))
-
-(defmacro map-font-dimension-slots (var font &body body)
-  "Map BODY on FONT dimension slots available as VAR."
-  `(map-slots ,var ,font ,+font-dimension-slots+ ,@body))
-
-
-;; ----------------
-;; Pseudo-accessors
-;; ----------------
+;; ---------------------------------------------
+;; Internal character, ligature, and kern access
+;; ---------------------------------------------
 
 ;; #### NOTE: this is a compliance error. It may only be signalled by the
 ;; internal API, meaning that the TFM data contains invalid references to
@@ -364,8 +330,6 @@ being loaded."))
     "character code ~A is invalid."
   (code condition))
 
-
-;; #### NOTE: this is the internal API, used while loading TFM data.
 (defun code-character (code font &optional (errorp t))
   "Return FONT's CODE character.
 If ERRORP (the default), check that the character exists, or signal an
@@ -376,51 +340,10 @@ retrieved by this function."
       ;; it's rather the job of the callers to provide sensible restarts.
       (when errorp (error 'invalid-character-code :code code))))
 
+
 (defun (setf code-character) (character font)
   "Make FONT's CHARACTER accessible by its code."
   (setf (gethash (code character) (characters font)) character))
-
-;; #### NOTE: this is the public API.
-(defun get-character (code font)
-  "Return FONT's CODE character, or NIL."
-  (gethash code (characters font)))
-
-
-(define-condition different-fonts (tfm-usage-error)
-  ((character1
-    :documentation "The first character."
-    :initarg :character1
-    :reader character1)
-   (character2
-    :documentation "The second character."
-    :initarg :character2
-    :reader character2))
-  (:documentation "The Different Fonts usage error.
-It signals an attempt at retrieving a ligature or kern for two characters
-from different fonts."))
-
-(define-condition-report (condition different-fonts)
-    "characters ~A and ~A don't belong to the same font."
-  (character1 condition)
-  (character2 condition))
-
-
-(defun get-ligature (character1 character2)
-  "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
-If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
-DIFFERENT-FONTS error."
-  (unless (eq (font character1) (font character2))
-    (error 'different-fonts :character1 character1 :character2 character2))
-  (gethash (cons character1 character2) (ligatures (font character1))))
-
-(defun get-kern (character1 character2)
-  "Return kern for CHARACTER1 and CHARACTER2, or NIL.
-If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
-DIFFERENT-FONTS error."
-  (unless (eq (font character1) (font character2))
-    (error 'different-fonts :character1 character1 :character2 character2))
-  (gethash (cons character1 character2) (kerns (font character1))))
-
 
 ;; #### NOTE: we don't currently bother to check that the two characters
 ;; belong to the same font. These functions are internal only, so let's just
@@ -436,9 +359,18 @@ DIFFERENT-FONTS error."
 	kern))
 
 
-;; --------
-;; Freezing
-;; --------
+;; -------
+;; Scaling
+;; -------
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +font-dimension-slots+
+      '(interword-space interword-stretch interword-shrink ex em extra-space)
+    "The list of dimension slot names in the FONT class."))
+
+(defmacro map-font-dimension-slots (var font &body body)
+  "Map BODY on FONT dimension slots available as VAR."
+  `(map-slots ,var ,font ,+font-dimension-slots+ ,@body))
 
 (defgeneric scale (font factor)
   (:documentation "Scale all FONT dimensions by FACTOR.")
@@ -459,28 +391,9 @@ DIFFERENT-FONTS error."
 	       (set-kern (car pair) (cdr pair) (* kern factor)))
 	     (kerns font))))
 
-(defun freeze (font)
-  "Freeze FONT.
-Freezing a font means that all dimensions normally expressed in design size
-units are multiplied by it, so as to lead values in TeX point units.
-If FONT is already frozen, this function does nothing and returns NIL.
-Otherwise, it returns T."
-  (unless (frozen font)
-    (scale font (design-size font))
-    (setf (slot-value font 'frozen) t)))
-
-(defun unfreeze (font)
-  "Unfreeze FONT.
-Unfreezing means performing the inverse of what FREEZE does.
-If FONT is not frozen, this function does nothing and returns NIL. Otherwise,
-it returns T."
-  (when (frozen font)
-    (scale font (/ 1 (design-size font)))
-    (setf (slot-value font 'frozen) nil)
-    t))
 
 
-
+
 ;; ==========================================================================
 ;; Math Symbols Font
 ;; ==========================================================================
@@ -605,8 +518,9 @@ scheme."))
 
 
 
+
 ;; ==========================================================================
-;; Math Symbols Font
+;; Math Extension Font
 ;; ==========================================================================
 
 (defclass math-extension-font (font)
@@ -668,5 +582,110 @@ scheme."))
   (call-next-method)
   (map-math-extension-font-dimension-slots slot font
     (setf slot (* slot factor))))
+
+
+
+
+;; ==========================================================================
+;; Public API
+;; ==========================================================================
+
+;; -------
+;; Scaling
+;; -------
+
+(defmethod (setf design-size) :before (design-size font)
+  "Unscale FONT if frozen."
+  (when (frozen font) (scale font (/ 1 (design-size font)))))
+
+(defmethod (setf design-size) :after (design-size font)
+  "Rescale FONT if frozen."
+  (when (frozen font) (scale font (design-size font))))
+
+(defmethod (setf design-size) :around (design-size font)
+  "Check that DESIGN-SIZE is a real greater or equal to 1.
+Otherwise, signal and INVALID-CUSTOM-DESIGN-SIZE error. When the font's
+original design size is itself valid, this error is immediately restartable
+with USE-ORIGINAL-DESIGN-SIZE."
+  (unless (typep design-size '(real 1))
+    (restart-case (error 'invalid-custom-design-size :value design-size)
+      (use-original-design-size ()
+	:report "Use the font's original design size."
+	:test (lambda (condition)
+		(declare (ignore condition))
+		(typep (original-design-size font) '(real 1)))
+	(setq design-size (original-design-size font)))))
+  (call-next-method design-size font))
+
+
+;; ------------------------------------
+;; Character, ligature, and kern access
+;; ------------------------------------
+
+(defun get-character (code font)
+  "Return FONT's CODE character, or NIL."
+  (gethash code (characters font)))
+
+
+(define-condition different-fonts (tfm-usage-error)
+  ((character1
+    :documentation "The first character."
+    :initarg :character1
+    :reader character1)
+   (character2
+    :documentation "The second character."
+    :initarg :character2
+    :reader character2))
+  (:documentation "The Different Fonts usage error.
+It signals an attempt at retrieving a ligature or kern for two characters
+from different fonts."))
+
+(define-condition-report (condition different-fonts)
+    "characters ~A and ~A don't belong to the same font."
+  (character1 condition)
+  (character2 condition))
+
+
+(defun get-ligature (character1 character2)
+  "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
+If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
+DIFFERENT-FONTS error."
+  (unless (eq (font character1) (font character2))
+    (error 'different-fonts :character1 character1 :character2 character2))
+  (gethash (cons character1 character2) (ligatures (font character1))))
+
+
+(defun get-kern (character1 character2)
+  "Return kern for CHARACTER1 and CHARACTER2, or NIL.
+If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
+DIFFERENT-FONTS error."
+  (unless (eq (font character1) (font character2))
+    (error 'different-fonts :character1 character1 :character2 character2))
+  (gethash (cons character1 character2) (kerns (font character1))))
+
+
+;; --------
+;; Freezing
+;; --------
+
+(defun freeze (font)
+  "Freeze FONT.
+Freezing a font means that all dimensions normally expressed in design size
+units are multiplied by it, so as to lead values in TeX point units.
+If FONT is already frozen, this function does nothing and returns NIL.
+Otherwise, it returns T."
+  (unless (frozen font)
+    (scale font (design-size font))
+    (setf (slot-value font 'frozen) t)))
+
+(defun unfreeze (font)
+  "Unfreeze FONT.
+Unfreezing means performing the inverse of what FREEZE does.
+If FONT is not frozen, this function does nothing and returns NIL. Otherwise,
+it returns T."
+  (when (frozen font)
+    (scale font (/ 1 (design-size font)))
+    (setf (slot-value font 'frozen) nil)
+    t))
 
 ;;; font.lisp ends here
