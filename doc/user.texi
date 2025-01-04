@@ -40,7 +40,7 @@
 @c ====================================================================
 @c Settings
 @c ====================================================================
-@set VERSION 1.4 "Eiad Concrete"
+@set VERSION 2.0 "Eiad Sans Serif"
 @set COPYRIGHT_YEARS 2018--2021, 2024, 2025
 @setchapternewpage odd
 @documentdescription

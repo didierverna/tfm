@@ -22,7 +22,7 @@
 @c Commentary:
 
 @c Generated automatically by Declt version 4.0 beta 3 "William Riker"
-@c on Sat Jan 04 15:44:20 2025 GMT+1.
+@c on Sat Jan 04 16:25:02 2025 GMT+1.
 
 
 @c ====================================================================
@@ -102,7 +102,7 @@
 @c ====================================================================
 @setchapternewpage odd
 @documentdescription
-The TFM Reference Manual, version 1.4 "Eiad Concrete".
+The TFM Reference Manual, version 2.0 "Eiad Sans Serif".
 @end documentdescription
 
 
@@ -264,13 +264,13 @@ except that this permission notice may be translated as well.
 @c ====================================================================
 @titlepage
 @title The TFM Reference Manual
-@subtitle TeX Font Metrics, version 1.4 "Eiad Concrete"
+@subtitle TeX Font Metrics, version 2.0 "Eiad Sans Serif"
 
 @author Didier Verna <@email{didier@atchar{}didierverna.net}>
 
 @page
 @quotation
-This manual was generated automatically by Declt 4.0 beta 3 "William Riker" on Sat Jan 04 15:44:20 2025 GMT+1.
+This manual was generated automatically by Declt 4.0 beta 3 "William Riker" on Sat Jan 04 16:25:02 2025 GMT+1.
 @end quotation
 @vskip 0pt plus 1filll
 @insertcopying
@@ -291,9 +291,9 @@ This manual was generated automatically by Declt 4.0 beta 3 "William Riker" on S
 @ifnottex
 @node Top, Copying, (dir), (dir)
 @top The TFM Reference Manual
-This is the TFM Reference Manual, version 1.4 "Eiad Concrete",
+This is the TFM Reference Manual, version 2.0 "Eiad Sans Serif",
 generated automatically by Declt version 4.0 beta 3 "William Riker"
-on Sat Jan 04 15:44:20 2025 GMT+1.
+on Sat Jan 04 16:25:02 2025 GMT+1.
 
 @menu
 * Copying:: The BSD License
@@ -411,13 +411,11 @@ TeX. The TFM library parses and decodes TFM files into an abstract data
 structure@comma{} providing easy access to the corresponding font information in
 Common Lisp.
 @item Version
-1.4
+2.0
 @item Dependency
 @ref{❨1❩, , @t{net.didierverna.tfm.core}}@: (system).
 @item Source
 @ref{❨5❩, , @t{net.didierverna.tfm.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/}}
 @end table
 
 
@@ -447,13 +445,11 @@ BSD
 The TeX Font Metrics core library provides the main functionality of TFM.
 For a more complete description of TFM@comma{} see the `net.didierverna.tfm' system.
 @item Version
-1.4
+2.0
 @item Dependency
 @ref{❨2❩, , @t{net.didierverna.tfm.setup}}@: (system).
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/}}
 @item Child Components
 @itemize @bullet
 @item
@@ -491,13 +487,11 @@ The TFM setup library provides support for various preload configuration
 parameters and meta-utilities. For a more complete description of TFM@comma{}
 see the `net.didierverna.tfm' system.
 @item Version
-1.4
+2.0
 @item Dependency
 @t{named-readtables}@: (system).
 @item Source
 @ref{❨7❩, , @t{net.didierverna.tfm.setup.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/}}
 @item Child Components
 @itemize @bullet
 @item
@@ -534,8 +528,6 @@ Modules are listed depth-first from the system components tree.
 @ref{❨8❩, , @t{package.lisp}}@: (file).
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/}}
 @item Parent Component
 @ref{❨1❩, , @t{net.didierverna.tfm.core}}@: (system).
 @item Child Components
@@ -566,8 +558,6 @@ Modules are listed depth-first from the system components tree.
 @ref{❨14❩, , @t{package.lisp}}@: (file).
 @item Source
 @ref{❨7❩, , @t{net.didierverna.tfm.setup.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/}}
 @item Parent Component
 @ref{❨2❩, , @t{net.didierverna.tfm.setup}}@: (system).
 @item Child Components
@@ -624,8 +614,6 @@ components trees.
 @table @strong
 @item Source
 @ref{❨5❩, , @t{net.didierverna.tfm.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/net.didierverna.tfm.asd, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/net.didierverna.tfm.asd}}
 @item Parent Component
 @ref{❨0❩, , @t{net.didierverna.tfm}}@: (system).
 @item ASDF Systems
@@ -639,8 +627,6 @@ components trees.
 @table @strong
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/net.didierverna.tfm.core.asd, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/net.didierverna.tfm.core.asd}}
 @item Parent Component
 @ref{❨1❩, , @t{net.didierverna.tfm.core}}@: (system).
 @item ASDF Systems
@@ -654,8 +640,6 @@ components trees.
 @table @strong
 @item Source
 @ref{❨7❩, , @t{net.didierverna.tfm.setup.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/net.didierverna.tfm.setup.asd, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/net.didierverna.tfm.setup.asd}}
 @item Parent Component
 @ref{❨2❩, , @t{net.didierverna.tfm.setup}}@: (system).
 @item ASDF Systems
@@ -669,8 +653,6 @@ components trees.
 @table @strong
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/package.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/package.lisp}}
 @item Parent Component
 @ref{❨1❩, , @t{net.didierverna.tfm.core}}@: (system).
 @item Packages
@@ -686,8 +668,6 @@ components trees.
 @table @strong
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/util.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/util.lisp}}
 @item Parent Component
 @ref{❨3❩, , @t{src}}@: (module).
 @item Public Interface
@@ -760,29 +740,29 @@ components trees.
 @item Internals
 @itemize @bullet
 @item
-@ref{❨563❩, , @t{*stream*}}@: (special variable).
+@ref{❨518❩, , @t{*stream*}}@: (special variable).
 @item
-@ref{❨520❩, , @t{context-format}}@: (function).
+@ref{❨556❩, , @t{context-format}}@: (function).
 @item
-@ref{❨530❩, , @t{define-condition-report}}@: (macro).
+@ref{❨525❩, , @t{define-condition-report}}@: (macro).
 @item
-@ref{❨552❩, , @t{define-constant}}@: (macro).
+@ref{❨531❩, , @t{define-constant}}@: (macro).
 @item
-@ref{❨526❩, , @t{map-slots}}@: (macro).
+@ref{❨522❩, , @t{map-slots}}@: (macro).
 @item
-@ref{❨498❩, , @t{read-fix-word}}@: (function).
+@ref{❨466❩, , @t{read-fix-word}}@: (function).
 @item
-@ref{❨559❩, , @t{read-padded-string}}@: (function).
+@ref{❨527❩, , @t{read-padded-string}}@: (function).
 @item
-@ref{❨497❩, , @t{read-u16}}@: (function).
+@ref{❨481❩, , @t{read-u16}}@: (function).
 @item
-@ref{❨496❩, , @t{read-u32}}@: (function).
+@ref{❨463❩, , @t{read-u32}}@: (function).
 @item
-@ref{❨524❩, , @t{read-u8}}@: (function).
+@ref{❨521❩, , @t{read-u8}}@: (function).
 @item
-@ref{❨503❩, , @t{remove-keys}}@: (function).
+@ref{❨536❩, , @t{remove-keys}}@: (function).
 @item
-@ref{❨518❩, , @t{with-condition-context}}@: (macro).
+@ref{❨460❩, , @t{with-condition-context}}@: (macro).
 @end itemize
 @end table
 
@@ -795,8 +775,6 @@ components trees.
 @ref{❨9❩, , @t{util.lisp}}@: (file).
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/intermediate.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/intermediate.lisp}}
 @item Parent Component
 @ref{❨3❩, , @t{src}}@: (module).
 @item Public Interface
@@ -817,93 +795,93 @@ components trees.
 @item Internals
 @itemize @bullet
 @item
-@ref{❨542❩, , @t{bot}}@: (reader).
+@ref{❨550❩, , @t{bot}}@: (reader).
 @item
-@ref{❨543❩, , @t{(setf bot)}}@: (writer).
+@ref{❨551❩, , @t{(setf bot)}}@: (writer).
 @item
-@ref{❨511❩, , @t{char-info-p}}@: (function).
+@ref{❨494❩, , @t{char-info-p}}@: (function).
 @item
-@ref{❨495❩, , @t{copy-char-info}}@: (function).
+@ref{❨513❩, , @t{copy-char-info}}@: (function).
 @item
-@ref{❨506❩, , @t{copy-exten}}@: (function).
+@ref{❨534❩, , @t{copy-exten}}@: (function).
 @item
-@ref{❨519❩, , @t{copy-lig/kern}}@: (function).
+@ref{❨538❩, , @t{copy-lig/kern}}@: (function).
 @item
-@ref{❨535❩, , @t{depth-index}}@: (reader).
+@ref{❨532❩, , @t{depth-index}}@: (reader).
 @item
-@ref{❨536❩, , @t{(setf depth-index)}}@: (writer).
+@ref{❨533❩, , @t{(setf depth-index)}}@: (writer).
 @item
-@ref{❨463❩, , @t{exten}}@: (structure).
+@ref{❨560❩, , @t{exten}}@: (structure).
 @item
-@ref{❨537❩, , @t{exten-index}}@: (reader).
+@ref{❨519❩, , @t{exten-index}}@: (reader).
 @item
-@ref{❨538❩, , @t{(setf exten-index)}}@: (writer).
+@ref{❨520❩, , @t{(setf exten-index)}}@: (writer).
 @item
-@ref{❨553❩, , @t{exten-p}}@: (function).
+@ref{❨491❩, , @t{exten-p}}@: (function).
 @item
-@ref{❨515❩, , @t{height-index}}@: (reader).
+@ref{❨511❩, , @t{height-index}}@: (reader).
 @item
-@ref{❨516❩, , @t{(setf height-index)}}@: (writer).
+@ref{❨512❩, , @t{(setf height-index)}}@: (writer).
 @item
-@ref{❨550❩, , @t{italic-index}}@: (reader).
+@ref{❨499❩, , @t{italic-index}}@: (reader).
 @item
-@ref{❨551❩, , @t{(setf italic-index)}}@: (writer).
+@ref{❨500❩, , @t{(setf italic-index)}}@: (writer).
 @item
-@ref{❨554❩, , @t{lig/kern}}@: (structure).
+@ref{❨543❩, , @t{lig/kern}}@: (structure).
 @item
-@ref{❨532❩, , @t{lig/kern-index}}@: (reader).
+@ref{❨495❩, , @t{lig/kern-index}}@: (reader).
 @item
-@ref{❨533❩, , @t{(setf lig/kern-index)}}@: (writer).
+@ref{❨496❩, , @t{(setf lig/kern-index)}}@: (writer).
 @item
-@ref{❨531❩, , @t{lig/kern-p}}@: (function).
+@ref{❨504❩, , @t{lig/kern-p}}@: (function).
 @item
-@ref{❨470❩, , @t{make-char-info}}@: (function).
+@ref{❨469❩, , @t{make-char-info}}@: (function).
 @item
-@ref{❨544❩, , @t{make-exten}}@: (function).
+@ref{❨470❩, , @t{make-exten}}@: (function).
 @item
-@ref{❨545❩, , @t{make-lig/kern}}@: (function).
+@ref{❨510❩, , @t{make-lig/kern}}@: (function).
 @item
-@ref{❨546❩, , @t{mid}}@: (reader).
+@ref{❨567❩, , @t{mid}}@: (reader).
 @item
-@ref{❨547❩, , @t{(setf mid)}}@: (writer).
+@ref{❨568❩, , @t{(setf mid)}}@: (writer).
 @item
-@ref{❨460❩, , @t{next}}@: (reader).
+@ref{❨497❩, , @t{next}}@: (reader).
 @item
-@ref{❨461❩, , @t{(setf next)}}@: (writer).
+@ref{❨498❩, , @t{(setf next)}}@: (writer).
 @item
-@ref{❨539❩, , @t{next-char}}@: (reader).
+@ref{❨483❩, , @t{next-char}}@: (reader).
 @item
-@ref{❨540❩, , @t{(setf next-char)}}@: (writer).
+@ref{❨484❩, , @t{(setf next-char)}}@: (writer).
 @item
-@ref{❨509❩, , @t{op}}@: (reader).
+@ref{❨539❩, , @t{op}}@: (reader).
 @item
-@ref{❨510❩, , @t{(setf op)}}@: (writer).
+@ref{❨540❩, , @t{(setf op)}}@: (writer).
 @item
-@ref{❨483❩, , @t{read-char-info}}@: (function).
+@ref{❨565❩, , @t{read-char-info}}@: (function).
 @item
-@ref{❨522❩, , @t{read-exten}}@: (function).
+@ref{❨482❩, , @t{read-exten}}@: (function).
 @item
-@ref{❨482❩, , @t{read-lig/kern}}@: (function).
+@ref{❨516❩, , @t{read-lig/kern}}@: (function).
 @item
-@ref{❨499❩, , @t{rep}}@: (reader).
+@ref{❨487❩, , @t{rep}}@: (reader).
 @item
-@ref{❨500❩, , @t{(setf rep)}}@: (writer).
+@ref{❨488❩, , @t{(setf rep)}}@: (writer).
 @item
-@ref{❨566❩, , @t{rmd}}@: (reader).
+@ref{❨485❩, , @t{rmd}}@: (reader).
 @item
-@ref{❨567❩, , @t{(setf rmd)}}@: (writer).
+@ref{❨486❩, , @t{(setf rmd)}}@: (writer).
 @item
-@ref{❨560❩, , @t{skip}}@: (reader).
+@ref{❨541❩, , @t{skip}}@: (reader).
 @item
-@ref{❨561❩, , @t{(setf skip)}}@: (writer).
+@ref{❨542❩, , @t{(setf skip)}}@: (writer).
 @item
-@ref{❨527❩, , @t{top}}@: (reader).
+@ref{❨502❩, , @t{top}}@: (reader).
 @item
-@ref{❨528❩, , @t{(setf top)}}@: (writer).
+@ref{❨503❩, , @t{(setf top)}}@: (writer).
 @item
-@ref{❨480❩, , @t{width-index}}@: (reader).
+@ref{❨467❩, , @t{width-index}}@: (reader).
 @item
-@ref{❨481❩, , @t{(setf width-index)}}@: (writer).
+@ref{❨468❩, , @t{(setf width-index)}}@: (writer).
 @end itemize
 @end table
 
@@ -916,8 +894,6 @@ components trees.
 @ref{❨10❩, , @t{intermediate.lisp}}@: (file).
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/character.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/character.lisp}}
 @item Parent Component
 @ref{❨3❩, , @t{src}}@: (module).
 @item Public Interface
@@ -970,19 +946,19 @@ components trees.
 @item Internals
 @itemize @bullet
 @item
-@ref{❨564❩, , @t{+character-metrics-dimension-slots+}}@: (constant).
+@ref{❨526❩, , @t{+character-metrics-dimension-slots+}}@: (constant).
 @item
-@ref{❨534❩, , @t{define-extension-recipe-pseudo-accessor}}@: (macro).
+@ref{❨558❩, , @t{define-extension-recipe-pseudo-accessor}}@: (macro).
 @item
-@ref{❨472❩, , @t{extension-recipe}}@: (reader method).
+@ref{❨474❩, , @t{extension-recipe}}@: (reader method).
 @item
-@ref{❨473❩, , @t{extension-recipe}}@: (class).
+@ref{❨475❩, , @t{extension-recipe}}@: (class).
 @item
-@ref{❨512❩, , @t{make-character-metrics}}@: (function).
+@ref{❨535❩, , @t{make-character-metrics}}@: (function).
 @item
-@ref{❨517❩, , @t{make-extension-recipe}}@: (function).
+@ref{❨472❩, , @t{make-extension-recipe}}@: (function).
 @item
-@ref{❨521❩, , @t{map-character-metrics-dimension-slots}}@: (macro).
+@ref{❨461❩, , @t{map-character-metrics-dimension-slots}}@: (macro).
 @end itemize
 @end table
 
@@ -995,8 +971,6 @@ components trees.
 @ref{❨11❩, , @t{character.lisp}}@: (file).
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/font.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/font.lisp}}
 @item Parent Component
 @ref{❨3❩, , @t{src}}@: (module).
 @item Public Interface
@@ -1165,35 +1139,35 @@ components trees.
 @item Internals
 @itemize @bullet
 @item
-@ref{❨529❩, , @t{+font-dimension-slots+}}@: (constant).
+@ref{❨515❩, , @t{+font-dimension-slots+}}@: (constant).
 @item
-@ref{❨479❩, , @t{+math-extension-font-dimension-slots+}}@: (constant).
+@ref{❨530❩, , @t{+math-extension-font-dimension-slots+}}@: (constant).
 @item
-@ref{❨507❩, , @t{+math-symbols-font-dimension-slots+}}@: (constant).
+@ref{❨559❩, , @t{+math-symbols-font-dimension-slots+}}@: (constant).
 @item
-@ref{❨568❩, , @t{apply-ligature}}@: (function).
+@ref{❨493❩, , @t{apply-ligature}}@: (function).
 @item
-@ref{❨513❩, , @t{code-character}}@: (function).
+@ref{❨528❩, , @t{code-character}}@: (function).
 @item
-@ref{❨514❩, , @t{(setf code-character)}}@: (function).
+@ref{❨529❩, , @t{(setf code-character)}}@: (function).
 @item
-@ref{❨469❩, , @t{kerns}}@: (reader method).
+@ref{❨490❩, , @t{kerns}}@: (reader method).
 @item
-@ref{❨549❩, , @t{ligatures}}@: (reader method).
+@ref{❨465❩, , @t{ligatures}}@: (reader method).
 @item
-@ref{❨501❩, , @t{make-ligature}}@: (function).
+@ref{❨480❩, , @t{make-ligature}}@: (function).
 @item
-@ref{❨494❩, , @t{map-font-dimension-slots}}@: (macro).
+@ref{❨462❩, , @t{map-font-dimension-slots}}@: (macro).
 @item
-@ref{❨502❩, , @t{map-math-extension-font-dimension-slots}}@: (macro).
+@ref{❨557❩, , @t{map-math-extension-font-dimension-slots}}@: (macro).
 @item
-@ref{❨523❩, , @t{map-math-symbols-font-dimension-slots}}@: (macro).
+@ref{❨548❩, , @t{map-math-symbols-font-dimension-slots}}@: (macro).
 @item
-@ref{❨489❩, , @t{scale}}@: (generic function).
+@ref{❨552❩, , @t{scale}}@: (generic function).
 @item
-@ref{❨525❩, , @t{set-kern}}@: (function).
+@ref{❨514❩, , @t{set-kern}}@: (function).
 @item
-@ref{❨565❩, , @t{set-ligature}}@: (function).
+@ref{❨566❩, , @t{set-ligature}}@: (function).
 @end itemize
 @end table
 
@@ -1206,8 +1180,6 @@ components trees.
 @ref{❨12❩, , @t{font.lisp}}@: (file).
 @item Source
 @ref{❨6❩, , @t{net.didierverna.tfm.core.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/file.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/core/src/file.lisp}}
 @item Parent Component
 @ref{❨3❩, , @t{src}}@: (module).
 @item Public Interface
@@ -1366,23 +1338,23 @@ components trees.
 @item Internals
 @itemize @bullet
 @item
-@ref{❨478❩, , @t{%run-ligature/kerning-program}}@: (function).
+@ref{❨517❩, , @t{%run-ligature/kerning-program}}@: (function).
 @item
-@ref{❨508❩, , @t{font-extension-recipe}}@: (function).
+@ref{❨537❩, , @t{font-extension-recipe}}@: (function).
 @item
-@ref{❨541❩, , @t{load-tfm-font}}@: (function).
+@ref{❨549❩, , @t{load-tfm-font}}@: (function).
 @item
-@ref{❨562❩, , @t{parse-character-information}}@: (function).
+@ref{❨501❩, , @t{parse-character-information}}@: (function).
 @item
-@ref{❨504❩, , @t{parse-header}}@: (function).
+@ref{❨524❩, , @t{parse-header}}@: (function).
 @item
-@ref{❨484❩, , @t{parse-parameters}}@: (generic function).
+@ref{❨505❩, , @t{parse-parameters}}@: (generic function).
 @item
-@ref{❨462❩, , @t{run-ligature/kerning-program}}@: (function).
+@ref{❨523❩, , @t{run-ligature/kerning-program}}@: (function).
 @item
-@ref{❨493❩, , @t{table-aref}}@: (function).
+@ref{❨471❩, , @t{table-aref}}@: (function).
 @item
-@ref{❨505❩, , @t{tref}}@: (macro).
+@ref{❨492❩, , @t{tref}}@: (macro).
 @end itemize
 @end table
 
@@ -1393,8 +1365,6 @@ components trees.
 @table @strong
 @item Source
 @ref{❨7❩, , @t{net.didierverna.tfm.setup.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/package.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/package.lisp}}
 @item Parent Component
 @ref{❨2❩, , @t{net.didierverna.tfm.setup}}@: (system).
 @item Packages
@@ -1408,8 +1378,6 @@ components trees.
 @table @strong
 @item Source
 @ref{❨7❩, , @t{net.didierverna.tfm.setup.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/configuration.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/configuration.lisp}}
 @item Parent Component
 @ref{❨4❩, , @t{src}}@: (module).
 @item Public Interface
@@ -1432,8 +1400,6 @@ components trees.
 @ref{❨15❩, , @t{configuration.lisp}}@: (file).
 @item Source
 @ref{❨7❩, , @t{net.didierverna.tfm.setup.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/readtable.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/readtable.lisp}}
 @item Parent Component
 @ref{❨4❩, , @t{src}}@: (module).
 @item Internals
@@ -1458,8 +1424,6 @@ components trees.
 @ref{❨16❩, , @t{readtable.lisp}}@: (file).
 @item Source
 @ref{❨7❩, , @t{net.didierverna.tfm.setup.asd}}.
-@item Location
-@url{file:///Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/version.lisp, ignore, @t{/Users/didier/Documents/Science/Software/Common Lisp/tfm/setup/src/version.lisp}}
 @item Parent Component
 @ref{❨4❩, , @t{src}}@: (module).
 @item Public Interface
@@ -1897,179 +1861,179 @@ The TeX Font Metrics package.
 @item Internals
 @itemize @bullet
 @item
-@ref{❨478❩, , @t{%run-ligature/kerning-program}}@: (function).
+@ref{❨517❩, , @t{%run-ligature/kerning-program}}@: (function).
 @item
-@ref{❨563❩, , @t{*stream*}}@: (special variable).
+@ref{❨518❩, , @t{*stream*}}@: (special variable).
 @item
-@ref{❨564❩, , @t{+character-metrics-dimension-slots+}}@: (constant).
+@ref{❨526❩, , @t{+character-metrics-dimension-slots+}}@: (constant).
 @item
-@ref{❨529❩, , @t{+font-dimension-slots+}}@: (constant).
+@ref{❨515❩, , @t{+font-dimension-slots+}}@: (constant).
 @item
-@ref{❨479❩, , @t{+math-extension-font-dimension-slots+}}@: (constant).
+@ref{❨530❩, , @t{+math-extension-font-dimension-slots+}}@: (constant).
 @item
-@ref{❨507❩, , @t{+math-symbols-font-dimension-slots+}}@: (constant).
+@ref{❨559❩, , @t{+math-symbols-font-dimension-slots+}}@: (constant).
 @item
-@ref{❨568❩, , @t{apply-ligature}}@: (function).
+@ref{❨493❩, , @t{apply-ligature}}@: (function).
 @item
-@ref{❨542❩, , @t{bot}}@: (reader).
+@ref{❨550❩, , @t{bot}}@: (reader).
 @item
-@ref{❨543❩, , @t{(setf bot)}}@: (writer).
+@ref{❨551❩, , @t{(setf bot)}}@: (writer).
 @item
-@ref{❨511❩, , @t{char-info-p}}@: (function).
+@ref{❨494❩, , @t{char-info-p}}@: (function).
 @item
-@ref{❨513❩, , @t{code-character}}@: (function).
+@ref{❨528❩, , @t{code-character}}@: (function).
 @item
-@ref{❨514❩, , @t{(setf code-character)}}@: (function).
+@ref{❨529❩, , @t{(setf code-character)}}@: (function).
 @item
-@ref{❨520❩, , @t{context-format}}@: (function).
+@ref{❨556❩, , @t{context-format}}@: (function).
 @item
-@ref{❨495❩, , @t{copy-char-info}}@: (function).
+@ref{❨513❩, , @t{copy-char-info}}@: (function).
 @item
-@ref{❨506❩, , @t{copy-exten}}@: (function).
+@ref{❨534❩, , @t{copy-exten}}@: (function).
 @item
-@ref{❨519❩, , @t{copy-lig/kern}}@: (function).
+@ref{❨538❩, , @t{copy-lig/kern}}@: (function).
 @item
-@ref{❨530❩, , @t{define-condition-report}}@: (macro).
+@ref{❨525❩, , @t{define-condition-report}}@: (macro).
 @item
-@ref{❨552❩, , @t{define-constant}}@: (macro).
+@ref{❨531❩, , @t{define-constant}}@: (macro).
 @item
-@ref{❨534❩, , @t{define-extension-recipe-pseudo-accessor}}@: (macro).
+@ref{❨558❩, , @t{define-extension-recipe-pseudo-accessor}}@: (macro).
 @item
-@ref{❨535❩, , @t{depth-index}}@: (reader).
+@ref{❨532❩, , @t{depth-index}}@: (reader).
 @item
-@ref{❨536❩, , @t{(setf depth-index)}}@: (writer).
+@ref{❨533❩, , @t{(setf depth-index)}}@: (writer).
 @item
-@ref{❨463❩, , @t{exten}}@: (structure).
+@ref{❨560❩, , @t{exten}}@: (structure).
 @item
-@ref{❨537❩, , @t{exten-index}}@: (reader).
+@ref{❨519❩, , @t{exten-index}}@: (reader).
 @item
-@ref{❨538❩, , @t{(setf exten-index)}}@: (writer).
+@ref{❨520❩, , @t{(setf exten-index)}}@: (writer).
 @item
-@ref{❨553❩, , @t{exten-p}}@: (function).
+@ref{❨491❩, , @t{exten-p}}@: (function).
 @item
-@ref{❨471❩, , @t{extension-recipe}}@: (generic reader).
+@ref{❨473❩, , @t{extension-recipe}}@: (generic reader).
 @item
-@ref{❨473❩, , @t{extension-recipe}}@: (class).
+@ref{❨475❩, , @t{extension-recipe}}@: (class).
 @item
-@ref{❨508❩, , @t{font-extension-recipe}}@: (function).
+@ref{❨537❩, , @t{font-extension-recipe}}@: (function).
 @item
-@ref{❨515❩, , @t{height-index}}@: (reader).
+@ref{❨511❩, , @t{height-index}}@: (reader).
 @item
-@ref{❨516❩, , @t{(setf height-index)}}@: (writer).
+@ref{❨512❩, , @t{(setf height-index)}}@: (writer).
 @item
-@ref{❨550❩, , @t{italic-index}}@: (reader).
+@ref{❨499❩, , @t{italic-index}}@: (reader).
 @item
-@ref{❨551❩, , @t{(setf italic-index)}}@: (writer).
+@ref{❨500❩, , @t{(setf italic-index)}}@: (writer).
 @item
-@ref{❨468❩, , @t{kerns}}@: (generic reader).
+@ref{❨489❩, , @t{kerns}}@: (generic reader).
 @item
-@ref{❨554❩, , @t{lig/kern}}@: (structure).
+@ref{❨543❩, , @t{lig/kern}}@: (structure).
 @item
-@ref{❨532❩, , @t{lig/kern-index}}@: (reader).
+@ref{❨495❩, , @t{lig/kern-index}}@: (reader).
 @item
-@ref{❨533❩, , @t{(setf lig/kern-index)}}@: (writer).
+@ref{❨496❩, , @t{(setf lig/kern-index)}}@: (writer).
 @item
-@ref{❨531❩, , @t{lig/kern-p}}@: (function).
+@ref{❨504❩, , @t{lig/kern-p}}@: (function).
 @item
-@ref{❨548❩, , @t{ligatures}}@: (generic reader).
+@ref{❨464❩, , @t{ligatures}}@: (generic reader).
 @item
-@ref{❨541❩, , @t{load-tfm-font}}@: (function).
+@ref{❨549❩, , @t{load-tfm-font}}@: (function).
 @item
-@ref{❨470❩, , @t{make-char-info}}@: (function).
+@ref{❨469❩, , @t{make-char-info}}@: (function).
 @item
-@ref{❨512❩, , @t{make-character-metrics}}@: (function).
+@ref{❨535❩, , @t{make-character-metrics}}@: (function).
 @item
-@ref{❨544❩, , @t{make-exten}}@: (function).
+@ref{❨470❩, , @t{make-exten}}@: (function).
 @item
-@ref{❨517❩, , @t{make-extension-recipe}}@: (function).
+@ref{❨472❩, , @t{make-extension-recipe}}@: (function).
 @item
-@ref{❨545❩, , @t{make-lig/kern}}@: (function).
+@ref{❨510❩, , @t{make-lig/kern}}@: (function).
 @item
-@ref{❨501❩, , @t{make-ligature}}@: (function).
+@ref{❨480❩, , @t{make-ligature}}@: (function).
 @item
-@ref{❨521❩, , @t{map-character-metrics-dimension-slots}}@: (macro).
+@ref{❨461❩, , @t{map-character-metrics-dimension-slots}}@: (macro).
 @item
-@ref{❨494❩, , @t{map-font-dimension-slots}}@: (macro).
+@ref{❨462❩, , @t{map-font-dimension-slots}}@: (macro).
 @item
-@ref{❨502❩, , @t{map-math-extension-font-dimension-slots}}@: (macro).
+@ref{❨557❩, , @t{map-math-extension-font-dimension-slots}}@: (macro).
 @item
-@ref{❨523❩, , @t{map-math-symbols-font-dimension-slots}}@: (macro).
+@ref{❨548❩, , @t{map-math-symbols-font-dimension-slots}}@: (macro).
 @item
-@ref{❨526❩, , @t{map-slots}}@: (macro).
+@ref{❨522❩, , @t{map-slots}}@: (macro).
 @item
-@ref{❨546❩, , @t{mid}}@: (reader).
+@ref{❨567❩, , @t{mid}}@: (reader).
 @item
-@ref{❨547❩, , @t{(setf mid)}}@: (writer).
+@ref{❨568❩, , @t{(setf mid)}}@: (writer).
 @item
-@ref{❨460❩, , @t{next}}@: (reader).
+@ref{❨497❩, , @t{next}}@: (reader).
 @item
-@ref{❨461❩, , @t{(setf next)}}@: (writer).
+@ref{❨498❩, , @t{(setf next)}}@: (writer).
 @item
-@ref{❨539❩, , @t{next-char}}@: (reader).
+@ref{❨483❩, , @t{next-char}}@: (reader).
 @item
-@ref{❨540❩, , @t{(setf next-char)}}@: (writer).
+@ref{❨484❩, , @t{(setf next-char)}}@: (writer).
 @item
-@ref{❨509❩, , @t{op}}@: (reader).
+@ref{❨539❩, , @t{op}}@: (reader).
 @item
-@ref{❨510❩, , @t{(setf op)}}@: (writer).
+@ref{❨540❩, , @t{(setf op)}}@: (writer).
 @item
-@ref{❨562❩, , @t{parse-character-information}}@: (function).
+@ref{❨501❩, , @t{parse-character-information}}@: (function).
 @item
-@ref{❨504❩, , @t{parse-header}}@: (function).
+@ref{❨524❩, , @t{parse-header}}@: (function).
 @item
-@ref{❨484❩, , @t{parse-parameters}}@: (generic function).
+@ref{❨505❩, , @t{parse-parameters}}@: (generic function).
 @item
-@ref{❨483❩, , @t{read-char-info}}@: (function).
+@ref{❨565❩, , @t{read-char-info}}@: (function).
 @item
-@ref{❨522❩, , @t{read-exten}}@: (function).
+@ref{❨482❩, , @t{read-exten}}@: (function).
 @item
-@ref{❨498❩, , @t{read-fix-word}}@: (function).
+@ref{❨466❩, , @t{read-fix-word}}@: (function).
 @item
-@ref{❨482❩, , @t{read-lig/kern}}@: (function).
+@ref{❨516❩, , @t{read-lig/kern}}@: (function).
 @item
-@ref{❨559❩, , @t{read-padded-string}}@: (function).
+@ref{❨527❩, , @t{read-padded-string}}@: (function).
 @item
-@ref{❨497❩, , @t{read-u16}}@: (function).
+@ref{❨481❩, , @t{read-u16}}@: (function).
 @item
-@ref{❨496❩, , @t{read-u32}}@: (function).
+@ref{❨463❩, , @t{read-u32}}@: (function).
 @item
-@ref{❨524❩, , @t{read-u8}}@: (function).
+@ref{❨521❩, , @t{read-u8}}@: (function).
 @item
-@ref{❨503❩, , @t{remove-keys}}@: (function).
+@ref{❨536❩, , @t{remove-keys}}@: (function).
 @item
-@ref{❨499❩, , @t{rep}}@: (reader).
+@ref{❨487❩, , @t{rep}}@: (reader).
 @item
-@ref{❨500❩, , @t{(setf rep)}}@: (writer).
+@ref{❨488❩, , @t{(setf rep)}}@: (writer).
 @item
-@ref{❨566❩, , @t{rmd}}@: (reader).
+@ref{❨485❩, , @t{rmd}}@: (reader).
 @item
-@ref{❨567❩, , @t{(setf rmd)}}@: (writer).
+@ref{❨486❩, , @t{(setf rmd)}}@: (writer).
 @item
-@ref{❨462❩, , @t{run-ligature/kerning-program}}@: (function).
+@ref{❨523❩, , @t{run-ligature/kerning-program}}@: (function).
 @item
-@ref{❨489❩, , @t{scale}}@: (generic function).
+@ref{❨552❩, , @t{scale}}@: (generic function).
 @item
-@ref{❨525❩, , @t{set-kern}}@: (function).
+@ref{❨514❩, , @t{set-kern}}@: (function).
 @item
-@ref{❨565❩, , @t{set-ligature}}@: (function).
+@ref{❨566❩, , @t{set-ligature}}@: (function).
 @item
-@ref{❨560❩, , @t{skip}}@: (reader).
+@ref{❨541❩, , @t{skip}}@: (reader).
 @item
-@ref{❨561❩, , @t{(setf skip)}}@: (writer).
+@ref{❨542❩, , @t{(setf skip)}}@: (writer).
 @item
-@ref{❨493❩, , @t{table-aref}}@: (function).
+@ref{❨471❩, , @t{table-aref}}@: (function).
 @item
-@ref{❨527❩, , @t{top}}@: (reader).
+@ref{❨502❩, , @t{top}}@: (reader).
 @item
-@ref{❨528❩, , @t{(setf top)}}@: (writer).
+@ref{❨503❩, , @t{(setf top)}}@: (writer).
 @item
-@ref{❨505❩, , @t{tref}}@: (macro).
+@ref{❨492❩, , @t{tref}}@: (macro).
 @item
-@ref{❨480❩, , @t{width-index}}@: (reader).
+@ref{❨467❩, , @t{width-index}}@: (reader).
 @item
-@ref{❨481❩, , @t{(setf width-index)}}@: (writer).
+@ref{❨468❩, , @t{(setf width-index)}}@: (writer).
 @item
-@ref{❨518❩, , @t{with-condition-context}}@: (macro).
+@ref{❨460❩, , @t{with-condition-context}}@: (macro).
 @end itemize
 @end table
 
@@ -2144,7 +2108,7 @@ The minor level of this release.
 @specialsubindex{*release-name*}@c
 The name of this release.@*
 The general naming theme for TFM is "Uncial Fonts"@comma{} from the LaTeX Font
-Catalogue (https://www.tug.org/FontCatalogue/uncialfonts.html).
+Catalogue (https://www.tug.org/FontCatalogue/uncialfonts.Internal).
 @table @strong
 @item Package
 @ref{❨18❩, , @t{net.didierverna.tfm.setup}}.
@@ -2548,7 +2512,7 @@ If CHARACTER is not extensible@comma{} signal a NOT-EXTENSIBLE error.
 @ref{❨11❩, , @t{character.lisp}}.
 @end table
 @end deffn
-@deffn {Reader Method} {bottom-character} ((extension-recipe @ref{❨473❩, , @t{extension-recipe}}))
+@deffn {Reader Method} {bottom-character} ((extension-recipe @ref{❨475❩, , @t{extension-recipe}}))
 @anchor{❨353❩}@c
 @methodsubindex{bottom-character}@c
 The recipe's bottom character@comma{} or NIL.
@@ -2556,7 +2520,7 @@ The recipe's bottom character@comma{} or NIL.
 @item Source
 @ref{❨11❩, , @t{character.lisp}}.
 @item Target Slot
-@ref{❨476❩, , @t{bottom-character}}.
+@ref{❨478❩, , @t{bottom-character}}.
 @end table
 @end deffn
 @end table
@@ -3667,7 +3631,7 @@ If CHARACTER is not extensible@comma{} signal a NOT-EXTENSIBLE error.
 @ref{❨11❩, , @t{character.lisp}}.
 @end table
 @end deffn
-@deffn {Reader Method} {middle-character} ((extension-recipe @ref{❨473❩, , @t{extension-recipe}}))
+@deffn {Reader Method} {middle-character} ((extension-recipe @ref{❨475❩, , @t{extension-recipe}}))
 @anchor{❨110❩}@c
 @methodsubindex{middle-character}@c
 The recipe's middle character@comma{} or NIL.
@@ -3675,7 +3639,7 @@ The recipe's middle character@comma{} or NIL.
 @item Source
 @ref{❨11❩, , @t{character.lisp}}.
 @item Target Slot
-@ref{❨475❩, , @t{middle-character}}.
+@ref{❨477❩, , @t{middle-character}}.
 @end table
 @end deffn
 @end table
@@ -4178,7 +4142,7 @@ If CHARACTER is not extensible@comma{} signal a NOT-EXTENSIBLE error.
 @ref{❨11❩, , @t{character.lisp}}.
 @end table
 @end deffn
-@deffn {Reader Method} {repeated-character} ((extension-recipe @ref{❨473❩, , @t{extension-recipe}}))
+@deffn {Reader Method} {repeated-character} ((extension-recipe @ref{❨475❩, , @t{extension-recipe}}))
 @anchor{❨442❩}@c
 @methodsubindex{repeated-character}@c
 The recipe's repeated character.
@@ -4186,7 +4150,7 @@ The recipe's repeated character.
 @item Source
 @ref{❨11❩, , @t{character.lisp}}.
 @item Target Slot
-@ref{❨477❩, , @t{repeated-character}}.
+@ref{❨479❩, , @t{repeated-character}}.
 @end table
 @end deffn
 @end table
@@ -4499,7 +4463,7 @@ If CHARACTER is not extensible@comma{} signal a NOT-EXTENSIBLE error.
 @ref{❨11❩, , @t{character.lisp}}.
 @end table
 @end deffn
-@deffn {Reader Method} {top-character} ((extension-recipe @ref{❨473❩, , @t{extension-recipe}}))
+@deffn {Reader Method} {top-character} ((extension-recipe @ref{❨475❩, , @t{extension-recipe}}))
 @anchor{❨309❩}@c
 @methodsubindex{top-character}@c
 The recipe's top character@comma{} or NIL.
@@ -4507,7 +4471,7 @@ The recipe's top character@comma{} or NIL.
 @item Source
 @ref{❨11❩, , @t{character.lisp}}.
 @item Target Slot
-@ref{❨474❩, , @t{top-character}}.
+@ref{❨476❩, , @t{top-character}}.
 @end table
 @end deffn
 @end table
@@ -4925,7 +4889,7 @@ Print CHARACTER unreadably with its code to STREAM.
 @ref{❨9❩, , @t{util.lisp}}.
 @end table
 @end deffn
-@deffn {Method} {print-object} ((extension-recipe @ref{❨473❩, , @t{extension-recipe}}) stream)
+@deffn {Method} {print-object} ((extension-recipe @ref{❨475❩, , @t{extension-recipe}}) stream)
 @anchor{❨609❩}@c
 @methodsubindex{print-object}@c
 Print EXTENSION-RECIPE unreadably with its repeated character to STREAM.
@@ -6713,9 +6677,9 @@ This structure is used to store decoded information from the char-info table
 @slotsubindex{width-index}@c
 @table @strong
 @item Readers
-@ref{❨480❩, , @t{width-index}}.
+@ref{❨467❩, , @t{width-index}}.
 @item Writers
-@ref{❨481❩, , @t{(setf width-index)}}.
+@ref{❨468❩, , @t{(setf width-index)}}.
 @end table
 @end defvr
 @defvr {Slot} {height-index}
@@ -6723,9 +6687,9 @@ This structure is used to store decoded information from the char-info table
 @slotsubindex{height-index}@c
 @table @strong
 @item Readers
-@ref{❨515❩, , @t{height-index}}.
+@ref{❨511❩, , @t{height-index}}.
 @item Writers
-@ref{❨516❩, , @t{(setf height-index)}}.
+@ref{❨512❩, , @t{(setf height-index)}}.
 @end table
 @end defvr
 @defvr {Slot} {depth-index}
@@ -6733,9 +6697,9 @@ This structure is used to store decoded information from the char-info table
 @slotsubindex{depth-index}@c
 @table @strong
 @item Readers
-@ref{❨535❩, , @t{depth-index}}.
+@ref{❨532❩, , @t{depth-index}}.
 @item Writers
-@ref{❨536❩, , @t{(setf depth-index)}}.
+@ref{❨533❩, , @t{(setf depth-index)}}.
 @end table
 @end defvr
 @defvr {Slot} {italic-index}
@@ -6743,9 +6707,9 @@ This structure is used to store decoded information from the char-info table
 @slotsubindex{italic-index}@c
 @table @strong
 @item Readers
-@ref{❨550❩, , @t{italic-index}}.
+@ref{❨499❩, , @t{italic-index}}.
 @item Writers
-@ref{❨551❩, , @t{(setf italic-index)}}.
+@ref{❨500❩, , @t{(setf italic-index)}}.
 @end table
 @end defvr
 @defvr {Slot} {lig/kern-index}
@@ -6753,9 +6717,9 @@ This structure is used to store decoded information from the char-info table
 @slotsubindex{lig/kern-index}@c
 @table @strong
 @item Readers
-@ref{❨532❩, , @t{lig/kern-index}}.
+@ref{❨495❩, , @t{lig/kern-index}}.
 @item Writers
-@ref{❨533❩, , @t{(setf lig/kern-index)}}.
+@ref{❨496❩, , @t{(setf lig/kern-index)}}.
 @end table
 @end defvr
 @defvr {Slot} {next-char}
@@ -6763,9 +6727,9 @@ This structure is used to store decoded information from the char-info table
 @slotsubindex{next-char}@c
 @table @strong
 @item Readers
-@ref{❨539❩, , @t{next-char}}.
+@ref{❨483❩, , @t{next-char}}.
 @item Writers
-@ref{❨540❩, , @t{(setf next-char)}}.
+@ref{❨484❩, , @t{(setf next-char)}}.
 @end table
 @end defvr
 @defvr {Slot} {exten-index}
@@ -6773,9 +6737,9 @@ This structure is used to store decoded information from the char-info table
 @slotsubindex{exten-index}@c
 @table @strong
 @item Readers
-@ref{❨537❩, , @t{exten-index}}.
+@ref{❨519❩, , @t{exten-index}}.
 @item Writers
-@ref{❨538❩, , @t{(setf exten-index)}}.
+@ref{❨520❩, , @t{(setf exten-index)}}.
 @end table
 @end defvr
 @end table
@@ -6837,7 +6801,7 @@ this library@comma{} the term "character" denotes an instance of this class.
 @item
 @ref{❨293❩, , @t{depth}}.
 @item
-@ref{❨472❩, , @t{extension-recipe}}.
+@ref{❨474❩, , @t{extension-recipe}}.
 @item
 @ref{❨112❩, , @t{font}}.
 @item
@@ -6969,7 +6933,7 @@ Program [544]). It is mutually exclusive with the NEXT-CHARACTER slot@comma{} an
 also with the existence of a ligature or kerning program for this character.
 @table @strong
 @item Readers
-@ref{❨472❩, , @t{extension-recipe}}.
+@ref{❨474❩, , @t{extension-recipe}}.
 @item Writers
 @i{This slot is read-only.}
 @end table
@@ -7060,9 +7024,9 @@ subclasses.
 @item
 @ref{❨269❩, , @t{interword-stretch}}.
 @item
-@ref{❨469❩, , @t{kerns}}.
+@ref{❨490❩, , @t{kerns}}.
 @item
-@ref{❨549❩, , @t{ligatures}}.
+@ref{❨465❩, , @t{ligatures}}.
 @item
 @ref{❨306❩, , @t{max-code}}.
 @item
@@ -7428,7 +7392,7 @@ ligature.
 @item Initform
 @t{(make-hash-table :test (function equal))}
 @item Readers
-@ref{❨549❩, , @t{ligatures}}.
+@ref{❨465❩, , @t{ligatures}}.
 @item Writers
 @i{This slot is read-only.}
 @end table
@@ -7444,7 +7408,7 @@ the font is frozen.
 @item Initform
 @t{(make-hash-table :test (function equal))}
 @item Readers
-@ref{❨469❩, , @t{kerns}}.
+@ref{❨490❩, , @t{kerns}}.
 @item Writers
 @i{This slot is read-only.}
 @end table
@@ -7572,9 +7536,9 @@ scheme.
 @item
 @ref{❨91❩, , @t{default-rule-thickness}}.
 @item
-@ref{❨487❩, , @t{parse-parameters}}.
+@ref{❨508❩, , @t{parse-parameters}}.
 @item
-@ref{❨490❩, , @t{scale}}.
+@ref{❨553❩, , @t{scale}}.
 @end itemize
 @item Direct slots
 @defvr {Slot} {default-rule-thickness}
@@ -7701,9 +7665,9 @@ scheme.
 @item
 @ref{❨62❩, , @t{num3}}.
 @item
-@ref{❨486❩, , @t{parse-parameters}}.
+@ref{❨507❩, , @t{parse-parameters}}.
 @item
-@ref{❨491❩, , @t{scale}}.
+@ref{❨554❩, , @t{scale}}.
 @item
 @ref{❨399❩, , @t{sub1}}.
 @item
@@ -8067,7 +8031,7 @@ The table size.
 @node Private constants, Private special variables, Internals, Internals
 @subsection Constants
 @defvr {Constant} {+character-metrics-dimension-slots+}
-@anchor{❨564❩}@c
+@anchor{❨526❩}@c
 @constantsubindex{+character-metrics-dimension-slots+}@c
 The list of dimension slot names in the CHARACTER-METRICS class.
 @table @strong
@@ -8078,7 +8042,7 @@ The list of dimension slot names in the CHARACTER-METRICS class.
 @end table
 @end defvr
 @defvr {Constant} {+font-dimension-slots+}
-@anchor{❨529❩}@c
+@anchor{❨515❩}@c
 @constantsubindex{+font-dimension-slots+}@c
 The list of dimension slot names in the FONT class.
 @table @strong
@@ -8089,7 +8053,7 @@ The list of dimension slot names in the FONT class.
 @end table
 @end defvr
 @defvr {Constant} {+math-extension-font-dimension-slots+}
-@anchor{❨479❩}@c
+@anchor{❨530❩}@c
 @constantsubindex{+math-extension-font-dimension-slots+}@c
 The list of dimension slot names in the MATH-EXTENSION-FONT class.
 @table @strong
@@ -8100,7 +8064,7 @@ The list of dimension slot names in the MATH-EXTENSION-FONT class.
 @end table
 @end defvr
 @defvr {Constant} {+math-symbols-font-dimension-slots+}
-@anchor{❨507❩}@c
+@anchor{❨559❩}@c
 @constantsubindex{+math-symbols-font-dimension-slots+}@c
 The list of dimension slot names in the MATH-SYMBOLS-FONT class.
 @table @strong
@@ -8130,7 +8094,7 @@ See Chapter 5 of the user manual for more information.
 @end table
 @end defvr
 @defvr {Special Variable} {*stream*}
-@anchor{❨563❩}@c
+@anchor{❨518❩}@c
 @specialsubindex{*stream*}@c
 The stream being read.
 @table @strong
@@ -8155,7 +8119,7 @@ Wrapper around `clindent' to avoid quoting SYMBOL and INDENT.
 @end table
 @end deffn
 @deffn {Macro} {define-condition-report} ((condition type) format-string &rest arguments)
-@anchor{❨530❩}@c
+@anchor{❨525❩}@c
 @macrosubindex{define-condition-report}@c
 Define a context-aware report function for a CONDITION of TYPE.@*
 The reporting is ultimately done by calling FORMAT on FORMAT-STRING with
@@ -8168,7 +8132,7 @@ ARGUMENTS.
 @end table
 @end deffn
 @deffn {Macro} {define-constant} (name value &optional documentation)
-@anchor{❨552❩}@c
+@anchor{❨531❩}@c
 @macrosubindex{define-constant}@c
 Like DEFCONSTANT@comma{} but reuse existing value if any.
 @table @strong
@@ -8179,7 +8143,7 @@ Like DEFCONSTANT@comma{} but reuse existing value if any.
 @end table
 @end deffn
 @deffn {Macro} {define-extension-recipe-pseudo-accessor} (name)
-@anchor{❨534❩}@c
+@anchor{❨558❩}@c
 @macrosubindex{define-extension-recipe-pseudo-accessor}@c
 @table @strong
 @item Package
@@ -8189,7 +8153,7 @@ Like DEFCONSTANT@comma{} but reuse existing value if any.
 @end table
 @end deffn
 @deffn {Macro} {map-character-metrics-dimension-slots} (var character &body body)
-@anchor{❨521❩}@c
+@anchor{❨461❩}@c
 @macrosubindex{map-character-metrics-dimension-slots}@c
 Map BODY on CHARACTER metrics dimension slots available as VAR.
 @table @strong
@@ -8200,7 +8164,7 @@ Map BODY on CHARACTER metrics dimension slots available as VAR.
 @end table
 @end deffn
 @deffn {Macro} {map-font-dimension-slots} (var font &body body)
-@anchor{❨494❩}@c
+@anchor{❨462❩}@c
 @macrosubindex{map-font-dimension-slots}@c
 Map BODY on FONT dimension slots available as VAR.
 @table @strong
@@ -8211,7 +8175,7 @@ Map BODY on FONT dimension slots available as VAR.
 @end table
 @end deffn
 @deffn {Macro} {map-math-extension-font-dimension-slots} (var font &body body)
-@anchor{❨502❩}@c
+@anchor{❨557❩}@c
 @macrosubindex{map-math-extension-font-dimension-slots}@c
 Map BODY on math extension FONT dimension slots available as VAR.
 @table @strong
@@ -8222,7 +8186,7 @@ Map BODY on math extension FONT dimension slots available as VAR.
 @end table
 @end deffn
 @deffn {Macro} {map-math-symbols-font-dimension-slots} (var font &body body)
-@anchor{❨523❩}@c
+@anchor{❨548❩}@c
 @macrosubindex{map-math-symbols-font-dimension-slots}@c
 Map BODY on FONT dimension slots available as VAR.
 @table @strong
@@ -8233,7 +8197,7 @@ Map BODY on FONT dimension slots available as VAR.
 @end table
 @end deffn
 @deffn {Macro} {map-slots} (var object slots &body body)
-@anchor{❨526❩}@c
+@anchor{❨522❩}@c
 @macrosubindex{map-slots}@c
 Map BODY on OBJECT SLOTS@comma{} each in turn available as VAR.
 @table @strong
@@ -8244,7 +8208,7 @@ Map BODY on OBJECT SLOTS@comma{} each in turn available as VAR.
 @end table
 @end deffn
 @deffn {Macro} {tref} (table index)
-@anchor{❨505❩}@c
+@anchor{❨492❩}@c
 @macrosubindex{tref}@c
 Call TABLE-AREF@comma{} computing the table name from TABLE.
 @table @strong
@@ -8255,7 +8219,7 @@ Call TABLE-AREF@comma{} computing the table name from TABLE.
 @end table
 @end deffn
 @deffn {Macro} {with-condition-context} ((condition-type context-type &rest initargs) &body body)
-@anchor{❨518❩}@c
+@anchor{❨460❩}@c
 @macrosubindex{with-condition-context}@c
 Execute BODY within a particular condition signalling context.@*
 While BODY is executing@comma{} conditions of type CONDITION-TYPE (not evaluated) are
@@ -8272,7 +8236,7 @@ initialized with INITARGS.
 @node Private ordinary functions, Private generic functions, Private macros, Internals
 @subsection Ordinary functions
 @deffn {Function} {%run-ligature/kerning-program} (character index lig/kerns kerns)
-@anchor{❨478❩}@c
+@anchor{❨517❩}@c
 @functionsubindex{%run-ligature/kerning-program}@c
 Run a ligature/kerning program for CHARACTER.@*
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array. Running the
@@ -8311,7 +8275,7 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERN.
 @end table
 @end deffn
 @deffn {Function} {apply-ligature} (ligature state)
-@anchor{❨568❩}@c
+@anchor{❨493❩}@c
 @functionsubindex{apply-ligature}@c
 Apply LIGATURE to STATE and return the new state.@*
 STATE is a list of characters@comma{} the first two being subject to LIGATURE.
@@ -8323,10 +8287,10 @@ STATE is a list of characters@comma{} the first two being subject to LIGATURE.
 @end table
 @end deffn
 @deffn {Reader} {bot} (instance)
-@anchor{❨542❩}@c
+@anchor{❨550❩}@c
 @functionsubindex{bot}@c
 @deffnx {Writer} {(setf bot)} (instance)
-@anchor{❨543❩}@c
+@anchor{❨551❩}@c
 @functionsubindex{(setf bot)}@c
 @table @strong
 @item Package
@@ -8334,11 +8298,11 @@ STATE is a list of characters@comma{} the first two being subject to LIGATURE.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨466❩, , @t{bot}}.
+@ref{❨563❩, , @t{bot}}.
 @end table
 @end deffn
 @deffn {Function} {char-info-p} (object)
-@anchor{❨511❩}@c
+@anchor{❨494❩}@c
 @functionsubindex{char-info-p}@c
 @table @strong
 @item Package
@@ -8362,7 +8326,7 @@ considered as an indentation definition.
 @end table
 @end deffn
 @deffn {Function} {code-character} (code font &optional errorp)
-@anchor{❨513❩}@c
+@anchor{❨528❩}@c
 @functionsubindex{code-character}@c
 Return FONT's CODE character.@*
 If ERRORP (the default)@comma{} check that the character exists@comma{} or signal an
@@ -8376,7 +8340,7 @@ retrieved by this function.
 @end table
 @end deffn
 @deffn {Function} {(setf code-character)} (font)
-@anchor{❨514❩}@c
+@anchor{❨529❩}@c
 @functionsubindex{(setf code-character)}@c
 Make FONT's CHARACTER accessible by its code.
 @table @strong
@@ -8387,7 +8351,7 @@ Make FONT's CHARACTER accessible by its code.
 @end table
 @end deffn
 @deffn {Function} {context-format} (stream context format-string &rest arguments)
-@anchor{❨520❩}@c
+@anchor{❨556❩}@c
 @functionsubindex{context-format}@c
 Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 - When *STREAM*@comma{} report that we're reading from it to STREAM.
@@ -8401,7 +8365,7 @@ Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 @end table
 @end deffn
 @deffn {Function} {copy-char-info} (instance)
-@anchor{❨495❩}@c
+@anchor{❨513❩}@c
 @functionsubindex{copy-char-info}@c
 @table @strong
 @item Package
@@ -8411,7 +8375,7 @@ Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 @end table
 @end deffn
 @deffn {Function} {copy-exten} (instance)
-@anchor{❨506❩}@c
+@anchor{❨534❩}@c
 @functionsubindex{copy-exten}@c
 @table @strong
 @item Package
@@ -8421,7 +8385,7 @@ Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 @end table
 @end deffn
 @deffn {Function} {copy-lig/kern} (instance)
-@anchor{❨519❩}@c
+@anchor{❨538❩}@c
 @functionsubindex{copy-lig/kern}@c
 @table @strong
 @item Package
@@ -8431,10 +8395,10 @@ Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 @end table
 @end deffn
 @deffn {Reader} {depth-index} (instance)
-@anchor{❨535❩}@c
+@anchor{❨532❩}@c
 @functionsubindex{depth-index}@c
 @deffnx {Writer} {(setf depth-index)} (instance)
-@anchor{❨536❩}@c
+@anchor{❨533❩}@c
 @functionsubindex{(setf depth-index)}@c
 @table @strong
 @item Package
@@ -8446,10 +8410,10 @@ Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 @end table
 @end deffn
 @deffn {Reader} {exten-index} (instance)
-@anchor{❨537❩}@c
+@anchor{❨519❩}@c
 @functionsubindex{exten-index}@c
 @deffnx {Writer} {(setf exten-index)} (instance)
-@anchor{❨538❩}@c
+@anchor{❨520❩}@c
 @functionsubindex{(setf exten-index)}@c
 @table @strong
 @item Package
@@ -8461,7 +8425,7 @@ Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 @end table
 @end deffn
 @deffn {Function} {exten-p} (object)
-@anchor{❨553❩}@c
+@anchor{❨491❩}@c
 @functionsubindex{exten-p}@c
 @table @strong
 @item Package
@@ -8471,7 +8435,7 @@ Like FORMAT@comma{} but *STREAM* and CONTEXT-aware.@*
 @end table
 @end deffn
 @deffn {Function} {font-extension-recipe} (exten font)
-@anchor{❨508❩}@c
+@anchor{❨537❩}@c
 @functionsubindex{font-extension-recipe}@c
 Make an extension recipe based on EXTEN with FONT's characters.
 @table @strong
@@ -8482,10 +8446,10 @@ Make an extension recipe based on EXTEN with FONT's characters.
 @end table
 @end deffn
 @deffn {Reader} {height-index} (instance)
-@anchor{❨515❩}@c
+@anchor{❨511❩}@c
 @functionsubindex{height-index}@c
 @deffnx {Writer} {(setf height-index)} (instance)
-@anchor{❨516❩}@c
+@anchor{❨512❩}@c
 @functionsubindex{(setf height-index)}@c
 @table @strong
 @item Package
@@ -8510,10 +8474,10 @@ NET.DIDIERVERNA.TFM named readtable.
 @end table
 @end deffn
 @deffn {Reader} {italic-index} (instance)
-@anchor{❨550❩}@c
+@anchor{❨499❩}@c
 @functionsubindex{italic-index}@c
 @deffnx {Writer} {(setf italic-index)} (instance)
-@anchor{❨551❩}@c
+@anchor{❨500❩}@c
 @functionsubindex{(setf italic-index)}@c
 @table @strong
 @item Package
@@ -8525,10 +8489,10 @@ NET.DIDIERVERNA.TFM named readtable.
 @end table
 @end deffn
 @deffn {Reader} {lig/kern-index} (instance)
-@anchor{❨532❩}@c
+@anchor{❨495❩}@c
 @functionsubindex{lig/kern-index}@c
 @deffnx {Writer} {(setf lig/kern-index)} (instance)
-@anchor{❨533❩}@c
+@anchor{❨496❩}@c
 @functionsubindex{(setf lig/kern-index)}@c
 @table @strong
 @item Package
@@ -8540,7 +8504,7 @@ NET.DIDIERVERNA.TFM named readtable.
 @end table
 @end deffn
 @deffn {Function} {lig/kern-p} (object)
-@anchor{❨531❩}@c
+@anchor{❨504❩}@c
 @functionsubindex{lig/kern-p}@c
 @table @strong
 @item Package
@@ -8550,7 +8514,7 @@ NET.DIDIERVERNA.TFM named readtable.
 @end table
 @end deffn
 @deffn {Function} {load-tfm-font} (font lf)
-@anchor{❨541❩}@c
+@anchor{❨549❩}@c
 @functionsubindex{load-tfm-font}@c
 Parse *STREAM* of declared length LF into FONT@comma{} and return it.@*
 
@@ -8575,7 +8539,7 @@ length@comma{} signal an INVALID-SECTION-LENGTHS error.
 @end table
 @end deffn
 @deffn {Function} {make-char-info} (&key width-index height-index depth-index italic-index lig/kern-index next-char exten-index)
-@anchor{❨470❩}@c
+@anchor{❨469❩}@c
 @functionsubindex{make-char-info}@c
 @table @strong
 @item Package
@@ -8585,7 +8549,7 @@ length@comma{} signal an INVALID-SECTION-LENGTHS error.
 @end table
 @end deffn
 @deffn {Function} {make-character-metrics} (code font width height depth italic-correction)
-@anchor{❨512❩}@c
+@anchor{❨535❩}@c
 @functionsubindex{make-character-metrics}@c
 Make a new CHARACTER-METRICS instance@comma{} and return it.@*
 Initialize the character's CODE@comma{} FONT@comma{} WIDTH@comma{} HEIGHT@comma{} DEPTH@comma{} and
@@ -8600,7 +8564,7 @@ metrics instances are created.
 @end table
 @end deffn
 @deffn {Function} {make-exten} (&key top mid bot rep)
-@anchor{❨544❩}@c
+@anchor{❨470❩}@c
 @functionsubindex{make-exten}@c
 @table @strong
 @item Package
@@ -8610,7 +8574,7 @@ metrics instances are created.
 @end table
 @end deffn
 @deffn {Function} {make-extension-recipe} (repeated-character &rest initargs &key top-character middle-character bottom-character)
-@anchor{❨517❩}@c
+@anchor{❨472❩}@c
 @functionsubindex{make-extension-recipe}@c
 Make a new EXTENSION-RECIPE with REPEATED-CHARACTER and return it.
 The recipe may also have a TOP-@comma{} MIDDLE-@comma{} and BOTTOM-CHARACTER.
@@ -8622,7 +8586,7 @@ The recipe may also have a TOP-@comma{} MIDDLE-@comma{} and BOTTOM-CHARACTER.
 @end table
 @end deffn
 @deffn {Function} {make-lig/kern} (&key skip next op rmd)
-@anchor{❨545❩}@c
+@anchor{❨510❩}@c
 @functionsubindex{make-lig/kern}@c
 @table @strong
 @item Package
@@ -8632,7 +8596,7 @@ The recipe may also have a TOP-@comma{} MIDDLE-@comma{} and BOTTOM-CHARACTER.
 @end table
 @end deffn
 @deffn {Function} {make-ligature} (composite delete-before delete-after pass-over)
-@anchor{❨501❩}@c
+@anchor{❨480❩}@c
 @functionsubindex{make-ligature}@c
 Make a new LIGATURE instance@comma{} and return it.
 @table @strong
@@ -8643,10 +8607,10 @@ Make a new LIGATURE instance@comma{} and return it.
 @end table
 @end deffn
 @deffn {Reader} {mid} (instance)
-@anchor{❨546❩}@c
+@anchor{❨567❩}@c
 @functionsubindex{mid}@c
 @deffnx {Writer} {(setf mid)} (instance)
-@anchor{❨547❩}@c
+@anchor{❨568❩}@c
 @functionsubindex{(setf mid)}@c
 @table @strong
 @item Package
@@ -8654,14 +8618,14 @@ Make a new LIGATURE instance@comma{} and return it.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨465❩, , @t{mid}}.
+@ref{❨562❩, , @t{mid}}.
 @end table
 @end deffn
 @deffn {Reader} {next} (instance)
-@anchor{❨460❩}@c
+@anchor{❨497❩}@c
 @functionsubindex{next}@c
 @deffnx {Writer} {(setf next)} (instance)
-@anchor{❨461❩}@c
+@anchor{❨498❩}@c
 @functionsubindex{(setf next)}@c
 @table @strong
 @item Package
@@ -8669,14 +8633,14 @@ Make a new LIGATURE instance@comma{} and return it.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨556❩, , @t{next}}.
+@ref{❨545❩, , @t{next}}.
 @end table
 @end deffn
 @deffn {Reader} {next-char} (instance)
-@anchor{❨539❩}@c
+@anchor{❨483❩}@c
 @functionsubindex{next-char}@c
 @deffnx {Writer} {(setf next-char)} (instance)
-@anchor{❨540❩}@c
+@anchor{❨484❩}@c
 @functionsubindex{(setf next-char)}@c
 @table @strong
 @item Package
@@ -8688,10 +8652,10 @@ Make a new LIGATURE instance@comma{} and return it.
 @end table
 @end deffn
 @deffn {Reader} {op} (instance)
-@anchor{❨509❩}@c
+@anchor{❨539❩}@c
 @functionsubindex{op}@c
 @deffnx {Writer} {(setf op)} (instance)
-@anchor{❨510❩}@c
+@anchor{❨540❩}@c
 @functionsubindex{(setf op)}@c
 @table @strong
 @item Package
@@ -8699,11 +8663,11 @@ Make a new LIGATURE instance@comma{} and return it.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨557❩, , @t{op}}.
+@ref{❨546❩, , @t{op}}.
 @end table
 @end deffn
 @deffn {Function} {parse-character-information} (nc nw nh nd ni nl nk ne font)
-@anchor{❨562❩}@c
+@anchor{❨501❩}@c
 @functionsubindex{parse-character-information}@c
 Parse the 8 character information tables from *STREAM* into FONT.@*
 NC (EC - BC + 1)@comma{} NW@comma{} NH@comma{} ND@comma{} NI@comma{} NL@comma{} NK@comma{} and NE are the declared numbers of
@@ -8747,7 +8711,7 @@ DISCARD-EXTENSION-RECIPE.
 @end table
 @end deffn
 @deffn {Function} {parse-header} (length font)
-@anchor{❨504❩}@c
+@anchor{❨524❩}@c
 @functionsubindex{parse-header}@c
 Parse a header of LENGTH words from *STREAM* into FONT.@*
 If FONT's design size is less than 1pt@comma{} signal an INVALID-DESIGN-SIZE error.
@@ -8762,7 +8726,7 @@ INVALID-ORIGINAL-DESIGN-SIZE warning.
 @end table
 @end deffn
 @deffn {Function} {read-char-info} ()
-@anchor{❨483❩}@c
+@anchor{❨565❩}@c
 @functionsubindex{read-char-info}@c
 Read one char-info from *STREAM* into a new CHAR-INFO instance.@*
 If the char-info denotes a non-existent character (that is@comma{} it is has a width
@@ -8775,7 +8739,7 @@ index of 0) but is not completely blank@comma{} signal a SPURIOUS-CHAR-INFO warn
 @end table
 @end deffn
 @deffn {Function} {read-exten} ()
-@anchor{❨522❩}@c
+@anchor{❨482❩}@c
 @functionsubindex{read-exten}@c
 Read one exten from *STREAM* into a new EXTEN instance.
 @table @strong
@@ -8786,7 +8750,7 @@ Read one exten from *STREAM* into a new EXTEN instance.
 @end table
 @end deffn
 @deffn {Function} {read-fix-word} (&optional limit)
-@anchor{❨498❩}@c
+@anchor{❨466❩}@c
 @functionsubindex{read-fix-word}@c
 Read a fix word from *STREAM* and return it.@*
 If LIMIT (the default)@comma{} check that the number lies within ]-16@comma{}+16[@comma{} or
@@ -8800,7 +8764,7 @@ SET-TO-ZERO.
 @end table
 @end deffn
 @deffn {Function} {read-lig/kern} ()
-@anchor{❨482❩}@c
+@anchor{❨516❩}@c
 @functionsubindex{read-lig/kern}@c
 Read one lig/kern from *stream* into a new LIG/KERN instance.
 @table @strong
@@ -8811,7 +8775,7 @@ Read one lig/kern from *stream* into a new LIG/KERN instance.
 @end table
 @end deffn
 @deffn {Function} {read-padded-string} (pad)
-@anchor{❨559❩}@c
+@anchor{❨527❩}@c
 @functionsubindex{read-padded-string}@c
 Read a padded string out of PAD bytes from *STREAM*.@*
 The first byte in *STREAM* indicates the actual length of the string.@*
@@ -8835,7 +8799,7 @@ warning.
 @end table
 @end deffn
 @deffn {Function} {read-u16} ()
-@anchor{❨497❩}@c
+@anchor{❨481❩}@c
 @functionsubindex{read-u16}@c
 Read an unsigned 16 bits Big Endian integer from *STREAM* and return it.
 If >= 2^15@comma{} signal a U16-OVERFLOW error.
@@ -8847,7 +8811,7 @@ If >= 2^15@comma{} signal a U16-OVERFLOW error.
 @end table
 @end deffn
 @deffn {Function} {read-u32} ()
-@anchor{❨496❩}@c
+@anchor{❨463❩}@c
 @functionsubindex{read-u32}@c
 Read an unsigned 32 bits Big Endian integer from *STREAM*.
 @table @strong
@@ -8858,7 +8822,7 @@ Read an unsigned 32 bits Big Endian integer from *STREAM*.
 @end table
 @end deffn
 @deffn {Function} {read-u8} ()
-@anchor{❨524❩}@c
+@anchor{❨521❩}@c
 @functionsubindex{read-u8}@c
 Read an unsigned 8 bits integer from *STREAM*.
 @table @strong
@@ -8879,7 +8843,7 @@ Read an unsigned 8 bits integer from *STREAM*.
 @end table
 @end deffn
 @deffn {Function} {remove-keys} (keys &rest removed)
-@anchor{❨503❩}@c
+@anchor{❨536❩}@c
 @functionsubindex{remove-keys}@c
 Return a new property list from KEYS without REMOVED ones.
 @table @strong
@@ -8890,10 +8854,10 @@ Return a new property list from KEYS without REMOVED ones.
 @end table
 @end deffn
 @deffn {Reader} {rep} (instance)
-@anchor{❨499❩}@c
+@anchor{❨487❩}@c
 @functionsubindex{rep}@c
 @deffnx {Writer} {(setf rep)} (instance)
-@anchor{❨500❩}@c
+@anchor{❨488❩}@c
 @functionsubindex{(setf rep)}@c
 @table @strong
 @item Package
@@ -8901,14 +8865,14 @@ Return a new property list from KEYS without REMOVED ones.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨467❩, , @t{rep}}.
+@ref{❨564❩, , @t{rep}}.
 @end table
 @end deffn
 @deffn {Reader} {rmd} (instance)
-@anchor{❨566❩}@c
+@anchor{❨485❩}@c
 @functionsubindex{rmd}@c
 @deffnx {Writer} {(setf rmd)} (instance)
-@anchor{❨567❩}@c
+@anchor{❨486❩}@c
 @functionsubindex{(setf rmd)}@c
 @table @strong
 @item Package
@@ -8916,11 +8880,11 @@ Return a new property list from KEYS without REMOVED ones.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨558❩, , @t{rmd}}.
+@ref{❨547❩, , @t{rmd}}.
 @end table
 @end deffn
 @deffn {Function} {run-ligature/kerning-program} (character index lig/kerns kerns)
-@anchor{❨462❩}@c
+@anchor{❨523❩}@c
 @functionsubindex{run-ligature/kerning-program}@c
 Find the real start of a ligature/kerning program and run it.@*
 See %run-ligature/kerning-program for more information.@*
@@ -8935,7 +8899,7 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM.
 @end table
 @end deffn
 @deffn {Function} {set-kern} (character1 character2 kern)
-@anchor{❨525❩}@c
+@anchor{❨514❩}@c
 @functionsubindex{set-kern}@c
 Set KERN for CHARACTER1 and CHARACTER2.
 @table @strong
@@ -8946,7 +8910,7 @@ Set KERN for CHARACTER1 and CHARACTER2.
 @end table
 @end deffn
 @deffn {Function} {set-ligature} (character1 character2 ligature)
-@anchor{❨565❩}@c
+@anchor{❨566❩}@c
 @functionsubindex{set-ligature}@c
 Set LIGATURE for CHARACTER1 and CHARACTER2.
 @table @strong
@@ -8957,10 +8921,10 @@ Set LIGATURE for CHARACTER1 and CHARACTER2.
 @end table
 @end deffn
 @deffn {Reader} {skip} (instance)
-@anchor{❨560❩}@c
+@anchor{❨541❩}@c
 @functionsubindex{skip}@c
 @deffnx {Writer} {(setf skip)} (instance)
-@anchor{❨561❩}@c
+@anchor{❨542❩}@c
 @functionsubindex{(setf skip)}@c
 @table @strong
 @item Package
@@ -8968,11 +8932,11 @@ Set LIGATURE for CHARACTER1 and CHARACTER2.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨555❩, , @t{skip}}.
+@ref{❨544❩, , @t{skip}}.
 @end table
 @end deffn
 @deffn {Function} {table-aref} (name table index)
-@anchor{❨493❩}@c
+@anchor{❨471❩}@c
 @functionsubindex{table-aref}@c
 Access NAMEd TABLE at INDEX.@*
 If INDEX is out of bounds@comma{} signal an INVALID-TABLE-INDEX error.
@@ -8984,10 +8948,10 @@ If INDEX is out of bounds@comma{} signal an INVALID-TABLE-INDEX error.
 @end table
 @end deffn
 @deffn {Reader} {top} (instance)
-@anchor{❨527❩}@c
+@anchor{❨502❩}@c
 @functionsubindex{top}@c
 @deffnx {Writer} {(setf top)} (instance)
-@anchor{❨528❩}@c
+@anchor{❨503❩}@c
 @functionsubindex{(setf top)}@c
 @table @strong
 @item Package
@@ -8995,14 +8959,14 @@ If INDEX is out of bounds@comma{} signal an INVALID-TABLE-INDEX error.
 @item Source
 @ref{❨10❩, , @t{intermediate.lisp}}.
 @item Target Slot
-@ref{❨464❩, , @t{top}}.
+@ref{❨561❩, , @t{top}}.
 @end table
 @end deffn
 @deffn {Reader} {width-index} (instance)
-@anchor{❨480❩}@c
+@anchor{❨467❩}@c
 @functionsubindex{width-index}@c
 @deffnx {Writer} {(setf width-index)} (instance)
-@anchor{❨481❩}@c
+@anchor{❨468❩}@c
 @functionsubindex{(setf width-index)}@c
 @table @strong
 @item Package
@@ -9028,14 +8992,14 @@ Read a series of ~"string" to be concatenated together.
 @node Private generic functions, Private structures, Private ordinary functions, Internals
 @subsection Generic functions
 @deffn {Generic Reader} {extension-recipe} (object)
-@anchor{❨471❩}@c
+@anchor{❨473❩}@c
 @genericsubindex{extension-recipe}@c
 @table @strong
 @item Package
 @ref{❨19❩, , @t{net.didierverna.tfm}}.
 @item Methods
 @deffn {Reader Method} {extension-recipe} ((character-metrics @ref{❨340❩, , @t{character-metrics}}))
-@anchor{❨472❩}@c
+@anchor{❨474❩}@c
 @methodsubindex{extension-recipe}@c
 The character's extension recipe@comma{} or NIL.@*
 This slot is non-null only if this character is extensible (see TeX: the
@@ -9051,14 +9015,14 @@ also with the existence of a ligature or kerning program for this character.
 @end table
 @end deffn
 @deffn {Generic Reader} {kerns} (object)
-@anchor{❨468❩}@c
+@anchor{❨489❩}@c
 @genericsubindex{kerns}@c
 @table @strong
 @item Package
 @ref{❨19❩, , @t{net.didierverna.tfm}}.
 @item Methods
 @deffn {Reader Method} {kerns} ((font @ref{❨113❩, , @t{font}}))
-@anchor{❨469❩}@c
+@anchor{❨490❩}@c
 @methodsubindex{kerns}@c
 The font's kerns.@*
 This is a hash table associating conses of characters with the corresponding
@@ -9074,14 +9038,14 @@ the font is frozen.
 @end table
 @end deffn
 @deffn {Generic Reader} {ligatures} (object)
-@anchor{❨548❩}@c
+@anchor{❨464❩}@c
 @genericsubindex{ligatures}@c
 @table @strong
 @item Package
 @ref{❨19❩, , @t{net.didierverna.tfm}}.
 @item Methods
 @deffn {Reader Method} {ligatures} ((font @ref{❨113❩, , @t{font}}))
-@anchor{❨549❩}@c
+@anchor{❨465❩}@c
 @methodsubindex{ligatures}@c
 The font's ligatures.@*
 This is a hash table associating conses of characters with the corresponding
@@ -9096,7 +9060,7 @@ ligature.
 @end table
 @end deffn
 @deffn {Generic Function} {parse-parameters} (length font)
-@anchor{❨484❩}@c
+@anchor{❨505❩}@c
 @genericsubindex{parse-parameters}@c
 Parse a parameters section of LENGTH words from *STREAM* into FONT.
 Return remaining LENGTH.
@@ -9107,28 +9071,28 @@ Return remaining LENGTH.
 @ref{❨13❩, , @t{file.lisp}}.
 @item Methods
 @deffn {Method} {parse-parameters} (length font)
-@anchor{❨485❩}@c
+@anchor{❨506❩}@c
 @methodsubindex{parse-parameters}@c
 Parse the 7 regular FONT parameters. Return remaining LENGTH.
 @table @strong
 @end table
 @end deffn
 @deffn {Method} {parse-parameters} (length (font @ref{❨400❩, , @t{math-symbols-font}}))
-@anchor{❨486❩}@c
+@anchor{❨507❩}@c
 @methodsubindex{parse-parameters}@c
 Parse the 15 additional TeX math symbols FONT parameters.
 @table @strong
 @end table
 @end deffn
 @deffn {Method} {parse-parameters} (length (font @ref{❨146❩, , @t{math-extension-font}}))
-@anchor{❨487❩}@c
+@anchor{❨508❩}@c
 @methodsubindex{parse-parameters}@c
 Parse the 6 additional TeX math extension FONT parameters.
 @table @strong
 @end table
 @end deffn
 @deffn {Method} {parse-parameters} :around (length font)
-@anchor{❨488❩}@c
+@anchor{❨509❩}@c
 @methodsubindex{parse-parameters}@c
 Read remaining parameters into a parameters array.
 @table @strong
@@ -9137,7 +9101,7 @@ Read remaining parameters into a parameters array.
 @end table
 @end deffn
 @deffn {Generic Function} {scale} (font factor)
-@anchor{❨489❩}@c
+@anchor{❨552❩}@c
 @genericsubindex{scale}@c
 Scale all FONT dimensions by FACTOR.
 @table @strong
@@ -9147,21 +9111,21 @@ Scale all FONT dimensions by FACTOR.
 @ref{❨12❩, , @t{font.lisp}}.
 @item Methods
 @deffn {Method} {scale} :around ((font @ref{❨146❩, , @t{math-extension-font}}) factor)
-@anchor{❨490❩}@c
+@anchor{❨553❩}@c
 @methodsubindex{scale}@c
 Scaling method for MATH-EXTENSION-FONTs.
 @table @strong
 @end table
 @end deffn
 @deffn {Method} {scale} :around ((font @ref{❨400❩, , @t{math-symbols-font}}) factor)
-@anchor{❨491❩}@c
+@anchor{❨554❩}@c
 @methodsubindex{scale}@c
 Scaling method for MATH-SYMBOL-FONTs.
 @table @strong
 @end table
 @end deffn
 @deffn {Method} {scale} (font factor)
-@anchor{❨492❩}@c
+@anchor{❨555❩}@c
 @methodsubindex{scale}@c
 Scaling method for regular FONTs.
 @table @strong
@@ -9173,7 +9137,7 @@ Scaling method for regular FONTs.
 @node Private structures, Private classes, Private generic functions, Internals
 @subsection Structures
 @deftp {Structure} {exten}
-@anchor{❨463❩}@c
+@anchor{❨560❩}@c
 @structuresubindex{exten}@c
 The Exten structure.@*
 This structure is used to store decoded information from the exten table
@@ -9187,49 +9151,49 @@ This structure is used to store decoded information from the exten table
 @t{structure-object}.
 @item Direct slots
 @defvr {Slot} {top}
-@anchor{❨464❩}@c
+@anchor{❨561❩}@c
 @slotsubindex{top}@c
 @table @strong
 @item Readers
-@ref{❨527❩, , @t{top}}.
+@ref{❨502❩, , @t{top}}.
 @item Writers
-@ref{❨528❩, , @t{(setf top)}}.
+@ref{❨503❩, , @t{(setf top)}}.
 @end table
 @end defvr
 @defvr {Slot} {mid}
-@anchor{❨465❩}@c
+@anchor{❨562❩}@c
 @slotsubindex{mid}@c
 @table @strong
 @item Readers
-@ref{❨546❩, , @t{mid}}.
+@ref{❨567❩, , @t{mid}}.
 @item Writers
-@ref{❨547❩, , @t{(setf mid)}}.
+@ref{❨568❩, , @t{(setf mid)}}.
 @end table
 @end defvr
 @defvr {Slot} {bot}
-@anchor{❨466❩}@c
+@anchor{❨563❩}@c
 @slotsubindex{bot}@c
 @table @strong
 @item Readers
-@ref{❨542❩, , @t{bot}}.
+@ref{❨550❩, , @t{bot}}.
 @item Writers
-@ref{❨543❩, , @t{(setf bot)}}.
+@ref{❨551❩, , @t{(setf bot)}}.
 @end table
 @end defvr
 @defvr {Slot} {rep}
-@anchor{❨467❩}@c
+@anchor{❨564❩}@c
 @slotsubindex{rep}@c
 @table @strong
 @item Readers
-@ref{❨499❩, , @t{rep}}.
+@ref{❨487❩, , @t{rep}}.
 @item Writers
-@ref{❨500❩, , @t{(setf rep)}}.
+@ref{❨488❩, , @t{(setf rep)}}.
 @end table
 @end defvr
 @end table
 @end deftp
 @deftp {Structure} {lig/kern}
-@anchor{❨554❩}@c
+@anchor{❨543❩}@c
 @structuresubindex{lig/kern}@c
 The Lig/Kern structure.@*
 This structure is used to store decoded information from the lig/kern table
@@ -9243,43 +9207,43 @@ This structure is used to store decoded information from the lig/kern table
 @t{structure-object}.
 @item Direct slots
 @defvr {Slot} {skip}
-@anchor{❨555❩}@c
+@anchor{❨544❩}@c
 @slotsubindex{skip}@c
 @table @strong
 @item Readers
-@ref{❨560❩, , @t{skip}}.
+@ref{❨541❩, , @t{skip}}.
 @item Writers
-@ref{❨561❩, , @t{(setf skip)}}.
+@ref{❨542❩, , @t{(setf skip)}}.
 @end table
 @end defvr
 @defvr {Slot} {next}
-@anchor{❨556❩}@c
+@anchor{❨545❩}@c
 @slotsubindex{next}@c
 @table @strong
 @item Readers
-@ref{❨460❩, , @t{next}}.
+@ref{❨497❩, , @t{next}}.
 @item Writers
-@ref{❨461❩, , @t{(setf next)}}.
+@ref{❨498❩, , @t{(setf next)}}.
 @end table
 @end defvr
 @defvr {Slot} {op}
-@anchor{❨557❩}@c
+@anchor{❨546❩}@c
 @slotsubindex{op}@c
 @table @strong
 @item Readers
-@ref{❨509❩, , @t{op}}.
+@ref{❨539❩, , @t{op}}.
 @item Writers
-@ref{❨510❩, , @t{(setf op)}}.
+@ref{❨540❩, , @t{(setf op)}}.
 @end table
 @end defvr
 @defvr {Slot} {rmd}
-@anchor{❨558❩}@c
+@anchor{❨547❩}@c
 @slotsubindex{rmd}@c
 @table @strong
 @item Readers
-@ref{❨566❩, , @t{rmd}}.
+@ref{❨485❩, , @t{rmd}}.
 @item Writers
-@ref{❨567❩, , @t{(setf rmd)}}.
+@ref{❨486❩, , @t{(setf rmd)}}.
 @end table
 @end defvr
 @end table
@@ -9288,7 +9252,7 @@ This structure is used to store decoded information from the lig/kern table
 @node Private classes, , Private structures, Internals
 @subsection Classes
 @deftp {Class} {extension-recipe}
-@anchor{❨473❩}@c
+@anchor{❨475❩}@c
 @classsubindex{extension-recipe}@c
 The Extension Recipe class.@*
 This class represents decoded information for extensible characters. Within
@@ -9314,7 +9278,7 @@ instance of this class.
 @end itemize
 @item Direct slots
 @defvr {Slot} {top-character}
-@anchor{❨474❩}@c
+@anchor{❨476❩}@c
 @slotsubindex{top-character}@c
 The recipe's top character@comma{} or NIL.
 @table @strong
@@ -9327,7 +9291,7 @@ The recipe's top character@comma{} or NIL.
 @end table
 @end defvr
 @defvr {Slot} {middle-character}
-@anchor{❨475❩}@c
+@anchor{❨477❩}@c
 @slotsubindex{middle-character}@c
 The recipe's middle character@comma{} or NIL.
 @table @strong
@@ -9340,7 +9304,7 @@ The recipe's middle character@comma{} or NIL.
 @end table
 @end defvr
 @defvr {Slot} {bottom-character}
-@anchor{❨476❩}@c
+@anchor{❨478❩}@c
 @slotsubindex{bottom-character}@c
 The recipe's bottom character@comma{} or NIL.
 @table @strong
@@ -9353,7 +9317,7 @@ The recipe's bottom character@comma{} or NIL.
 @end table
 @end defvr
 @defvr {Slot} {repeated-character}
-@anchor{❨477❩}@c
+@anchor{❨479❩}@c
 @slotsubindex{repeated-character}@c
 The recipe's repeated character.
 @table @strong
