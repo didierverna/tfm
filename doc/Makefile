@@ -1,6 +1,6 @@
 ### Makefile --- Doc directory
 
-## Copyright (C) 2019, 2021 Didier Verna
+## Copyright (C) 2019, 2021, 2025 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
