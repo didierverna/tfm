@@ -1,4 +1,4 @@
-## Version 2.0
+# Version 2.0
 This version features a number of improvements at the expense of backward
 incompatibility.
 - LOAD-FONT now allows to override the default font name.
