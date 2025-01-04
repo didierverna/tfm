@@ -674,23 +674,21 @@ Freezing a font means that all dimensions normally expressed in design size
 units are multiplied by it, so as to lead values in TeX point units.
 If FONT is already frozen, this function does nothing.
 Otherwise, it returns T as a second value." 
-  (cond ((frozen font)
-	 font)
-	(t
-	 (scale font (design-size font))
-	 (setf (slot-value font 'frozen) t)
-	 (values font t))))
+  (values font
+	  (unless (frozen font)
+	    (scale font (design-size font))
+	    (setf (slot-value font 'frozen) t)
+	    t)))
 
 (defun unfreeze (font)
   "Unfreeze FONT and return it.
 Unfreezing means performing the inverse of what FREEZE does.
 If FONT is not frozen, this function does nothing.
 Otherwise, it returns T as a second value."
-  (cond ((frozen font)
-	 (scale font (/ 1 (design-size font)))
-	 (setf (slot-value font 'frozen) nil)
-	 (values font t))
-	(t
-	 font)))
+  (values font
+	  (when (frozen font)
+	    (scale font (/ 1 (design-size font)))
+	    (setf (slot-value font 'frozen) nil)
+	    t)))
 
 ;;; font.lisp ends here
