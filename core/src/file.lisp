@@ -916,8 +916,8 @@ Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
-  ;; #### NOTE: the errors signalled below (directly, or by READ-U32) are
-  ;; really too early to attempt any clever recovery.
+  ;; #### NOTE: the errors signalled below (directly, or by the WORD-READER)
+  ;; are really too early to attempt any clever recovery.
   (let* ((word-reader (ecase fmt (:o0 #'read-u32) (:tfm #'read-u16)))
 	 (lh (funcall word-reader))
 	 (bc (funcall word-reader))
@@ -946,8 +946,8 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 	       ;; seem to be any kind of interesting information in there
 	       ;; (contrary to padded strings).
 	       (warn 'file-overflow
-		     :actual-size actual-size
-		     :declared-size declared-size)))))
+		 :actual-size actual-size
+		 :declared-size declared-size)))))
     (unless (>= lh 2) (error 'invalid-header-length :value lh))
     (unless (and (<= (1- bc) ec) (<= ec (if (eq fmt :o0) 65535 255)))
       (error 'invalid-character-range :bc bc :ec ec))
@@ -964,7 +964,7 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 			  "extens")
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
-		       :value length :smallest min :largest max :name name))
+		  :value length :smallest min :largest max :name name))
     (unless (= lf (if (eq fmt :o0)
 		    (+ 14 lh (* 2 nc) nw nh nd ni (* 2 nl) nk (* 2 ne) np)
 		    (+ 6 lh nc nw nh nd ni nl nk ne np)))
@@ -1041,8 +1041,7 @@ It signals that an OFM font advertises a level different from 0 or 1."))
   (value condition))
 
 
-(defun load-font
-    (file &rest keys &key name design-size freeze &aux lf font)
+(defun load-font (file &rest keys &key name design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
 - FILE must be a pathname designator.
 - If NAME is not NIL, use it as the font's name instead of FILE's base name,

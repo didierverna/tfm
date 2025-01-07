@@ -123,7 +123,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
   (:documentation "The Spurious Level 0 Omega Char Info compliance warning.
 It signals that a char-info for a non-existent character (that is, with a
 width-index of 0) is not completely zero'ed out."))
-  
+
 ;; See comment above the TFM counterpart.
 (define-condition-report (condition spurious-o0-char-info)
   "char-info structure for a non-existent character is not blank~A~%~A"
