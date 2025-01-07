@@ -1119,11 +1119,11 @@ It signals that an OFM font advertises a level different from 0 or 1."))
 
 
 (defun load-font
-    (file &rest keys &key (name nil namep) design-size freeze &aux lf font)
+    (file &rest keys &key name design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
 - FILE must be a pathname designator.
-- The font's name (FILE's base name by default) may be overridden with NAME.
-  If a provided NAME is not a non-empty string, signal and INVALID-CUSTOM-NAME
+- If NAME is not NIL, use it as the font's name instead of FILE's base name.
+  It must be a non-empty string. Otherwise, signal an INVALID-CUSTOM-NAME
   error. This error is immediately restartable with USE-FILE-BASE-NAME.
 - The font's original design size may be overridden with DESIGN-SIZE
   (a real greater or equal to 1).
@@ -1137,7 +1137,7 @@ UNSUPPORTED-FORMAT warning and returns NIL.
 Any condition signalled while FILE is being loaded is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
   (declare (ignore design-size))
-  (when namep
+  (when name
     (unless (and (stringp name) (not (zerop (length name))))
       (restart-case (error 'invalid-custom-name :name name)
 	(use-file-base-name () :report "Use the font file's base name."
