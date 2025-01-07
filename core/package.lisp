@@ -92,7 +92,7 @@
     :math-extension-font :default-rule-thickness
     :big-op-spacing1 :big-op-spacing2 :big-op-spacing3 :big-op-spacing4
     :big-op-spacing5
-    :l0-omega-font :direction
+    :o0-font :direction
 
     ;; From src/file.lisp:
     :invalid-design-size :value

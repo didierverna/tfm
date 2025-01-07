@@ -114,7 +114,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
     char-info))
 
 
-(define-condition spurious-l0-omega-char-info (spurious-char-info)
+(define-condition spurious-o0-char-info (spurious-char-info)
   ((section :initform nil) ; slot merge
    (tag ; slot merge, even though a bit dirty
     :documentation "The RFU/TAG byte."
@@ -125,7 +125,7 @@ It signals that a char-info for a non-existent character (that is, with a
 width-index of 0) is not completely zero'ed out."))
   
 ;; See comment above the TFM counterpart.
-(define-condition-report (condition spurious-l0-omega-char-info)
+(define-condition-report (condition spurious-o0-char-info)
   "char-info structure for a non-existent character is not blank~A~%~A"
   (let ((char-info (value condition)))
     ;; #### WARNING: EQL below because we might be comparing with NIL.
@@ -139,7 +139,7 @@ width-index of 0) is not completely zero'ed out."))
 	  (t "")))
   (value condition))
 
-(defun read-l0-omega-char-info ()
+(defun read-o0-char-info ()
   "Read one char-info from *STREAM* into a new CHAR-INFO instance.
 If the char-info denotes a non-existent character (that is, it is has a width
 index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
@@ -161,7 +161,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		     (zerop (italic-index char-info))
 		     (zerop rfu&tag)
 		     (zerop remainder)))
-      (warn 'spurious-l0-omega-char-info
+      (warn 'spurious-o0-char-info
 	    :rfu&tag rfu&tag :remainder remainder :value char-info))
     char-info))
 
@@ -186,7 +186,7 @@ This structure is used to store decoded information from the exten table
    :bot (read-u8)
    :rep (read-u8)))
 
-(defun read-l0-omega-exten ()
+(defun read-o0-exten ()
   "Read one exten from *STREAM* into a new EXTEN instance."
   (make-exten
    :top (read-u16 nil)
@@ -219,7 +219,7 @@ This structure is used to store decoded information from the lig/kern table
    :op (read-u8)
    :rmd (read-u8)))
 
-(defun read-l0-omega-lig/kern ()
+(defun read-o0-lig/kern ()
   "Read one lig/kern from *stream* into a new LIG/KERN instance."
   (make-lig/kern
    :skip (read-u16 nil)

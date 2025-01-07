@@ -468,7 +468,7 @@ DISCARD-EXTENSION-RECIPE."
     (unless (zerop nc)
       (loop :with char-info-reader
 	      := (typecase font
-		   (l0-omega-font #'read-l0-omega-char-info)
+		   (o0-font #'read-o0-char-info)
 		   (t #'read-char-info))
 	    :for i :from 0 :upto (1- nc)
 	    :for code :from (min-code font)
@@ -493,7 +493,7 @@ DISCARD-EXTENSION-RECIPE."
 			  (vector-push (read-fix-word) array))))
     (loop :with lig/kern-reader
 	    := (typecase font
-		 (l0-omega-font #'read-l0-omega-lig/kern)
+		 (o0-font #'read-o0-lig/kern)
 		 (t #'read-lig/kern))
 	  :repeat nl
 	  :do (vector-push (funcall lig/kern-reader) lig/kerns))
@@ -501,7 +501,7 @@ DISCARD-EXTENSION-RECIPE."
 	  :do (vector-push (read-fix-word) kerns))
     (loop :with exten-reader
 	    := (typecase font
-		 (l0-omega-font #'read-l0-omega-exten)
+		 (o0-font #'read-o0-exten)
 		 (t #'read-exten))
 	  :repeat ne
 	  :do (vector-push (funcall exten-reader) extens))
@@ -1123,7 +1123,7 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 	  (setq lf (read-u32))
 	  (with-simple-restart (cancel-loading "Cancel loading this font.")
 	    (setq font (load-l0-ofm-font
-			(apply #'make-instance 'l0-omega-font
+			(apply #'make-instance 'o0-font
 			       :file file (remove-keys keys :freeze))
 			lf))
 	    (when freeze (freeze font))))
