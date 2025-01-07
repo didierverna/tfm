@@ -1080,18 +1080,27 @@ It signals that an OFM font advertises a level different from 0 or 1."))
   (value condition))
 
 
-(define-condition extended-tfm (tfm-warning)
-  ((fmt :documentation "The unsupported format." :initarg :fmt :reader fmt)
-   (file :documentation "The extended TFM file." :initarg :file :reader file))
-  (:documentation "The Extended TFM warning.
-It signals that a file contains unsupported extended TFM data.
-In addition to plain TFM, level 0 OFM is currently supported.
+(define-condition unsupported-format (tfm-warning)
+  ((fmt
+    :documentation "The unsupported format.
+Possible values include :O1 (meaning level 1 OFM data) and :JFM."
+    :initarg :fmt
+    :reader fmt)
+   (file
+    :documentation "The unsupported font's file name."
+    :initarg :file
+    :reader file))
+  (:documentation "The Unsupported Format warning.
+It signals that a file contains data in a currently unsupported format.
+Currently supported font formats are regular TFM and level 0 Omega (OFM).
 Level 1 OFM and JFM formats might be supported in the future."))
 
-(define-condition-report (condition extended-tfm)
+(define-condition-report (condition unsupported-format)
     "file ~A contains ~A data (not supported yet)"
   (file condition)
-  (fmt condition))
+  (ecase (fmt condition)
+    (:o1 "level 1 Omega (OFM)")
+    (:jfm "JFM")))
 
 (defun load-font (file &rest keys &key name design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
@@ -1103,10 +1112,11 @@ Level 1 OFM and JFM formats might be supported in the future."))
 - When FREEZE (NIL by default), freeze the font immediately after loading it.
   See the eponymous function for more information.
 
-TFM and level 0 OFM data are currently supported. If level 1 OFM or JFM data
-is detected, this function signals an EXTENDED-TFM warning and returns NIL.
+Both regular TFM and level 0 Omega (OFM) fonts are currently supported. If
+level 1 OFM or JFM data is detected, this function signals an
+UNSUPPORTED-FORMAT warning and returns NIL.
 
-While loading font data, any signalled condition is restartable with
+Any condition signalled while FILE is being loaded is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
   (declare (ignore name design-size))
   (with-open-file
@@ -1128,13 +1138,13 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 			lf))
 	    (when freeze (freeze font))))
 	 (1
-	  (warn 'extended-tfm :value "Level 1 OFM" :file file))
+	  (warn 'unsupported-format :fmt :o1 :file file))
 	 (t
 	  (with-simple-restart
 			(cancel-loading "Cancel loading this font.")
 	    (error 'invalid-ofm-level :value lf)))))
       ((9 11)
-       (warn 'extended-tfm :fmt "JFM" :file file))
+       (warn 'unsupported-format :fmt :jfm :file file))
       (t
        (with-simple-restart (cancel-loading "Cancel loading this font.")
 	 (unless (zerop (ldb (byte 1 15) lf)) (error 'u16-overflow :value lf))

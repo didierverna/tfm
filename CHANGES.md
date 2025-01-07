@@ -1,5 +1,6 @@
 # Version 3.0
 - Support for level 0 Omega (OFM) fonts.
+- The EXTENDED-TFM warning has been renamed to UNSUPPORTED-FORMAT.
 
 # Version 2.0
 This version features a number of improvements at the expense of backward

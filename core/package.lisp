@@ -119,7 +119,7 @@
     :invalid-l0-ofm-section-lengths
     :invalid-table-length :value :smallest :largest
     :invalid-ofm-level :value
-    :extended-tfm :fmt :file
+    :unsupported-format :fmt :file
     :load-font :cancel-loading))
 
 
