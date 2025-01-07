@@ -1170,8 +1170,7 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 	 (1
 	  (warn 'unsupported-format :fmt :o1 :file file))
 	 (t
-	  (with-simple-restart
-			(cancel-loading "Cancel loading this font.")
+	  (with-simple-restart (cancel-loading "Cancel loading this font.")
 	    (error 'invalid-ofm-level :value lf)))))
       ((9 11)
        (warn 'unsupported-format :fmt :jfm :file file))
