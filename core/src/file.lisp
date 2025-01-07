@@ -1139,6 +1139,7 @@ UNSUPPORTED-FORMAT warning and returns NIL.
 
 Any condition signalled while FILE is being loaded is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
+  (setq keys (remove-keys keys :freeze))
   (when name
     (unless (and (stringp name) (not (zerop (length name))))
       (restart-case (error 'invalid-custom-name :name name)
@@ -1164,10 +1165,8 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 	  (setq lf (read-u32))
 	  (with-simple-restart (cancel-loading "Cancel loading this font.")
 	    (setq font (load-o0-font
-			(apply #'make-instance 'o0-font
-			       :file file (remove-keys keys :freeze))
-			lf))
-	    (when freeze (freeze font))))
+			(apply #'make-instance 'o0-font :file file keys)
+			lf))))
 	 (1
 	  (warn 'unsupported-format :fmt :o1 :file file))
 	 (t
@@ -1180,10 +1179,9 @@ CANCEL-LOADING, in which case this function simply returns NIL."
        (with-simple-restart (cancel-loading "Cancel loading this font.")
 	 (unless (zerop (ldb (byte 1 15) lf)) (error 'u16-overflow :value lf))
 	 (setq font (load-tfm-font
-		     (apply #'make-instance 'font
-			    :file file (remove-keys keys :freeze))
-		     lf))
-	 (when freeze (freeze font))))))
+		     (apply #'make-instance 'font :file file keys)
+		     lf))))))
+  (when (and font freeze) (freeze font))
   font)
 
 ;;; file.lisp ends here
