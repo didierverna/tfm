@@ -258,19 +258,6 @@ subclasses."))
     (when (frozen font) (princ " (frozen)" stream))))
 
 
-(define-condition invalid-custom-name (tfm-usage-error)
-  ((name
-    :documentation "The invalid custom name."
-    :initarg :name
-    :reader name))
-  (:documentation "The Invalid Custom Name usage error.
-It signals that a custom name is not a non-empty string."))
-
-(define-condition-report (condition invalid-custom-name)
-    "custom name ~S is invalid (should be a non-empty string)"
-  (name condition))
-
-
 (define-condition invalid-custom-design-size (tfm-usage-error)
   ((value
     :documentation "The invalid custom design size."
@@ -287,19 +274,16 @@ It signals that a custom design size is not a real greater or equal to 1."))
 ;; #### NOTE: we're not currently so pedantic as to check that the font's file
 ;; has a non-empty base name.
 (defmethod initialize-instance :after ((font font) &key)
-  "Check the validity of FONT's name and design-size.
-- If the font's name is not a non-empty string, signal and INVALID-CUSTOM-NAME
-  error. This error is immediately restartable with USE-FILE-BASE-NAME.
+  "Handle FONT's name and design-size initialization.
+- Unless a custom name has been provided, initialize it with the font file's
+  base name.
 - IF the font's design-size is not NIL or a real greater or equal to 1, signal
   an INVALID-CUSTOM-DESIGN-SIZE error. This error is immediately restartable
   with USE-ORIGINAL-DESIGN-SIZE."
   (with-slots (file name design-size) font
-    (if (null name)
-      (setq name (pathname-name file))
-      (unless (and (stringp name) (not (zerop (length name))))
-	(restart-case (error 'invalid-custom-name :name name)
-	  (use-file-base-name () :report "Use the font file's base name."
-	    (setq name (pathname-name file))))))
+    ;; #### NOTE: the validity of a custom name has already been checked by
+    ;; LOAD-FONT.
+    (unless name (setq name (pathname-name file)))
     (unless (typep design-size '(or null (real 1)))
       (restart-case (error 'invalid-custom-design-size :value design-size)
 	(use-original-design-size () :report "Use the font's design size."

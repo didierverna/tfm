@@ -1070,14 +1070,17 @@ length, signal an INVALID-SECTION-LENGTHS error."
 ;; Entry Point
 ;; ==========================================================================
 
-(define-condition invalid-ofm-level (tfm-compliance-error)
-  ((value :documentation "The invalid level." :initarg :value :accessor value))
-  (:documentation "The Invalid OFM LEVEL compliance error.
-It signals that an OFM font advertises a level different from 0 or 1."))
+(define-condition invalid-custom-name (tfm-usage-error)
+  ((name
+    :documentation "The invalid custom name."
+    :initarg :name
+    :reader name))
+  (:documentation "The Invalid Custom Name usage error.
+It signals that a custom name is not a non-empty string."))
 
-(define-condition-report (condition invalid-ofm-level)
-  "OFM level ~S is invalid (should be 0 or 1)"
-  (value condition))
+(define-condition-report (condition invalid-custom-name)
+    "custom name ~S is invalid (should be a non-empty string)"
+  (name condition))
 
 
 (define-condition unsupported-format (tfm-warning)
@@ -1104,11 +1107,24 @@ Level 1 OFM and JFM formats might be supported in the future."))
     (:o1 "level 1 Omega (OFM)")
     (:jfm "JFM")))
 
-(defun load-font (file &rest keys &key name design-size freeze &aux lf font)
+
+(define-condition invalid-ofm-level (tfm-compliance-error)
+  ((value :documentation "The invalid level." :initarg :value :accessor value))
+  (:documentation "The Invalid OFM LEVEL compliance error.
+It signals that an OFM font advertises a level different from 0 or 1."))
+
+(define-condition-report (condition invalid-ofm-level)
+  "OFM level ~S is invalid (should be 0 or 1)"
+  (value condition))
+
+
+(defun load-font
+    (file &rest keys &key (name nil namep) design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
 - FILE must be a pathname designator.
-- The font's name (FILE's base name by default) may be overridden with NAME
-  (a non-empty string).
+- The font's name (FILE's base name by default) may be overridden with NAME.
+  If a provided NAME is not a non-empty string, signal and INVALID-CUSTOM-NAME
+  error. This error is immediately restartable with USE-FILE-BASE-NAME.
 - The font's original design size may be overridden with DESIGN-SIZE
   (a real greater or equal to 1).
 - When FREEZE (NIL by default), freeze the font immediately after loading it.
@@ -1120,7 +1136,12 @@ UNSUPPORTED-FORMAT warning and returns NIL.
 
 Any condition signalled while FILE is being loaded is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
-  (declare (ignore name design-size))
+  (declare (ignore design-size))
+  (when namep
+    (unless (and (stringp name) (not (zerop (length name))))
+      (restart-case (error 'invalid-custom-name :name name)
+	(use-file-base-name () :report "Use the font file's base name."
+	  (setq keys (remove-keys keys :name))))))
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
     ;; #### NOTE: in order to detect the format, we don't even know how many
