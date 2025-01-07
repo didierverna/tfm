@@ -973,7 +973,7 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 	       'invalid-section-lengths)
 	:lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
 	:ne ne :np np))
-    (when (eq fmt :o0) (setf (direction font) fd))
+    (when (eq fmt :o0) (setf (slot-value font 'direction) fd))
 
     ;; 2. Parse the header section.
     (parse-header lh font)
