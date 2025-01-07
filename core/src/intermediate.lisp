@@ -119,7 +119,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
    (tag ; slot merge, even though a bit dirty
     :documentation "The RFU/TAG byte."
     :initarg :rfu&tag
-    :accessor rfu&tag))
+    :reader rfu&tag))
   (:documentation "The Spurious Level 0 Omega Char Info compliance warning.
 It signals that a char-info for a non-existent character (that is, with a
 width-index of 0) is not completely zero'ed out."))
@@ -127,7 +127,7 @@ width-index of 0) is not completely zero'ed out."))
 ;; See comment above the TFM counterpart.
 (define-condition-report (condition spurious-o0-char-info)
   "char-info structure for a non-existent character is not blank~A~%~A"
-  (let ((char-info (value condition)))
+  (let ((char-info (char-info condition)))
     ;; #### WARNING: EQL below because we might be comparing with NIL.
     (cond ((or (eql (lig/kern-index char-info) 0)
 	       (eql (next-char char-info) 0)
@@ -137,7 +137,7 @@ width-index of 0) is not completely zero'ed out."))
 	  ((zerop (rfu&tag condition))
 	   (format nil " (remainder = ~A)" (remainder condition)))
 	  (t "")))
-  (value condition))
+  (char-info condition))
 
 (defun read-o0-char-info ()
   "Read one char-info from *STREAM* into a new CHAR-INFO instance.
@@ -162,7 +162,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 		     (zerop rfu&tag)
 		     (zerop remainder)))
       (warn 'spurious-o0-char-info
-	    :rfu&tag rfu&tag :remainder remainder :value char-info))
+	:char-info char-info :rfu&tag rfu&tag :remainder remainder))
     char-info))
 
 
