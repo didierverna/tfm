@@ -82,7 +82,7 @@ This error is immediately restartable with SET-TO-TEN.
 However, if FONT's design size was explicitly overridden, only signal an
 INVALID-ORIGINAL-DESIGN-SIZE warning."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller
-  ;; (LOAD-TFM-FONT or LOAD-l0-OFM-FONT).
+  ;; (LOAD-TFM-FONT or LOAD-O0-FONT).
   (setf (slot-value font 'checksum) (read-u32 nil))
   (decf length)
   (setf (slot-value font 'original-design-size) (read-fix-word nil))
@@ -960,13 +960,13 @@ length, signal an INVALID-SECTION-LENGTHS error."
 ;; Level 0 OFM Data
 ;; ==========================================================================
 
-(define-condition invalid-l0-ofm-section-lengths (invalid-section-lengths)
+(define-condition invalid-o0-section-lengths (invalid-section-lengths)
   ((section :initform nil)) ; slot merge
   (:documentation "The Invalid Level 0 OFM Section Lengths compliance error.
 It signals that
 LF != 14 + LH + 2*NC + NW + NH + ND + NI + 2*NL + NK + 2*NE + NP."))
 
-(define-condition-report (condition invalid-l0-ofm-section-lengths)
+(define-condition-report (condition invalid-o0-section-lengths)
   "section lengths don't satisfy ~
 ~A (lf) = 14 + ~A (lh) + 2*~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
 + 2*~A (nl) + ~A (nk) + 2*~A (ne) + ~A (np)"
@@ -983,7 +983,7 @@ LF != 14 + LH + 2*NC + NW + NH + ND + NI + 2*NL + NK + 2*NE + NP."))
   (np condition))
 
 
-(defun load-l0-ofm-font (font lf)
+(defun load-o0-font (font lf)
   "Parse *STREAM* of declared length LF into FONT, and return it.
 
 If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
@@ -1048,7 +1048,7 @@ length, signal an INVALID-SECTION-LENGTHS error."
 	    :do (error 'invalid-table-length
 		       :value length :smallest min :largest max :name name))
     (unless (= lf (+ 14 lh (* 2 nc) nw nh nd ni (* 2 nl) nk (* 2 ne) np))
-      (error 'invalid-l0-ofm-section-lengths
+      (error 'invalid-o0-section-lengths
 	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
 	     :ne ne :np np))
     (setf (direction font) fd)
@@ -1132,7 +1132,7 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 	 (0
 	  (setq lf (read-u32))
 	  (with-simple-restart (cancel-loading "Cancel loading this font.")
-	    (setq font (load-l0-ofm-font
+	    (setq font (load-o0-font
 			(apply #'make-instance 'o0-font
 			       :file file (remove-keys keys :freeze))
 			lf))

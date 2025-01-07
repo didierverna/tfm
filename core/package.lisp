@@ -116,7 +116,7 @@
     :invalid-header-length :value
     :invalid-character-range :bc :ec
     :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
-    :invalid-l0-ofm-section-lengths
+    :invalid-o0-section-lengths
     :invalid-table-length :value :smallest :largest
     :invalid-ofm-level :value
     :unsupported-format :fmt :file
