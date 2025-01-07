@@ -1,6 +1,6 @@
 ;;; util.lisp --- General Utilities
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -60,6 +60,7 @@ conditions are signalled."))
     (setq upcase nil))
   (apply #'format stream "~:[~@?~;~@(~@?~)~]." upcase format-string arguments))
 
+#i(define-condition-report 2)
 (defmacro define-condition-report
     ((condition type) format-string &rest arguments)
   "Define a context-aware report function for a CONDITION of TYPE.
@@ -92,8 +93,10 @@ initialized with INITARGS."
 ;; ==========================================================================
 
 (define-condition tfm ()
-  ((context :documentation "The context in which the condition was signalled."
-	    :initform nil :reader context))
+  ((context
+    :documentation "The context in which the condition was signalled."
+    :initform nil
+    :reader context))
   (:documentation "The TFM root condition."))
 
 
@@ -107,8 +110,11 @@ initialized with INITARGS."
 
 
 (define-condition tfm-compliance (tfm)
-  ((section :documentation "The related TFtoPL section."
-	    :allocation :class :initform nil :reader section))
+  ((section
+    :documentation "The related TFtoPL section."
+    :allocation :class
+    :initform nil
+    :reader section))
   (:documentation "The TFM Compliance root condition.
 This is the mixin for conditions related to TFM compliance."))
 
@@ -159,12 +165,12 @@ This is the root condition for errors related to the use of the library."))
 
 (define-condition u16-overflow (tfm-compliance-error)
   ((section :initform 8) ; slot merge
-   (value :documentation "The faulty value." :initarg :value :accessor value))
+   (value :documentation "The faulty value." :initarg :value :reader value))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
 
 (define-condition-report (condition u16-overflow)
-  "unsigned 16 bits integer ~A is greater than 2^15"
+    "unsigned 16 bits integer ~A is greater than 2^15"
   (value condition))
 
 (defun read-u16 (&optional (limit t))
@@ -204,12 +210,12 @@ U32-OVERFLOW error."
 
 (define-condition fix-word-overflow (tfm-compliance-error)
   ((section :initform 9) ; slot merge
-   (value :documentation "The faulty value." :initarg :value :accessor value))
+   (value :documentation "The faulty value." :initarg :value :reader value))
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
 
 (define-condition-report (condition fix-word-overflow)
-  "fix word ~A (~A) is outside ]-16,+16["
+    "fix word ~A (~A) is outside ]-16,+16["
   (value condition)
   (float (value condition)))
 
@@ -257,44 +263,46 @@ This is a mixin for all conditions related to padded strings."))
    (value
     :documentation "The invalid length."
     :initarg :value
-    :accessor value)
+    :reader value)
    (pad
-    :documentation "The maximum length."
+    :documentation "The string's maximum length."
     :initarg :pad
-    :accessor pad))
+    :reader pad))
   (:documentation "The Invalid Padded String Length compliance error.
 It signals that the declared length of a padded string is greater than its
 maximum."))
 
 (define-condition-report (condition invalid-padded-string-length)
-  "declared padded string length ~A is greater than its maximum ~A"
+    "declared padded string length ~A is greater than its maximum ~A"
   (value condition)
   (1- (pad condition)))
 
 
 (define-condition invalid-padded-string (tfm-compliance-error padded-string)
   ((section :initform 10) ; slot merge
-   (value :documentation "The invalid string." :initarg :value :accessor value))
+   (str :documentation "The invalid string." :initarg :str :reader str))
   (:documentation "The Invalid Padded String compliance error.
 It signals that a padded string is not in BCPL format (it contains parentheses
 or non-ASCII characters)."))
 
 (define-condition-report (condition invalid-padded-string)
-  "padded string ~S is not in BCPL format (it contains parentheses and/or ~
+    "padded string ~S is not in BCPL format (it contains parentheses and/or ~
 non-ASCII characters)"
-  (value condition))
+  (str condition))
 
 
 (define-condition padded-string-overflow (tfm-compliance-warning padded-string)
-  ((value :documentation "The string's overflow."
-	  :initarg :value :accessor value))
+  ((overflow
+    :documentation "The string's overflow."
+    :initarg :overflow
+    :reader overflow))
   (:documentation "The Padded String Overflow compliance warning.
 It signals that a padded string contains non null characters after its
 declared length."))
 
 (define-condition-report (condition padded-string-overflow)
-  "padded string contains non-null overflow characters (~S)"
-  (value condition))
+    "padded string contains non-null overflow characters (~S)"
+  (overflow condition))
 
 (defmethod print-object :after ((condition padded-string-overflow) stream)
   "Advertise padded string overflow CONDITION's relevant documentation."
@@ -305,8 +313,7 @@ See §87 of the PLtoTF documentation, or “TeX Font Metrics Files”
 (David Fuchs, TUGBoat, Volume 2, №1) for more information.")))
 
 
-(defun read-padded-string
-    (pad &aux (length (read-u8)) string)
+(defun read-padded-string (pad &aux (length (read-u8)) string)
   "Read a padded string out of PAD bytes from *STREAM*.
 The first byte in *STREAM* indicates the actual length of the string.
 
@@ -339,7 +346,7 @@ warning."
 			 (or (< (char-code character) 32)
 			     (> (char-code character) 126)))
 		       string))
-      (restart-case (error 'invalid-padded-string :value string)
+      (restart-case (error 'invalid-padded-string :str string)
 	(keep-string () :report "Keep it anyway.")
 	(fix-string () :report "Fix it using /'s and ?'s."
 	  (loop :for i :from 0 :upto (1- (length string))
@@ -375,7 +382,7 @@ warning."
 	      ;; encoding agrees at least with ASCII.
 	      :do (setf (aref tail i) (code-char (read-u8))))
 	(when (find-if-not #'zerop tail :key #'char-code)
-	  (warn 'padded-string-overflow :value tail)))))
+	  (warn 'padded-string-overflow :overflow tail)))))
   string)
 
 
@@ -390,11 +397,18 @@ warning."
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when documentation (list documentation))))
 
-(defmacro map-accessors (var object accessors &body body)
-  "Map BODY on OBJECT ACCESSORS, each in turn available as VAR."
-  `(progn ,@(mapcar (lambda (accessor)
-		      `(with-accessors ((,var ,accessor)) ,object
-			   ,@body))
-	      accessors)))
+(defmacro map-slots (var object slots &body body)
+  "Map BODY on OBJECT SLOTS, each in turn available as VAR."
+  `(progn ,@(mapcar (lambda (slot)
+		      `(with-slots ((,var ,slot)) ,object ,@body))
+	      slots)))
+
+#i(remove-keys 1)
+(defun remove-keys (keys &rest removed)
+  "Return a new property list from KEYS without REMOVED ones."
+  (loop :for key :in keys :by #'cddr
+	:for val :in (cdr keys) :by #'cddr
+	:unless (member key removed)
+	  :nconc (list key val)))
 
 ;;; util.lisp ends here

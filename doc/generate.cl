@@ -1,6 +1,6 @@
 ;;; generate.cl --- TFM reference manual generation script
 
-;; Copyright (C) 2019, 2021 Didier Verna
+;; Copyright (C) 2019, 2021, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -68,20 +68,20 @@ for a more human-readable guide to using @tfm{}."
 ;; VERSION function).
 (asdf:load-system :net.didierverna.tfm.setup)
 
-(defvar *hyperlinks* nil)
+(defvar *locations* nil)
 (when (and (second sb-ext:*posix-argv*)
-	   (string= (second sb-ext:*posix-argv*) "--hyperlinks"))
-  (setq *hyperlinks* t))
+	   (string= (second sb-ext:*posix-argv*) "--locations"))
+  (setq *locations* t))
 
 (declt:declt :net.didierverna.tfm
 	     :library-name "TFM"
-	     :version (net.didierverna.tfm.setup:version :long)
+	     :library-version (net.didierverna.tfm.setup:version :long)
 	     :copyright-years net.didierverna.tfm.setup:*copyright-years*
 	     :license :bsd
 	     :introduction +introduction+
-	     :texi-name "reference"
-	     :info-name "tfm-reference"
-	     :hyperlinks *hyperlinks*)
+	     :locations *locations*
+	     :file-name "reference"
+	     :info-name "tfm-reference")
 
 (uiop:quit)
 

@@ -1,6 +1,6 @@
 ;;; font.lisp --- Font Information
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -78,6 +78,7 @@ STATE is a list of characters, the first two being subject to LIGATURE."
 
 
 
+
 ;; ==========================================================================
 ;; Base (TFM) Font
 ;; ==========================================================================
@@ -86,163 +87,153 @@ STATE is a list of characters, the first two being subject to LIGATURE."
 ;; Class
 ;; -----
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (define-constant +font-dimension-accessors+
-      '(interword-space interword-stretch interword-shrink ex em extra-space)
-    "The list of dimension accessor names in the FONT class."))
-
-(defmacro map-font-dimension-accessors (var font &body body)
-  "Map BODY on FONT dimension accessors available as VAR."
-  `(map-accessors ,var ,font ,+font-dimension-accessors+
-     ,@body))
-
 (defclass font ()
-  ((name
-    :documentation "The font's name.
-When the font is loaded from a file, it defaults to the file's base name,
-along with potential scaling information."
-    :initarg :name
-    :accessor name)
-   (file
-    :documentation "The file from which the font was loaded, or NIL."
-    :initform nil
+  ((file
+    :documentation "The font's file."
     :initarg :file
-    :accessor file)
+    :reader file)
+   (name
+    :documentation "The font's name."
+    :initform nil
+    :initarg :name
+    :reader name)
    (checksum
-    :documentation "The font's checksum, as provided by Metafont."
-    :accessor checksum)
+    :documentation "The font's checksum."
+    :reader checksum)
    (frozen
     :documentation "Whether the font is frozen."
     :initform nil
-    :accessor frozen)
+    :reader frozen)
    (design-size
     :documentation "The font's design size, in units of TeX points."
     :initform nil
+    :initarg :design-size
     :accessor design-size)
    (original-design-size
     :documentation "The font's original design size, in units of TeX points."
-    :accessor original-design-size)
+    :reader original-design-size)
    (encoding
     :documentation "The font's character coding scheme (a BCPL string), or NIL."
     :initform nil
-    :accessor encoding)
+    :reader encoding)
    (family
     :documentation "The font's family (a BCPL string), or NIL."
     :initform nil
-    :accessor family)
+    :reader family)
    (7bits-safe
     :documentation "Whether the font is 7 bits safe (0 or 1), or NIL.
 When 1, it means that no character of code lesser than 128 can lead to a
 character of code greater than 128 by ways of ligatures or extensible
 recipes."
     :initform nil
-    :accessor 7bits-safe)
+    :reader 7bits-safe)
    (face-number
     :documentation "The font's face number, or NIL."
     :initform nil
-    :accessor face-number)
+    :reader face-number)
    (weight
     :documentation "The font's weight (:medium, :bold, :light), or NIL.
 When available, it is decoded from the font face number."
     :initform nil
-    :accessor weight)
+    :reader weight)
    (slope
     :documentation "The font's slope (:roman, :italic), or NIL.
 When available, it is decoded from the font face number."
     :initform nil
-    :accessor slope)
+    :reader slope)
    (expansion
     :documentation
     "The font's expansion (:regular, :condensed, :extended), or NIL.
 When available, it is decoded from the font face number."
     :initform nil
-    :accessor expansion)
+    :reader expansion)
    (face-code
     :documentation "The font's 3-letters face code, or NIL.
 When available, it is the concatenation of the upcased first letters of the
 font's weight, slope, and expansion."
     :initform nil
-    :accessor face-code)
+    :reader face-code)
    (slant
     :documentation "The font's slant (a scalar ratio)."
     :initform 0
-    :accessor slant)
+    :reader slant)
    (interword-space
     :documentation "The font's normal interword space.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initform 0
-    :accessor interword-space)
+    :reader interword-space)
    (interword-stretch
     :documentation "The font's interword stretchability.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initform 0
-    :accessor interword-stretch)
+    :reader interword-stretch)
    (interword-shrink
     :documentation "The font's interword shrinkability.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initform 0
-    :accessor interword-shrink)
+    :reader interword-shrink)
    (ex
     :documentation "The font's ex size.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initform 0
-    :accessor ex)
+    :reader ex)
    (em
     :documentation "The font's em size.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initform 0
-    :accessor em)
+    :reader em)
    (extra-space
     :documentation "The font's extra space.
 It is expressed in design size units, or in TeX point units if the font is
 frozen.
 
 This is the additional space to put at the end of sentences."
-    :initform 0 :accessor extra-space)
+    :initform 0
+    :reader extra-space)
    (parameters
     :documentation "The font's additional parameters array, or NIL.
 Parameters are expressed in design size units, or in TeX point units if the
 font is frozen."
     :initform nil
-    :accessor parameters)
+    :reader parameters)
    (min-code
     :documentation
     "The font's smallest character code, or NIL if the font is empty."
     :initform nil
-    :accessor min-code)
+    :reader min-code)
    (max-code
     :documentation
     "The font's largest character code, or NIL if the font is empty."
     :initform nil
-    :accessor max-code)
+    :reader max-code)
    (characters
     :documentation "The font's characters.
 This is a hash table associating character codes with characters."
     :initform (make-hash-table :test #'eq)
-    :accessor characters)
+    :reader characters)
    (character-count
     :documentation "The font's number of characters.
 The character count does not include the boundary character, unless that
 character really exists in the font (has non-zerop metrics)."
-    :accessor character-count)
+    :reader character-count)
    (ligatures
     :documentation "The font's ligatures.
 This is a hash table associating conses of characters with the corresponding
 ligature."
     :initform (make-hash-table :test #'equal)
-    :accessor ligatures)
-   (kernings
-    :documentation "The font's kernings.
+    :reader ligatures)
+   (kerns
+    :documentation "The font's kerns.
 This is a hash table associating conses of characters with the corresponding
-kerning. They are expressed in design size units, or in TeX point units if
+kern. They are expressed in design size units, or in TeX point units if
 the font is frozen."
     :initform (make-hash-table :test #'equal)
-    :accessor kernings)
+    :reader kerns)
    (boundary-character
     :documentation "The font's boundary character, or NIL.
 This character is also accessible by code, like normal ones. However, it is
@@ -251,11 +242,357 @@ TeX: the Program [545]). Finally, this character is not included in the
 character count, unless it exists for real in the font (has non-zero
 metrics)."
     :initform nil
-    :accessor boundary-character))
+    :reader boundary-character))
   (:documentation "The TeX Font Metrics class.
 This class represents decoded font information. Within the context of this
 library, the term \"font\" denotes an instance of this class, or of one of its
 subclasses."))
+
+
+(defmethod print-object ((font font) stream)
+  "Print FONT unreadably with its name to STREAM."
+  (print-unreadable-object (font stream :type t)
+    (princ (name font) stream)
+    (unless (= (design-size font) (original-design-size font))
+      (format stream " at ~Apt" (design-size font)))
+    (when (frozen font) (princ " (frozen)" stream))))
+
+
+(define-condition invalid-custom-name (tfm-usage-error)
+  ((name
+    :documentation "The invalid custom name."
+    :initarg :name
+    :reader name))
+  (:documentation "The Invalid Custom Name usage error.
+It signals that a custom name is not a non-empty string."))
+
+(define-condition-report (condition invalid-custom-name)
+    "custom name ~S is invalid (should be a non-empty string)"
+  (name condition))
+
+
+(define-condition invalid-custom-design-size (tfm-usage-error)
+  ((value
+    :documentation "The invalid custom design size."
+    :initarg :value
+    :reader value))
+  (:documentation "The Invalid Custom Design Size usage error.
+It signals that a custom design size is not a real greater or equal to 1."))
+
+(define-condition-report (condition invalid-custom-design-size)
+    "custom design size ~A is invalid (should be a real greater or equal to 1)"
+  (value condition))
+
+
+;; #### NOTE: we're not currently so pedantic as to check that the font's file
+;; has a non-empty base name.
+(defmethod initialize-instance :after ((font font) &key)
+  "Check the validity of FONT's name and design-size.
+- If the font's name is not a non-empty string, signal and INVALID-CUSTOM-NAME
+  error. This error is immediately restartable with USE-FILE-BASE-NAME.
+- IF the font's design-size is not NIL or a real greater or equal to 1, signal
+  an INVALID-CUSTOM-DESIGN-SIZE error. This error is immediately restartable
+  with USE-ORIGINAL-DESIGN-SIZE."
+  (with-slots (file name design-size) font
+    (if (null name)
+      (setq name (pathname-name file))
+      (unless (and (stringp name) (not (zerop (length name))))
+	(restart-case (error 'invalid-custom-name :name name)
+	  (use-file-base-name () :report "Use the font file's base name."
+	    (setq name (pathname-name file))))))
+    (unless (typep design-size '(or null (real 1)))
+      (restart-case (error 'invalid-custom-design-size :value design-size)
+	(use-original-design-size () :report "Use the font's design size."
+	  ;; #### NOTE: at this time, the original design size is not yet
+	  ;; known. NIL simply indicates that no custom value was provided at
+	  ;; initialization time.
+	  (setq design-size nil))))))
+
+
+;; ---------------------------------------------
+;; Internal character, ligature, and kern access
+;; ---------------------------------------------
+
+;; #### NOTE: this is a compliance error. It may only be signalled by the
+;; internal API, meaning that the TFM data contains invalid references to
+;; characters that don't exist in the font (remember that we do add a fake
+;; boundary character if needed, so even this one can be retrieved).
+(define-condition invalid-character-code (tfm-compliance-error)
+  ((code
+    :documentation "The invalid character code."
+    :initarg :code
+    :reader code))
+  (:documentation "The Invalid Character Code compliance error.
+It signals a reference to a character code which does not exist in the font
+being loaded."))
+
+(define-condition-report (condition invalid-character-code)
+    "character code ~A is invalid."
+  (code condition))
+
+(defun code-character (code font &optional (errorp t))
+  "Return FONT's CODE character.
+If ERRORP (the default), check that the character exists, or signal an
+INVALID-CHARACTER-CODE error. Note that a fake boundary character may be
+retrieved by this function."
+  (or (gethash code (characters font))
+      ;; #### NOTE: recovering from here directly would make little sense, so
+      ;; it's rather the job of the callers to provide sensible restarts.
+      (when errorp (error 'invalid-character-code :code code))))
+
+
+(defun (setf code-character) (character font)
+  "Make FONT's CHARACTER accessible by its code."
+  (setf (gethash (code character) (characters font)) character))
+
+;; #### NOTE: we don't currently bother to check that the two characters
+;; belong to the same font. These functions are internal only, so let's just
+;; say I trust my own code for now.
+(defun set-ligature (character1 character2 ligature)
+  "Set LIGATURE for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (ligatures (font character1)))
+	ligature))
+
+(defun set-kern (character1 character2 kern)
+  "Set KERN for CHARACTER1 and CHARACTER2."
+  (setf (gethash (cons character1 character2) (kerns (font character1)))
+	kern))
+
+
+;; -------
+;; Scaling
+;; -------
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +font-dimension-slots+
+      '(interword-space interword-stretch interword-shrink ex em extra-space)
+    "The list of dimension slot names in the FONT class."))
+
+(defmacro map-font-dimension-slots (var font &body body)
+  "Map BODY on FONT dimension slots available as VAR."
+  `(map-slots ,var ,font ,+font-dimension-slots+ ,@body))
+
+(defgeneric scale (font factor)
+  (:documentation "Scale all FONT dimensions by FACTOR.")
+  (:method (font factor)
+    "Scaling method for regular FONTs."
+    (map-font-dimension-slots slot font
+      (setf slot (* slot factor)))
+    (when (parameters font)
+      (loop :for i :from 0 :upto (1- (length (parameters font)))
+	    :do (setf (aref (parameters font) i)
+		      (* (aref (parameters font) i) factor))))
+    (maphash (lambda (code character)
+	       (declare (ignore code))
+	       (map-character-metrics-dimension-slots slot character
+		 (setf slot (* slot factor))))
+	     (characters font))
+    (maphash (lambda (pair kern)
+	       (set-kern (car pair) (cdr pair) (* kern factor)))
+	     (kerns font))))
+
+
+
+
+;; ==========================================================================
+;; Math Symbols Font
+;; ==========================================================================
+
+(defclass math-symbols-font (font)
+  ((num1
+    :documentation "The font's NUM1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader num1)
+   (num2
+    :documentation "The font's NUM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader num2)
+   (num3
+    :documentation "The font's NUM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader num3)
+   (denom1
+    :documentation "The font's DENOM1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader denom1)
+   (denom2
+    :documentation "The font's DENOM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader denom2)
+   (sup1
+    :documentation "The font's SUP1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader sup1)
+   (sup2
+    :documentation "The font's SUP2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader sup2)
+   (sup3
+    :documentation "The font's SUP2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader sup3)
+   (sub1
+    :documentation "The font's SUB1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader sub1)
+   (sub2
+    :documentation "The font's SUB2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader sub2)
+   (supdrop
+    :documentation "The font's SUPDROP parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader supdrop)
+   (subdrop
+    :documentation "The font's SUBDROP parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader subdrop)
+   (delim1
+    :documentation "The font's DELIM1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader delim1)
+   (delim2
+    :documentation "The font's DELIM2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader delim2)
+   (axis-height
+    :documentation "The font's AXIS-HEIGHT parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader axis-height))
+  (:documentation "The Math Symbols Font class.
+This class represents fonts with the \"TeX math symbols\" character coding
+scheme."))
+
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +math-symbols-font-dimension-slots+
+      '(num1 num2 num3
+	denom1 denom2
+	sup1 sup2 sup3
+	sub1 sub2
+	supdrop subdrop
+	delim1 delim2
+	axis-height)
+    "The list of dimension slot names in the MATH-SYMBOLS-FONT class."))
+
+(defmacro map-math-symbols-font-dimension-slots (var font &body body)
+  "Map BODY on FONT dimension slots available as VAR."
+  `(map-slots ,var ,font ,+math-symbols-font-dimension-slots+ ,@body))
+
+
+(defmethod scale :around ((font math-symbols-font) factor)
+  "Scaling method for MATH-SYMBOL-FONTs."
+  (call-next-method)
+  (map-math-symbols-font-dimension-slots slot font
+    (setf slot (* slot factor))))
+
+
+
+
+;; ==========================================================================
+;; Math Extension Font
+;; ==========================================================================
+
+(defclass math-extension-font (font)
+  ((default-rule-thickness
+    :documentation "The font's default rule thickness.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader default-rule-thickness)
+   (big-op-spacing1
+    :documentation "The font's BIG-OP-SPACING1 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader big-op-spacing1)
+   (big-op-spacing2
+    :documentation "The font's BIG-OP-SPACING2 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader big-op-spacing2)
+   (big-op-spacing3
+    :documentation "The font's BIG-OP-SPACING3 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader big-op-spacing3)
+   (big-op-spacing4
+    :documentation "The font's BIG-OP-SPACING4 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader big-op-spacing4)
+   (big-op-spacing5
+    :documentation "The font's BIG-OP-SPACING5 parameter.
+It is expressed in design size units, or in TeX point units if the font is
+frozen."
+    :initform 0
+    :reader big-op-spacing5))
+  (:documentation "The Math Extension Font class.
+This class represents fonts with the \"TeX math extension\" character coding
+scheme."))
+
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +math-extension-font-dimension-slots+
+      '(default-rule-thickness
+	big-op-spacing1 big-op-spacing2 big-op-spacing3 big-op-spacing4
+	big-op-spacing5)
+    "The list of dimension slot names in the MATH-EXTENSION-FONT class."))
+
+(defmacro map-math-extension-font-dimension-slots (var font &body body)
+  "Map BODY on math extension FONT dimension slots available as VAR."
+  `(map-slots ,var ,font ,+math-extension-font-dimension-slots+ ,@body))
+
+
+(defmethod scale :around ((font math-extension-font) factor)
+  "Scaling method for MATH-EXTENSION-FONTs."
+  (call-next-method)
+  (map-math-extension-font-dimension-slots slot font
+    (setf slot (* slot factor))))
+
+
+
+
+;; ==========================================================================
+;; Public API
+;; ==========================================================================
+
+;; -------
+;; Scaling
+;; -------
 
 (defmethod (setf design-size) :before (design-size font)
   "Unscale FONT if frozen."
@@ -266,77 +603,25 @@ subclasses."))
   (when (frozen font) (scale font (design-size font))))
 
 (defmethod (setf design-size) :around (design-size font)
-  "Check that DESIGN-SIZE is a real greater or equal to 1."
-  (check-type design-size (real 1))
+  "Check that DESIGN-SIZE is a real greater or equal to 1.
+Otherwise, signal and INVALID-CUSTOM-DESIGN-SIZE error. When the font's
+original design size is itself valid, this error is immediately restartable
+with USE-ORIGINAL-DESIGN-SIZE."
+  (unless (typep design-size '(real 1))
+    (restart-case (error 'invalid-custom-design-size :value design-size)
+      (use-original-design-size ()
+	:report "Use the font's original design size."
+	:test (lambda (condition)
+		(declare (ignore condition))
+		(typep (original-design-size font) '(real 1)))
+	(setq design-size (original-design-size font)))))
   (call-next-method design-size font))
 
-(defmethod print-object ((font font) stream)
-  "Print FONT unreadably with its name to STREAM."
-  (print-unreadable-object (font stream :type t)
-    (princ (name font) stream)
-    (unless (= (design-size font) (original-design-size font))
-      (format stream " at ~Apt" (design-size font)))
-    (when (frozen font) (princ " (frozen)" stream))))
 
-;; #### NOTE: this error is not currently exported, because it cannot in fact
-;; be triggered yet (by the public API).
-(define-condition anonymous-font (tfm-usage-error)
-  ()
-  (:documentation "The Anonymous Font usage error.
-It signals an attempt at creating a font with no name."))
+;; ------------------------------------
+;; Character, ligature, and kern access
+;; ------------------------------------
 
-(define-condition-report (condition anonymous-font)
-  "all fonts must be named.")
-
-
-(defmethod initialize-instance :before ((font font) &key name)
-  "Check that FONT has a name, or signal an ANONYMOUS-FONT error."
-  (unless name (error 'anonymous-font)))
-
-(defun make-font (name class &rest initargs)
-  "Make a new NAMEd instance of font CLASS, and return it.
-If INITARGS are provided, pass them as-is to MAKE-INSTANCE."
-  (apply #'make-instance class :name name initargs))
-
-
-;; ----------------
-;; Pseudo-accessors
-;; ----------------
-
-;; #### NOTE: this is a compliance error. It may only be signalled by the
-;; internal API, meaning that the TFM data contains invalid references to
-;; characters that don't exist in the font (remember that we do add a fake
-;; boundary character if needed, so even this one can be retrieved).
-(define-condition invalid-character-code (tfm-compliance-error)
-  ((value
-    :documentation "The invalid character code."
-    :initarg :value
-    :accessor value))
-  (:documentation "The Invalid Character Code compliance error.
-It signals a reference to a character code which does not exist in the font
-being loaded."))
-
-(define-condition-report (condition invalid-character-code)
-  "character code ~A is invalid."
-  (value condition))
-
-
-;; #### NOTE: this is the internal API, used while loading TFM data.
-(defun code-character (code font &optional (errorp t))
-  "Return FONT's CODE character.
-If ERRORP (the default), check that the character exists, or signal an
-INVALID-CHARACTER-CODE error. Note that a fake boundary character may be
-retrieved by this function."
-  (or (gethash code (characters font))
-      ;; #### NOTE: recovering from here directly would make little sense, so
-      ;; it's rather the job of the callers to provide sensible restarts.
-      (when errorp (error 'invalid-character-code :value code))))
-
-(defun (setf code-character) (character font)
-  "Make FONT's CHARACTER accessible by its code."
-  (setf (gethash (code character) (characters font)) character))
-
-;; #### NOTE: this is the public API.
 (defun get-character (code font)
   "Return FONT's CODE character, or NIL."
   (gethash code (characters font)))
@@ -346,22 +631,22 @@ retrieved by this function."
   ((character1
     :documentation "The first character."
     :initarg :character1
-    :accessor character1)
+    :reader character1)
    (character2
     :documentation "The second character."
     :initarg :character2
-    :accessor character2))
+    :reader character2))
   (:documentation "The Different Fonts usage error.
-It signals an attempt at retrieving a ligature or kerning for two characters
+It signals an attempt at retrieving a ligature or kern for two characters
 from different fonts."))
 
 (define-condition-report (condition different-fonts)
-  "characters ~A and ~A don't belong to the same font."
+    "characters ~A and ~A don't belong to the same font."
   (character1 condition)
   (character2 condition))
 
 
-(defun ligature (character1 character2)
+(defun get-ligature (character1 character2)
   "Return ligature for CHARACTER1 and CHARACTER2, or NIL.
 If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
 DIFFERENT-FONTS error."
@@ -369,260 +654,42 @@ DIFFERENT-FONTS error."
     (error 'different-fonts :character1 character1 :character2 character2))
   (gethash (cons character1 character2) (ligatures (font character1))))
 
-(defun kerning (character1 character2)
-  "Return kerning for CHARACTER1 and CHARACTER2, or NIL.
+
+(defun get-kern (character1 character2)
+  "Return kern for CHARACTER1 and CHARACTER2, or NIL.
 If CHARACTER1 and CHARACTER2 don't belong to the same font, signal a
 DIFFERENT-FONTS error."
   (unless (eq (font character1) (font character2))
     (error 'different-fonts :character1 character1 :character2 character2))
-  (gethash (cons character1 character2) (kernings (font character1))))
-
-
-;; #### NOTE: we don't currently bother to check that the two characters
-;; belong to the same font. These functions are internal only (although the
-;; symbols are exported, damn you CL), so let's just say I trust my own code
-;; for now.
-(defun (setf ligature) (ligature character1 character2)
-  "Set LIGATURE for CHARACTER1 and CHARACTER2."
-  (setf (gethash (cons character1 character2) (ligatures (font character1)))
-	ligature))
-
-(defun (setf kerning) (kerning character1 character2)
-  "Set KERNING for CHARACTER1 and CHARACTER2."
-  (setf (gethash (cons character1 character2) (kernings (font character1)))
-	kerning))
+  (gethash (cons character1 character2) (kerns (font character1))))
 
 
 ;; --------
 ;; Freezing
 ;; --------
 
-(defgeneric scale (font factor)
-  (:documentation "Scale all FONT dimensions by FACTOR.")
-  (:method (font factor)
-    "Scaling method for regular FONTs."
-    (map-font-dimension-accessors slot font
-      (setf slot (* slot factor)))
-    (when (parameters font)
-      (loop :for i :from 0 :upto (1- (length (parameters font)))
-	    :do (setf (aref (parameters font) i)
-		      (* (aref (parameters font) i) factor))))
-    (maphash (lambda (code character)
-	       (declare (ignore code))
-	       (map-character-metrics-dimension-accessors slot character
-		 (setf slot (* slot factor))))
-	     (characters font))
-    (maphash (lambda (pair kern)
-	       (setf (kerning (car pair) (cdr pair)) (* kern factor)))
-	     (kernings font))))
-
 (defun freeze (font)
-  "Freeze FONT.
+  "Freeze FONT, and return it.
 Freezing a font means that all dimensions normally expressed in design size
 units are multiplied by it, so as to lead values in TeX point units.
-If FONT is already frozen, this function does nothing and returns NIL.
-Otherwise, it returns T."
-  (unless (frozen font)
-    (scale font (design-size font))
-    (setf (frozen font) t)))
+If FONT is already frozen, this function does nothing.
+Otherwise, it returns T as a second value."
+  (values font
+	  (unless (frozen font)
+	    (scale font (design-size font))
+	    (setf (slot-value font 'frozen) t)
+	    t)))
 
 (defun unfreeze (font)
-  "Unfreeze FONT.
+  "Unfreeze FONT and return it.
 Unfreezing means performing the inverse of what FREEZE does.
-If FONT is not frozen, this function does nothing and returns NIL. Otherwise,
-it returns T."
-  (when (frozen font)
-    (scale font (/ 1 (design-size font)))
-    (setf (frozen font) nil)
-    t))
-
-
-
-;; ==========================================================================
-;; Math Symbols Font
-;; ==========================================================================
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (define-constant +math-symbols-font-dimension-accessors+
-      '(num1 num2 num3
-	denom1 denom2
-	sup1 sup2 sup3
-	sub1 sub2
-	supdrop subdrop
-	delim1 delim2
-	axis-height)
-    "The list of dimension accessor names in the MATH-SYMBOLS-FONT class."))
-
-(defmacro map-math-symbols-font-dimension-accessors (var font &body body)
-  "Map BODY on FONT dimension accessors available as VAR."
-  `(map-accessors ,var ,font ,+math-symbols-font-dimension-accessors+
-     ,@body))
-
-(defclass math-symbols-font (font)
-  ((num1
-    :documentation "The font's NUM1 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor num1)
-   (num2
-    :documentation "The font's NUM2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor num2)
-   (num3
-    :documentation "The font's NUM2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor num3)
-   (denom1
-    :documentation "The font's DENOM1 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor denom1)
-   (denom2
-    :documentation "The font's DENOM2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor denom2)
-   (sup1
-    :documentation "The font's SUP1 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor sup1)
-   (sup2
-    :documentation "The font's SUP2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor sup2)
-   (sup3
-    :documentation "The font's SUP2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor sup3)
-   (sub1
-    :documentation "The font's SUB1 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor sub1)
-   (sub2
-    :documentation "The font's SUB2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor sub2)
-   (supdrop
-    :documentation "The font's SUPDROP parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor supdrop)
-   (subdrop
-    :documentation "The font's SUBDROP parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor subdrop)
-   (delim1
-    :documentation "The font's DELIM1 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor delim1)
-   (delim2
-    :documentation "The font's DELIM2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor delim2)
-   (axis-height
-    :documentation "The font's AXIS-HEIGHT parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor axis-height))
-  (:documentation "The Math Symbols Font class.
-This class represents fonts with the \"TeX math symbols\" character coding
-scheme."))
-
-(defmethod scale :around ((font math-symbols-font) factor)
-  "Scaling method for MATH-SYMBOL-FONTs."
-  (map-math-symbols-font-dimension-accessors slot font
-    (setf slot (* slot factor)))
-  (call-next-method))
-
-
-
-;; ==========================================================================
-;; Math Symbols Font
-;; ==========================================================================
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (define-constant +math-extension-font-dimension-accessors+
-      '(default-rule-thickness
-	big-op-spacing1 big-op-spacing2 big-op-spacing3 big-op-spacing4
-	big-op-spacing5)
-    "The list of dimension accessor names in the MATH-EXTENSION-FONT class."))
-
-(defmacro map-math-extension-font-dimension-accessors (var font &body body)
-  "Map BODY on math extension FONT dimension accessors available as VAR."
-  `(map-accessors ,var ,font ,+math-extension-font-dimension-accessors+
-     ,@body))
-
-(defclass math-extension-font (font)
-  ((default-rule-thickness
-    :documentation "The font's default rule thickness.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor default-rule-thickness)
-   (big-op-spacing1
-    :documentation "The font's BIG-OP-SPACING1 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor big-op-spacing1)
-   (big-op-spacing2
-    :documentation "The font's BIG-OP-SPACING2 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor big-op-spacing2)
-   (big-op-spacing3
-    :documentation "The font's BIG-OP-SPACING3 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor big-op-spacing3)
-   (big-op-spacing4
-    :documentation "The font's BIG-OP-SPACING4 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor big-op-spacing4)
-   (big-op-spacing5
-    :documentation "The font's BIG-OP-SPACING5 parameter.
-It is expressed in design size units, or in TeX point units if the font is
-frozen."
-    :initform 0
-    :accessor big-op-spacing5))
-  (:documentation "The Math Extension Font class.
-This class represents fonts with the \"TeX math extension\" character coding
-scheme."))
-
-(defmethod scale :around ((font math-extension-font) factor)
-  "Scaling method for MATH-EXTENSION-FONTs."
-  (map-math-extension-font-dimension-accessors slot font
-    (setf slot (* slot factor)))
-  (call-next-method))
+If FONT is not frozen, this function does nothing.
+Otherwise, it returns T as a second value."
+  (values font
+	  (when (frozen font)
+	    (scale font (/ 1 (design-size font)))
+	    (setf (slot-value font 'frozen) nil)
+	    t)))
 
 
 

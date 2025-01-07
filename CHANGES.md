@@ -1,3 +1,17 @@
+# Version 2.0
+This version features a number of improvements at the expense of backward
+incompatibility.
+- LOAD-FONT now allows to override the default font name.
+- Invalid custom font name and design size are now signalled by two new usage
+  errors: INVALID-CUSTOM-NAME (restartable with USE-FILE-BASE-NAME) and
+  INVALID-CUSTOM-DESIGN-SIZE (restartable with USE-ORIGINAL-DESIGN-SIZE).
+- The LIGATURE and KERNING functions have been renamed to GET-LIGATURE and
+  GET-KERN respectively.
+- (UN)FREEZE now return two values: the font instance and T if (un)freezing
+  did occur (NIL otherwise).
+- The conditions ontology has been improved via more detailed reports and more
+  explicit slot names.
+
 ## Version 1.4
 - Improve representation of empty fonts. In particular, set MIN-CODE and
   MAX-CODE to NIL.

@@ -1,6 +1,6 @@
 ;;; character.lisp --- Character Information
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -33,26 +33,29 @@
 ;; Extension Recipes
 ;; ==========================================================================
 
+;; #### NOTE: extension recipes are considered internal. Character metrics
+;; instances provide pseudo-accessors to extension recipe components.
+
 (defclass extension-recipe ()
   ((top-character
     :documentation "The recipe's top character, or NIL."
     :initform nil
     :initarg :top-character
-    :accessor top-character)
+    :reader top-character)
    (middle-character
     :documentation "The recipe's middle character, or NIL."
     :initform nil
     :initarg :middle-character
-    :accessor middle-character)
+    :reader middle-character)
    (bottom-character
     :documentation "The recipe's bottom character, or NIL."
     :initform nil
     :initarg :bottom-character
-    :accessor bottom-character)
+    :reader bottom-character)
    (repeated-character
     :documentation "The recipe's repeated character."
     :initarg :repeated-character
-    :accessor repeated-character))
+    :reader repeated-character))
   (:documentation "The Extension Recipe class.
 This class represents decoded information for extensible characters. Within
 the context of this library, the expression \"extension recipe\" denotes an
@@ -76,19 +79,10 @@ The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
 
 
 
+
 ;; ==========================================================================
 ;; Character Metrics
 ;; ==========================================================================
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (define-constant +character-metrics-dimension-accessors+
-      '(width height depth italic-correction)
-    "The list of dimension accessor names in the CHARACTER-METRICS class."))
-
-(defmacro map-character-metrics-dimension-accessors (var character &body body)
-  "Map BODY on CHARACTER metrics dimension accessors available as VAR."
-  `(map-accessors ,var ,character ,+character-metrics-dimension-accessors+
-     ,@body))
 
 (defclass character-metrics ()
   ((code
@@ -104,19 +98,19 @@ The recipe may also have a TOP-, MIDDLE-, and BOTTOM-CHARACTER."
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initarg :width
-    :accessor width)
+    :reader width)
    (height
     :documentation "The character's height.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initarg :height
-    :accessor height)
+    :reader height)
    (depth
     :documentation "The character's depth.
 It is expressed in design size units, or in TeX point units if the font is
 frozen."
     :initarg :depth
-    :accessor depth)
+    :reader depth)
    (italic-correction
     :documentation
     "The character's italic correction.
@@ -124,7 +118,7 @@ TeX uses this value for regular characters followed by the command \/, and
 also in math mode for superscript placement. It is expressed in design size
 units, or in TeX point units if the font is frozen."
     :initarg :italic-correction
-    :accessor italic-correction)
+    :reader italic-correction)
    (next-character
     :documentation "The next character in a character list.
 This slot is non-null only if the character is part of a chain of characters
@@ -132,14 +126,14 @@ of ascending size, and not the last one (see TeX: the Program [544]). It is
 mutually exclusive with the EXTENSION-RECIPE slot, and also with the existence
 of a ligature or kerning program for this character."
     :initform nil
-    :accessor next-character)
+    :reader next-character)
    (extension-recipe
     :documentation "The character's extension recipe, or NIL.
 This slot is non-null only if this character is extensible (see TeX: the
 Program [544]). It is mutually exclusive with the NEXT-CHARACTER slot, and
 also with the existence of a ligature or kerning program for this character."
     :initform nil
-    :accessor extension-recipe))
+    :reader extension-recipe))
   (:documentation "The Character Metrics class.
 This class represents decoded character information. Within the context of
 this library, the term \"character\" denotes an instance of this class."))
@@ -164,6 +158,16 @@ metrics instances are created."
     :italic-correction italic-correction))
 
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +character-metrics-dimension-slots+
+      '(width height depth italic-correction)
+    "The list of dimension slot names in the CHARACTER-METRICS class."))
+
+(defmacro map-character-metrics-dimension-slots (var character &body body)
+  "Map BODY on CHARACTER metrics dimension slots available as VAR."
+  `(map-slots ,var ,character ,+character-metrics-dimension-slots+ ,@body))
+
+
 ;; ---------------------------------
 ;; Extension Recipe Pseudo-Accessors
 ;; ---------------------------------
@@ -174,17 +178,17 @@ metrics instances are created."
   (when (extension-recipe character) t))
 
 (define-condition not-extensible (tfm-usage-error)
-  ((value
+  ((chr
     :documentation "The non extensible character."
-    :initarg :value
-    :accessor value))
+    :initarg :chr
+    :reader chr))
   (:documentation "The Not Extensible usage error.
 It signals an attempt at accessing the extension recipe of a non extensible
 character."))
 
 (define-condition-report (condition not-extensible)
-  "character ~A is not extensible."
-  (value condition))
+    "character ~A is not extensible."
+  (chr condition))
 
 
 (defmacro define-extension-recipe-pseudo-accessor (name)
@@ -192,7 +196,7 @@ character."))
      ,(format nil "Return extensible CHARACTER's ~A.
 If CHARACTER is not extensible, signal a NOT-EXTENSIBLE error."
 	name)
-     (unless (extensiblep character) (error 'not-extensible :value character))
+     (unless (extensiblep character) (error 'not-extensible :chr character))
      (,name (extension-recipe character))))
 
 (define-extension-recipe-pseudo-accessor top-character)

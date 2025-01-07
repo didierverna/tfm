@@ -1,6 +1,6 @@
 ;;; file.lisp --- Parsing and decoding
 
-;; Copyright (C) 2018, 2019, 2024 Didier Verna
+;; Copyright (C) 2018, 2019, 2024, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -41,12 +41,12 @@
    (value
     :documentation "The invalid design size."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Design Size compliance error.
 It signals that a design size is too small (< 1pt)."))
 
 (define-condition-report (condition invalid-design-size)
-  "~Apt design size is too small (< 1pt)"
+    "~Apt design size is too small (< 1pt)"
   (value condition))
 
 
@@ -55,13 +55,13 @@ It signals that a design size is too small (< 1pt)."))
    (value
     :documentation "The invalid original design size."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Original Design Size compliance warning.
 It signals that, although overridden explicitly, an original design size was
 too small (< 1pt)."))
 
 (define-condition-report (condition invalid-original-design-size)
-  "~Apt original design size was too small (< 1pt)"
+    "~Apt original design size was too small (< 1pt)"
   (value condition))
 
 
@@ -83,16 +83,16 @@ However, if FONT's design size was explicitly overridden, only signal an
 INVALID-ORIGINAL-DESIGN-SIZE warning."
   ;; #### NOTE: LENGTH >= 2 has already been checked by the caller
   ;; (LOAD-TFM-FONT or LOAD-l0-OFM-FONT).
-  (setf (checksum font) (read-u32 nil))
+  (setf (slot-value font 'checksum) (read-u32 nil))
   (decf length)
-  (setf (original-design-size font) (read-fix-word nil))
+  (setf (slot-value font 'original-design-size) (read-fix-word nil))
   (unless (>= (original-design-size font) 1)
     (if (design-size font)
       (warn 'invalid-original-design-size :value (original-design-size font))
       (restart-case
 	  (error 'invalid-design-size :value (original-design-size font))
 	(set-to-ten () :report "Set it to 10pt."
-	  (setf (original-design-size font) 10)))))
+	  (setf (slot-value font 'original-design-size) 10)))))
   (unless (design-size font)
     (setf (design-size font) (original-design-size font)))
   (decf length)
@@ -106,7 +106,8 @@ If so, decrease LENGTH by NEEDED afterwards."
 	       `(when (>= length ,needed) ,@body (decf length ,needed))))
     (with-condition-context
 	(padded-string padded-string-context :name "character encoding scheme")
-      (checking-length 10 (setf (encoding font) (read-padded-string 40))))
+      (checking-length 10
+	(setf (slot-value font 'encoding) (read-padded-string 40))))
     ;; #### FIXME: is it possible for OFM data to be math symbol or extension?
     ;; If so, the code below is wrong because those classes are only
     ;; subclasses of regular TFM.
@@ -121,65 +122,74 @@ If so, decrease LENGTH by NEEDED afterwards."
 	     (change-class font 'math-extension-font))))
     (with-condition-context
 	(padded-string padded-string-context :name "font identifier")
-      (checking-length 5 (setf (family font) (read-padded-string 20))))
+      (checking-length 5
+	(setf (slot-value font 'family) (read-padded-string 20))))
     (checking-length 1
       (let ((word (read-u32 nil)))
-	(setf (7bits-safe font) (ldb (byte 1 31) word))
+	(setf (slot-value font '7bits-safe) (ldb (byte 1 31) word))
 	(let ((face (ldb (byte 8 0) word)))
-	  (setf (face-number font) face)
+	  (setf (slot-value font 'face-number) face)
 	  (when (< face 18)
-	    (setf (face-code font) (make-string 3))
+	    (setf (slot-value font 'face-code) (make-string 3))
 	    (case face
 	      ((0 1  6  7 12 13)
-	       (setf (weight font) :medium (aref (face-code font) 0) #\M))
+	       (setf (slot-value font 'weight) :medium
+		     (aref (face-code font) 0) #\M))
 	      ((2 3  8  9 14 15)
-	       (setf (weight font) :bold (aref (face-code font) 0) #\B))
+	       (setf (slot-value font 'weight) :bold
+		     (aref (face-code font) 0) #\B))
 	      ((4 5 10 11 16 17)
-	       (setf (weight font) :light (aref (face-code font) 0) #\L)))
+	       (setf (slot-value font 'weight) :light
+		     (aref (face-code font) 0) #\L)))
 	    (case face
 	      ((0 2 4 6 8 10 12 14 16)
-	       (setf (slope font) :roman (aref (face-code font) 1) #\R))
+	       (setf (slot-value font 'slope)  :roman
+		     (aref (face-code font) 1) #\R))
 	      ((1 3 5 7 9 11 13 15 17)
-	       (setf (slope font) :bold (aref (face-code font) 1) #\I)))
+	       (setf (slot-value font 'slope)  :bold
+		     (aref (face-code font) 1) #\I)))
 	    (case face
 	      ((0  1  2  3  4  5)
-	       (setf (expansion font) :regular (aref (face-code font) 2) #\R))
+	       (setf (slot-value font 'expansion) :regular
+		     (aref (face-code font) 2)    #\R))
 	      ((6  7  8  9  10 11)
-	       (setf (expansion font) :condensed (aref (face-code font) 2) #\C))
+	       (setf (slot-value font 'expansion) :condensed
+		     (aref (face-code font) 2)    #\C))
 	      ((12 13 14 15 16 17)
-	       (setf (expansion font) :extended
-		     (aref (face-code font) 2) #\E))))))))
+	       (setf (slot-value font 'expansion) :extended
+		     (aref (face-code font) 2)    #\E))))))))
   ;; #### TODO: if applicable, maybe store the remainder somewhere instead of
   ;; just discarding it.
   (loop :repeat length :do (read-u32 nil)))
 
 
 
+
 ;; ==========================================================================
 ;; Character Information Tables
 ;; ==========================================================================
 
 (define-condition tfm-table-error (tfm-compliance-error)
-  ((name :documentation "The table's name." :initarg :name :accessor name))
+  ((name :documentation "The table's name." :initarg :name :reader name))
   (:documentation "The TFM table errors root condition.
 This is the root condition for errors related to TFM tables."))
 
 (define-condition invalid-table-index (tfm-table-error)
   ((section :initform 8) ; slot merge
-   (value
+   (index
     :documentation "The invalid index."
     :initarg :value
-    :accessor value)
+    :reader value)
    (largest
     :documentation "The largest index."
     :initarg :largest
-    :accessor largest))
+    :reader largest))
   (:documentation "The Invalid Table Index compliance error.
 It signals that a table index is greater than its largest value."))
 
 (define-condition-report (condition invalid-table-index)
   "index ~A in ~A table is invalid (largest is ~A)"
-  (value condition)
+  (index condition)
   (name condition)
   (largest condition))
 
@@ -189,7 +199,7 @@ It signals that a table index is greater than its largest value."))
 If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
   (unless (< index (length table))
     (error 'invalid-table-index
-      :value index :largest (1- (length table)) :name name))
+      :index index :largest (1- (length table)) :name name))
   (aref table index))
 
 (defmacro tref (table index)
@@ -203,23 +213,23 @@ If INDEX is out of bounds, signal an INVALID-TABLE-INDEX error."
 
 (define-condition invalid-ligature-opcode (tfm-compliance-error)
   ((section :initform 13) ; slot merge
-   (value
+   (opcode
     :documentation "The invalid ligature opcode."
-    :initarg :value
-    :accessor value))
+    :initarg :opcode
+    :reader opcode))
   (:documentation "The Invalid Ligature Opcode compliance error.
 It signals that a ligature opcode is invalid."))
 
 (define-condition-report (condition invalid-ligature-opcode)
   "ligature opcode ~A is invalid"
-  (value condition))
+  (opcode condition))
 
 
 (defun %run-ligature/kerning-program
     (character index lig/kerns kerns &aux (font (font character)))
   "Run a ligature/kerning program for CHARACTER.
 The program starts at LIG/KERNS[INDEX] and uses the KERNS array. Running the
-program eventually creates ligatures or kernings for CHARACTER and some other
+program eventually creates ligatures or kerns for CHARACTER and some other
 character.
 
 If an invalid index into LIG/KERNS is encountered, signal an
@@ -231,11 +241,11 @@ INVALID-LIGATURE-OPCODE error. This error is immediately restartable with
 DISCARD-LIGATURE.
 
 If an invalid index into KERNS is encountered, signal an INVALID-TABLE-INDEX
-error. This error is immediately restartable with DISCARD-KERNING.
+error. This error is immediately restartable with DISCARD-KERN.
 
 Finally, if an invalid character code is encountered, signal an
 INVALID-CHARACTER-CODE error. Depending on the context, this error is
-immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
+immediately restartable with DISCARD-LIGATURE or DISCARD-KERN."
   (loop
     :for lig/kern
       := (with-simple-restart
@@ -249,22 +259,21 @@ immediately restartable with DISCARD-LIGATURE or DISCARD-KERNING."
 	      (with-simple-restart
 		  (discard-ligature "Discard this ligature instruction.")
 		(if (or (= opcode 4) (and (> opcode 7) (not (= opcode 11))))
-		  (error 'invalid-ligature-opcode :value opcode)
-		  (setf (ligature character
-				  (code-character (next lig/kern) font))
-			(make-ligature
-			 (code-character (rmd lig/kern) font)
-			 (when (member opcode '(0 1 5)) t)
-			 (when (member opcode '(0 2 6)) t)
-			 (cond ((member opcode '(0 1 2 3)) 0)
-			       ((member opcode '(5 6 7)) 1)
-			       ((= opcode 11) 2)))))))
+		  (error 'invalid-ligature-opcode :opcode opcode)
+		  (set-ligature character (code-character (next lig/kern) font)
+				(make-ligature
+				 (code-character (rmd lig/kern) font)
+				 (when (member opcode '(0 1 5)) t)
+				 (when (member opcode '(0 2 6)) t)
+				 (cond ((member opcode '(0 1 2 3)) 0)
+				       ((member opcode '(5 6 7)) 1)
+				       ((= opcode 11) 2)))))))
 	    ;; kerning instruction
 	    (with-simple-restart
-		(discard-kerning "Discard this kerning instruction.")
-	      (setf (kerning character (code-character (next lig/kern) font))
-		    (tref kerns (+ (* 256 (- (op lig/kern) 128))
-				   (rmd lig/kern))))))
+		(discard-kern "Discard this kerning instruction.")
+	      (set-kern character (code-character (next lig/kern) font)
+			(tref kerns (+ (* 256 (- (op lig/kern) 128))
+				       (rmd lig/kern))))))
     :if (>= (skip lig/kern) 128)
       :return t
     ;; #### NOTE: because of the way the next instruction is computed below,
@@ -319,12 +328,12 @@ immediately restartable with ABORT-LIG/KERN-PROGRAM."
    (value
     :documentation "The invalid first table value."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Table Start compliance error.
 It signals that the first value in a TFM table is not 0."))
 
 (define-condition-report (condition invalid-table-start)
-  "first value ~A in ~A table is invalid (should be 0)"
+    "first value ~A in ~A table is invalid (should be 0)"
   (value condition)
   (name condition))
 
@@ -336,49 +345,56 @@ It signals that a boundary character ligature/kerning program was found,
 without a boundary character being defined."))
 
 (define-condition-report (condition no-boundary-character)
-  "found a boundary character ligature/kerning program,~
+    "found a boundary character ligature/kerning program,~
 without a boundary character being defined")
 
 
 (define-condition character-list-cycle (tfm-compliance-error)
   ((section :initform 12) ; slot merge
-   (value
+   (character-list
     :documentation "The cyclic character list."
-    :initarg :value
-    :accessor value))
+    :initarg :character-list
+    :reader character-list))
   (:documentation "The Character List Cycle compliance error.
 It signals that a cycle was found in a list of ascending character sizes."))
 
 (define-condition-report (condition character-list-cycle)
-  "found a cycle in character list ~A"
-  (value condition))
+    "found a cycle in character list ~A"
+  (character-list condition))
 
 
 (define-condition ligature-cycle (tfm-compliance-error)
   ((section :initform 13) ; slot merge
-   (value
+   (ligature
     :documentation "The ligature introducing a cycle."
-    :initarg :value
-    :accessor value)
+    :initarg :ligature
+    :reader ligature)
    (characters
     :documentation "The cons of characters involved in the ligature."
     :initarg :characters
-    :accessor characters))
+    :reader characters))
   (:documentation "The Ligature Cycle compliance error.
 It signals that a ligature introduces a cycle for a cons of characters."))
 
 (define-condition-report (condition ligature-cycle)
-  "ligature ~A introduces a cycle for characters ~A"
-  (value condition)
+    "ligature ~A introduces a cycle for characters ~A"
+  (ligature condition)
   (characters condition))
 
 
 (defclass table-context (context)
-  ((name :documentation "The table name." :initarg :name :reader name)
-   (index :documentation "The index in the table."
-	  :initarg :index :reader index)
-   (size :documentation "The table size."
-	 :initarg :size :reader size))
+  ((name
+    :documentation "The table name."
+    :initarg :name
+    :reader name)
+   (index
+    :documentation "The index in the table."
+    :initarg :index
+    :reader index)
+   (size
+    :documentation "The table size."
+    :initarg :size
+    :reader size))
   (:documentation "The Table Context class."))
 
 (defmethod context-string ((context table-context))
@@ -389,8 +405,10 @@ It signals that a ligature introduces a cycle for a cons of characters."))
     (1- (size context))))
 
 (defclass char-info-table-context (table-context)
-  ((code :documentation "The corresponding character code."
-	 :initarg :code :reader code))
+  ((code
+    :documentation "The corresponding character code."
+    :initarg :code
+    :reader code))
   (:documentation "The Char Info Table Context class."))
 
 (defmethod context-string ((context char-info-table-context))
@@ -405,8 +423,7 @@ entries in the 8 tables, that is, the char infos, widths, heights, depths,
 italic corrections, lig/kern instructions, kerns, and extens respectively.
 
 If a char info structure with a width index of 0 is not completely zero'ed
-out, signal an INVALID-CHAR-INFO error. This error is immediately restartable
-with SET-TO-ZERO.
+out, signal an SPURIOUS-CHAR-INFO warning.
 
 If the first entry in the widths, heights, depths, or italic corrections table
 is not 0, signal an INVALID-TABLE-START error. This error is immediately
@@ -514,7 +531,8 @@ DISCARD-EXTENSION-RECIPE."
 			     0))))))
     ;; #### NOTE: this count doesn't (and shouldn't) include a zero'ed out
     ;; boundary character potentially added below.
-    (setf (character-count font) (hash-table-count (characters font)))
+    (setf (slot-value font 'character-count)
+	  (hash-table-count (characters font)))
 
     ;; Now that we have all the characters registered, we can start processing
     ;; mutual references.
@@ -527,7 +545,7 @@ DISCARD-EXTENSION-RECIPE."
       (let ((lig/kern (aref lig/kerns 0)))
 	(when (= (skip lig/kern) 255)
 	  (let ((code (next lig/kern)))
-	    (setf (boundary-character font)
+	    (setf (slot-value font 'boundary-character)
 		  (or (code-character code font nil)
 		      (setf (code-character font)
 			    (make-character-metrics code font 0 0 0 0)))))))
@@ -572,7 +590,8 @@ DISCARD-EXTENSION-RECIPE."
 			 (with-simple-restart
 			     (discard-next-character
 			      "Discard the next character.")
-			   (setf (next-character (code-character code font))
+			   (setf (slot-value (code-character code font)
+					     'next-character)
 				 (code-character (next-char char-info) font))))
 			((exten-index char-info)
 			 ;; And neither about those in the extension recipe
@@ -580,7 +599,8 @@ DISCARD-EXTENSION-RECIPE."
 			 (with-simple-restart
 			     (discard-extension-recipe
 			      "Discard this extension recipe.")
-			   (setf (extension-recipe (code-character code font))
+			   (setf (slot-value (code-character code font)
+					     'extension-recipe)
 				 (font-extension-recipe
 				  (tref extens (exten-index char-info))
 				  font))))))))
@@ -602,47 +622,50 @@ DISCARD-EXTENSION-RECIPE."
 		     :while (next-character character)
 		     :if (member (next-character character) seen)
 		       :do (restart-case
-			       (error 'character-list-cycle :value seen)
+			       (error 'character-list-cycle
+				 :character-list seen)
 			     (discard-next-character ()
 			       :report "Discard the cyclic next character."
-			       (setf (next-character character) nil)))
+			       (setf (slot-value character 'next-character)
+				     nil)))
 		     :else
 		       :do (push (next-character character) seen)
-		       :and :do (setq character
-				      (next-character character)))))
+		       :and :do (setq character (next-character character)))))
 	   (characters font))
 
   ;; 6. Check for ligature cycles, ligature by ligature. Again, this is
   ;; perhaps not the most efficient way to do it and maybe I should study the
   ;; algorithm used in TFtoPL[88..], but we don't care right now.
-  (maphash (lambda (characters first-ligature)
-	     (loop :with state := (list (car characters) (cdr characters))
-		   :with seen := (list state)
-		   :with ligature := first-ligature
-		   :while ligature
-		   :do (setq state (apply-ligature ligature state))
-		   :do (cond ((= (length state) 1)
-			      (setq ligature nil))
-			     ((member-if (lambda (elt)
-					   (and (eq (car state) (car elt))
-						(eq (cadr state) (cadr elt))))
-					 seen)
-			      (restart-case
-				  (error 'ligature-cycle
-				    :value first-ligature
-				    :characters characters)
-				(discard-ligature ()
-				  :report "Discard the ligature."
-				  (remhash characters (ligatures font))
-				  (setq ligature nil))))
-			     (t
-			      (push state seen)
-			      (setq ligature
-				    (ligature (car state) (cadr state)))))))
-	   (ligatures font)))
+  (maphash
+   (lambda (characters first-ligature)
+     (loop :with state := (list (car characters) (cdr characters))
+	   :with seen := (list state)
+	   :with ligature := first-ligature
+	   :while ligature
+	   :do (setq state (apply-ligature ligature state))
+	   :do (cond ((= (length state) 1)
+		      (setq ligature nil))
+		     ((member-if (lambda (elt)
+				   (and (eq (car state) (car elt))
+					(eq (cadr state) (cadr elt))))
+				 seen)
+		      (restart-case
+			  (error 'ligature-cycle
+			    :ligature first-ligature
+			    :characters characters)
+			(discard-ligature ()
+			  :report "Discard the ligature."
+			  (remhash characters (ligatures font))
+			  (setq ligature nil))))
+		     (t
+		      (push state seen)
+		      (setq ligature
+			    (get-ligature (car state) (cadr state)))))))
+   (ligatures font)))
 
 
 
+
 ;; ==========================================================================
 ;; Parameters Section
 ;; ==========================================================================
@@ -659,19 +682,19 @@ Return remaining LENGTH.")
     (:method (length font)
       "Parse the 7 regular FONT parameters. Return remaining LENGTH."
       (when (>= length 1)
-	(setf (slant font) (read-fix-word nil))
+	(setf (slot-value font 'slant) (read-fix-word nil))
 	(decf length))
-      (map-font-dimension-accessors slot font read-parameter)
+      (map-font-dimension-slots slot font read-parameter)
       length)
     (:method (length (font math-symbols-font))
       "Parse the 15 additional TeX math symbols FONT parameters."
       (setq length (call-next-method))
-      (map-math-symbols-font-dimension-accessors slot font read-parameter)
+      (map-math-symbols-font-dimension-slots slot font read-parameter)
       length)
     (:method (length (font math-extension-font))
       "Parse the 6 additional TeX math extension FONT parameters."
       (setq length (call-next-method))
-      (map-math-extension-font-dimension-accessors slot font read-parameter)
+      (map-math-extension-font-dimension-slots slot font read-parameter)
       length)
     (:method :around (length font)
       "Read remaining parameters into a parameters array."
@@ -680,10 +703,11 @@ Return remaining LENGTH.")
 	(let ((array (make-array length)))
 	  (loop :for i :from 0 :upto (1- length)
 		:do (setf (aref array i) (read-fix-word)))
-	  (setf (parameters font) array))))))
+	  (setf (slot-value font 'parameters) array))))))
 
 
 
+
 ;; ==========================================================================
 ;; Preamble
 ;; ==========================================================================
@@ -692,11 +716,11 @@ Return remaining LENGTH.")
   ((declared-size
     :documentation "The declared file size, in bytes."
     :initarg :declared-size
-    :accessor declared-size)
+    :reader declared-size)
    (actual-size
     :documentation "The actual file size, in bytes."
     :initarg :actual-size
-    :accessor actual-size))
+    :reader actual-size))
   (:documentation "The File Size Mixin condition.
 It is used in both errors and warnings to report different declared and
 actual file sizes."))
@@ -707,7 +731,7 @@ actual file sizes."))
 It signals that the file size is shorter than expected."))
 
 (define-condition-report (condition file-underflow)
-  "declared file size ~A is greater than actual ~A bytes"
+    "declared file size ~A is greater than actual ~A bytes"
   (declared-size condition)
   (actual-size condition))
 
@@ -721,7 +745,7 @@ It signals that the file size is shorter than expected."))
 It signals that the file size is longer than expected."))
 
 (define-condition-report (condition file-overflow)
-  "declared file size ~A is less than actual ~A bytes"
+    "declared file size ~A is less than actual ~A bytes"
   (declared-size condition)
   (actual-size condition))
 
@@ -731,24 +755,24 @@ It signals that the file size is longer than expected."))
    (value
     :documentation "The invalid header length."
     :initarg :value
-    :accessor value))
+    :reader value))
   (:documentation "The Invalid Header Length compliance error.
 It signals that a header length is too small (< 2 words)."))
 
 (define-condition-report (condition invalid-header-length)
-  "~A word~:P header length is too small (< 2 words)"
+    "~A word~:P header length is too small (< 2 words)"
   (value condition))
 
 
 (define-condition invalid-character-range (tfm-compliance-error)
   ((section :initform 8) ; slot merge
-   (bc :documentation "The smallest character code." :initarg :bc :accessor bc)
-   (ec :documentation "The largest character code." :initarg :ec :accessor ec))
+   (bc :documentation "The smallest character code." :initarg :bc :reader bc)
+   (ec :documentation "The largest character code." :initarg :ec :reader ec))
   (:documentation "The Invalid Character Range compliance error.
 It signals that BC-1 > EC, or that EC > 255."))
 
 (define-condition-report (condition invalid-character-range)
-  "character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)"
+    "character range ~A (bc) - ~A (ec) doesn't satisfy bc-1 <= ec && ec <= 255)"
   (bc condition)
   (ec condition))
 
@@ -779,6 +803,7 @@ It signals that a declared TFM table's length is out of range."))
 
 
 
+
 ;; ==========================================================================
 ;; TFM Data
 ;; ==========================================================================
@@ -788,52 +813,52 @@ It signals that a declared TFM table's length is out of range."))
    (lf
     :documentation "The declared length of the file."
     :initarg :lf
-    :accessor lf)
+    :reader lf)
    (lh
     :documentation "The declared length of the file header."
     :initarg :lh
-    :accessor lh)
+    :reader lh)
    (nc
     :documentation "EC - BC + 1."
     :initarg :nc
-    :accessor nc)
+    :reader nc)
    (nw
     :documentation "The declared length of the width table."
     :initarg :nw
-    :accessor nw)
+    :reader nw)
    (nh
     :documentation "The declared length of the height table."
     :initarg :nh
-    :accessor nh)
+    :reader nh)
    (nd
     :documentation "The declared length of the depth table."
     :initarg :nd
-    :accessor nd)
+    :reader nd)
    (ni
     :documentation "The declared length of the italic correction table."
     :initarg :ni
-    :accessor ni)
+    :reader ni)
    (nl
     :documentation "The declared length of the lig/kern table."
     :initarg :nl
-    :accessor nl)
+    :reader nl)
    (nk
     :documentation "The declared length of the kern table."
     :initarg :nk
-    :accessor nk)
+    :reader nk)
    (ne
     :documentation "The declared length of the extensible character table."
     :initarg :ne
-    :accessor ne)
+    :reader ne)
    (np
     :documentation "The declared length of the parameters section."
     :initarg :np
-    :accessor np))
+    :reader np))
   (:documentation "The Section Lengths compliance error.
 It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
 
 (define-condition-report (condition invalid-section-lengths)
-  "section lengths don't satisfy ~
+    "section lengths don't satisfy ~
 ~A (lf) = 6 + ~A (lh) + ~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
 + ~A (nl) + ~A (nk) + ~A (ne) + ~A (np)"
   (lf condition)
@@ -849,17 +874,8 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
   (np condition))
 
 
-(defun load-tfm-font
-    (lf &key (file (when (typep *stream* 'file-stream) (pathname *stream*)))
-	     (name (when file (pathname-name file)))
-	     design-size freeze
-	&aux (font (make-font name 'font :file file)))
-  "Parse *STREAM* of declared length LF into a new TFM font.
-- FILE defaults to *STREAM*'s associated file if any.
-- NAME defaults to the FILE's base name, if any.
-- If DESIGN-SIZE is provided and not a real greater or equal to 1, signal a
-  type error. Otherwise, override the original design size with it.
-- When FREEZE (NIL by default), freeze the font immediately after creation.
+(defun load-tfm-font (font lf)
+  "Parse *STREAM* of declared length LF into FONT, and return it.
 
 If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
 If *STREAM* is longer than expected, signal a FILE-OVERFLOW warning.
@@ -874,9 +890,6 @@ are not within the expected range, signal an INVALID-TABLE-LENGTH error.
 
 Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-SECTION-LENGTHS error."
-
-  ;; 0. Handle early, user-provided information.
-  (when design-size (setf (design-size font) design-size))
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   ;; #### NOTE: the errors signalled below (directly, or by READ-U16) are
@@ -907,13 +920,15 @@ length, signal an INVALID-SECTION-LENGTHS error."
 	       ;; seem to be any kind of interesting information in there
 	       ;; (contrary to padded strings).
 	       (warn 'file-overflow
-		     :actual-size actual-size
-		     :declared-size declared-size)))))
+		 :actual-size actual-size
+		 :declared-size declared-size)))))
     (unless (>= lh 2) (error 'invalid-header-length :value lh))
     (unless (and (<= (1- bc) ec) (<= ec 255))
       (error 'invalid-character-range :bc bc :ec ec))
     (setq nc (+ ec (- bc) 1))
-    (unless (zerop nc) (setf (min-code font) bc (max-code font) ec))
+    (unless (zerop nc)
+      (setf (slot-value font 'min-code) bc
+	    (slot-value font 'max-code) ec))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(256 16 16 64 256)
@@ -921,11 +936,11 @@ length, signal an INVALID-SECTION-LENGTHS error."
 			  "extens")
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
-		       :value length :smallest min :largest max :name name))
+		  :value length :smallest min :largest max :name name))
     (unless (= lf (+ 6 lh nc nw nh nd ni nl nk ne np))
       (error 'invalid-section-lengths
-	     :lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
-	     :ne ne :np np))
+	:lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
+	:ne ne :np np))
 
     ;; 2. Parse the header section.
     (parse-header lh font)
@@ -936,13 +951,11 @@ length, signal an INVALID-SECTION-LENGTHS error."
     ;; 4. Parse the parameters section.
     (parse-parameters np font))
 
-  ;; 5. Maybe freeze the font
-  (when freeze (freeze font))
-
   font)
 
 
 
+
 ;; ==========================================================================
 ;; Level 0 OFM Data
 ;; ==========================================================================
@@ -970,17 +983,8 @@ LF != 14 + LH + 2*NC + NW + NH + ND + NI + 2*NL + NK + 2*NE + NP."))
   (np condition))
 
 
-(defun load-l0-ofm-font
-    (lf &key (file (when (typep *stream* 'file-stream) (pathname *stream*)))
-	     (name (when file (pathname-name file)))
-	     design-size freeze
-	&aux (font (make-font name 'l0-omega-font :file file)))
-  "Parse *STREAM* of declared length LF into a new level 0 OFM font.
-- FILE defaults to *STREAM*'s associated file if any.
-- NAME defaults to the FILE's base name, if any.
-- If DESIGN-SIZE is provided and not a real greater or equal to 1, signal a
-  type error. Otherwise, override the original design size with it.
-- When FREEZE (NIL by default), freeze the font immediately after creation.
+(defun load-l0-ofm-font (font lf)
+  "Parse *STREAM* of declared length LF into FONT, and return it.
 
 If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
 If *STREAM* is longer than expected, signal a FILE-OVERFLOW warning.
@@ -995,9 +999,6 @@ are not within the expected range, signal an INVALID-TABLE-LENGTH error.
 
 Finally, if the declared sections lengths don't add up to the declared file
 length, signal an INVALID-SECTION-LENGTHS error."
-
-  ;; 0. Handle early, user-provided information.
-  (when design-size (setf (design-size font) design-size))
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   ;; #### NOTE: the errors signalled below (directly, or by READ-U32) are
@@ -1035,7 +1036,9 @@ length, signal an INVALID-SECTION-LENGTHS error."
     (unless (and (<= (1- bc) ec) (<= ec 65535))
       (error 'invalid-character-range :bc bc :ec ec))
     (setq nc (+ ec (- bc) 1))
-    (unless (zerop nc) (setf (min-code font) bc (max-code font) ec))
+    (unless (zerop nc)
+      (setf (slot-value font 'min-code) bc
+	    (slot-value font 'max-code) ec))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
 	  :for max :in '(65536 256 256 256 256)
@@ -1059,9 +1062,6 @@ length, signal an INVALID-SECTION-LENGTHS error."
     ;; 4. Parse the parameters section.
     (parse-parameters np font))
 
-  ;; 5. Maybe freeze the font
-  (when freeze (freeze font))
-
   font)
 
 
@@ -1081,24 +1081,26 @@ It signals that an OFM font advertises a level different from 0 or 1."))
 
 
 (define-condition extended-tfm (tfm-warning)
-  ((value :documentation "The TFM extension." :initarg :value :accessor value)
-   (file :documentation "The extended TFM file." :initarg :file :accessor file))
+  ((fmt :documentation "The unsupported format." :initarg :fmt :reader fmt)
+   (file :documentation "The extended TFM file." :initarg :file :reader file))
   (:documentation "The Extended TFM warning.
 It signals that a file contains unsupported extended TFM data.
 In addition to plain TFM, level 0 OFM is currently supported.
 Level 1 OFM and JFM formats might be supported in the future."))
 
 (define-condition-report (condition extended-tfm)
-  "file ~A contains ~A data (not supported yet)"
+    "file ~A contains ~A data (not supported yet)"
   (file condition)
-  (value condition))
+  (fmt condition))
 
-
-(defun load-font (file &rest arguments &key design-size freeze)
+(defun load-font (file &rest keys &key name design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
-- If provided, DESIGN-SIZE overrides the font's original value. It must be a
-  real greater or equal to 1.
-- When FREEZE (NIL by default), freeze the font immediately after creation.
+- FILE must be a pathname designator.
+- The font's name (FILE's base name by default) may be overridden with NAME
+  (a non-empty string).
+- The font's original design size may be overridden with DESIGN-SIZE
+  (a real greater or equal to 1).
+- When FREEZE (NIL by default), freeze the font immediately after loading it.
   See the eponymous function for more information.
 
 TFM and level 0 OFM data are currently supported. If level 1 OFM or JFM data
@@ -1106,32 +1108,41 @@ is detected, this function signals an EXTENDED-TFM warning and returns NIL.
 
 While loading font data, any signalled condition is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
-  (declare (ignore design-size freeze))
+  (declare (ignore name design-size))
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
     ;; #### NOTE: in order to detect the format, we don't even know how many
     ;; bytes to read at first. TFM requires 2 but OFM requires 4. So we cannot
     ;; perform any early checking on the first two bytes.
-    (let ((lf (read-u16 nil)))
-      (cond ((zerop lf)
-	     (setq lf (read-u16 nil))
-	     (cond ((zerop lf)
-		    (setq lf (read-u32))
-		    (with-simple-restart
+    (setq lf (read-u16 nil))
+    (case lf
+      (0
+       (setq lf (read-u16 nil))
+       (case lf
+	 (0
+	  (setq lf (read-u32))
+	  (with-simple-restart (cancel-loading "Cancel loading this font.")
+	    (setq font (load-l0-ofm-font
+			(apply #'make-instance 'l0-omega-font
+			       :file file (remove-keys keys :freeze))
+			lf))
+	    (when freeze (freeze font))))
+	 (1
+	  (warn 'extended-tfm :value "Level 1 OFM" :file file))
+	 (t
+	  (with-simple-restart
 			(cancel-loading "Cancel loading this font.")
-		      (apply #'load-l0-ofm-font lf arguments)))
-		   ((= lf 1)
-		    (warn 'extended-tfm :value "Level 1 OFM" :file file))
-		   (t
-		    (with-simple-restart
-			(cancel-loading "Cancel loading this font.")
-		      (error 'invalid-ofm-level :value lf)))))
-	    ((or (= lf 9) (= lf 11))
-	     (warn 'extended-tfm :value "JFM" :file file))
-	    (t
-	     (with-simple-restart (cancel-loading "Cancel loading this font.")
-	       (unless (zerop (ldb (byte 1 15) lf))
-		 (error 'u16-overflow :value lf))
-	       (apply #'load-tfm-font lf arguments)))))))
+	    (error 'invalid-ofm-level :value lf)))))
+      ((9 11)
+       (warn 'extended-tfm :fmt "JFM" :file file))
+      (t
+       (with-simple-restart (cancel-loading "Cancel loading this font.")
+	 (unless (zerop (ldb (byte 1 15) lf)) (error 'u16-overflow :value lf))
+	 (setq font (load-tfm-font
+		     (apply #'make-instance 'font
+			    :file file (remove-keys keys :freeze))
+		     lf))
+	 (when freeze (freeze font))))))
+  font)
 
 ;;; file.lisp ends here

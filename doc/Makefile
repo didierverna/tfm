@@ -1,6 +1,6 @@
 ### Makefile --- Doc directory
 
-## Copyright (C) 2019, 2021 Didier Verna
+## Copyright (C) 2019, 2021, 2025 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
@@ -142,7 +142,7 @@ $(USR_MAN:%=%.texi): $(TOP_DIR)/make/version.make
 	$(PERL) -pi -e 's/@set COPYRIGHT_YEARS .*/@set COPYRIGHT_YEARS $(TYPESET_COPYRIGHT_YEARS)/' $@
 
 localref:
-	$(MAKE) generate GENERATE_FLAGS=--hyperlinks
+	$(MAKE) generate GENERATE_FLAGS=--locations
 
 generate:
 	$(SBCL_PATH) $(EVAL_CONFIG) $(SBCL_LOAD) ./generate.cl $(GENERATE_FLAGS)
