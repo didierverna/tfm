@@ -258,39 +258,16 @@ subclasses."))
     (when (frozen font) (princ " (frozen)" stream))))
 
 
-(define-condition invalid-custom-design-size (tfm-usage-error)
-  ((value
-    :documentation "The invalid custom design size."
-    :initarg :value
-    :reader value))
-  (:documentation "The Invalid Custom Design Size usage error.
-It signals that a custom design size is not a real greater or equal to 1."))
-
-(define-condition-report (condition invalid-custom-design-size)
-    "custom design size ~A is invalid (should be a real greater or equal to 1)"
-  (value condition))
-
-
 ;; #### NOTE: we're not currently so pedantic as to check that the font's file
 ;; has a non-empty base name.
 (defmethod initialize-instance :after ((font font) &key)
-  "Handle FONT's name and design-size initialization.
-- Unless a custom name has been provided, initialize it with the font file's
-  base name.
-- IF the font's design-size is not NIL or a real greater or equal to 1, signal
-  an INVALID-CUSTOM-DESIGN-SIZE error. This error is immediately restartable
-  with USE-ORIGINAL-DESIGN-SIZE."
-  (with-slots (file name design-size) font
+  "Handle FONT's name initialization.
+Unless a custom name has been provided already, initialize FONT's name to the
+font file's base name."
+  (with-slots (file name) font
     ;; #### NOTE: the validity of a custom name has already been checked by
     ;; LOAD-FONT.
-    (unless name (setq name (pathname-name file)))
-    (unless (typep design-size '(or null (real 1)))
-      (restart-case (error 'invalid-custom-design-size :value design-size)
-	(use-original-design-size () :report "Use the font's design size."
-	  ;; #### NOTE: at this time, the original design size is not yet
-	  ;; known. NIL simply indicates that no custom value was provided at
-	  ;; initialization time.
-	  (setq design-size nil))))))
+    (unless name (setq name (pathname-name file)))))
 
 
 ;; ---------------------------------------------
@@ -585,6 +562,20 @@ scheme."))
 (defmethod (setf design-size) :after (design-size font)
   "Rescale FONT if frozen."
   (when (frozen font) (scale font (design-size font))))
+
+
+(define-condition invalid-custom-design-size (tfm-usage-error)
+  ((value
+    :documentation "The invalid custom design size."
+    :initarg :value
+    :reader value))
+  (:documentation "The Invalid Custom Design Size usage error.
+It signals that a custom design size is not a real greater or equal to 1."))
+
+(define-condition-report (condition invalid-custom-design-size)
+    "custom design size ~A is invalid (should be a real greater or equal to 1)"
+  (value condition))
+
 
 (defmethod (setf design-size) :around (design-size font)
   "Check that DESIGN-SIZE is a real greater or equal to 1.

@@ -1126,8 +1126,10 @@ It signals that an OFM font advertises a level different from 0 or 1."))
   in which case it must be a non-empty string. Otherwise, signal an
   INVALID-CUSTOM-NAME error. This error is immediately restartable with
   USE-FILE-BASE-NAME.
-- The font's original design size may be overridden with DESIGN-SIZE
-  (a real greater or equal to 1).
+- If DESIGN-SIZE is not NIL, use it as the font's design size instead of the
+  original one, in which case it must be a real greater or equal to 1.
+  Otherwise, signal an INVALID-CUSTOM-DESIGN-SIZE error. This error is
+  immediately restartable with USE-ORIGINAL-DESIGN-SIZE.
 - When FREEZE (NIL by default), freeze the font immediately after loading it.
   See the eponymous function for more information.
 
@@ -1137,12 +1139,17 @@ UNSUPPORTED-FORMAT warning and returns NIL.
 
 Any condition signalled while FILE is being loaded is restartable with
 CANCEL-LOADING, in which case this function simply returns NIL."
-  (declare (ignore design-size))
   (when name
     (unless (and (stringp name) (not (zerop (length name))))
       (restart-case (error 'invalid-custom-name :name name)
 	(use-file-base-name () :report "Use the font file's base name."
 	  (setq keys (remove-keys keys :name))))))
+  (when design-size
+    (unless (typep design-size '(real 1))
+      (restart-case (error 'invalid-custom-design-size :value design-size)
+	(use-original-design-size ()
+	  :report "Use the font's original design size."
+	  (setq keys (remove-keys keys :design-size))))))
   (with-open-file
       (*stream* file :direction :input :element-type '(unsigned-byte 8))
     ;; #### NOTE: in order to detect the format, we don't even know how many
