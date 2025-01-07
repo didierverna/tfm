@@ -1,6 +1,6 @@
 ;;; net.didierverna.tfm.asd --- ASDF system definition
 
-;; Copyright (C) 2019, 2021 Didier Verna
+;; Copyright (C) 2019, 2021, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -26,10 +26,10 @@
 ;;; Code:
 
 (defsystem :net.didierverna.tfm
-  :long-name "TeX Font Metrics"
-  :description "A Common Lisp interface to the TeX Font Metrics format"
+  :long-name "TeX Font Metric"
+  :description "A Common Lisp interface to the TeX Font Metric format"
   :long-description "\
-TFM (for TeX Font Metrics) is the standard font description format used by
+TFM (for TeX Font Metric) is the standard font description format used by
 TeX. The TFM library parses and decodes TFM files into an abstract data
 structure, providing easy access to the corresponding font information in
 Common Lisp."

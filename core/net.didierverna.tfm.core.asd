@@ -1,6 +1,6 @@
 ;;; net.didierverna.tfm.core.asd --- ASDF system definition
 
-;; Copyright (C) 2018, 2019, 2021 Didier Verna
+;; Copyright (C) 2018, 2019, 2021, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -27,9 +27,9 @@
 
 (defsystem :net.didierverna.tfm.core
   :long-name "TFM Core"
-  :description "TeX Font Metrics, core library"
+  :description "TeX Font Metric, core library"
   :long-description "\
-The TeX Font Metrics core library provides the main functionality of TFM.
+The TeX Font Metric core library provides the main functionality of TFM.
 For a more complete description of TFM, see the `net.didierverna.tfm' system."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"

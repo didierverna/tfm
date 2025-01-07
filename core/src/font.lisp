@@ -219,7 +219,7 @@ This is a hash table associating character codes with characters."
    (character-count
     :documentation "The font's number of characters.
 The character count does not include the boundary character, unless that
-character really exists in the font (has non-zerop metrics)."
+character really exists in the font (has non-zero metrics)."
     :reader character-count)
    (ligatures
     :documentation "The font's ligatures.
@@ -243,7 +243,7 @@ character count, unless it exists for real in the font (has non-zero
 metrics)."
     :initform nil
     :reader boundary-character))
-  (:documentation "The TeX Font Metrics class.
+  (:documentation "The TeX Font Metric class.
 This class represents decoded font information. Within the context of this
 library, the term \"font\" denotes an instance of this class, or of one of its
 subclasses."))
@@ -704,7 +704,7 @@ Otherwise, it returns T as a second value."
 (defclass o0-font (font)
   ((direction :documentation "The font direction."
 	      :accessor direction))
-  (:documentation "The Level 0 Omega Font Metrics class."))
+  (:documentation "The Level 0 Omega Font Metric class."))
 
 
 ;;; font.lisp ends here

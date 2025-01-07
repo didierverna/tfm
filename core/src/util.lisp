@@ -309,7 +309,7 @@ declared length."))
   (unless *print-escape*
     (format stream
 	"~&This font may have been created before April 1983.
-See §87 of the PLtoTF documentation, or “TeX Font Metrics Files”
+See §87 of the PLtoTF documentation, or “TeX Font Metric Files”
 (David Fuchs, TUGBoat, Volume 2, №1) for more information.")))
 
 

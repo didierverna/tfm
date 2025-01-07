@@ -29,7 +29,7 @@
 
 
 (defpackage :net.didierverna.tfm
-  (:documentation "The TeX Font Metrics package.")
+  (:documentation "The TeX Font Metric package.")
   (:use :cl :net.didierverna.tfm.setup)
   (:export
 
