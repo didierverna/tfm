@@ -1086,6 +1086,9 @@ It signals that an OFM font advertises a level different from 0 or 1."))
 Possible values include :O1 (meaning level 1 OFM data) and :JFM."
     :initarg :fmt
     :reader fmt)
+   ;; #### NOTE: this slot is here for completeness, but since context-aware
+   ;; condition reporting already mentions the file we're reading from, it's
+   ;; not used in the condition reporting code below.
    (file
     :documentation "The unsupported font's file name."
     :initarg :file
@@ -1096,8 +1099,7 @@ Currently supported font formats are regular TFM and level 0 Omega (OFM).
 Level 1 OFM and JFM formats might be supported in the future."))
 
 (define-condition-report (condition unsupported-format)
-    "file ~A contains ~A data (not supported yet)"
-  (file condition)
+    "~A data is not supported yet"
   (ecase (fmt condition)
     (:o1 "level 1 Omega (OFM)")
     (:jfm "JFM")))
