@@ -1,3 +1,6 @@
+# Version 3.0
+- Support for level 0 Omega (OFM) fonts.
+
 # Version 2.0
 This version features a number of improvements at the expense of backward
 incompatibility.
