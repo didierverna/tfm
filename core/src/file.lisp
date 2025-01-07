@@ -1122,9 +1122,10 @@ It signals that an OFM font advertises a level different from 0 or 1."))
     (file &rest keys &key name design-size freeze &aux lf font)
   "Load FILE into a new font, and return it.
 - FILE must be a pathname designator.
-- If NAME is not NIL, use it as the font's name instead of FILE's base name.
-  It must be a non-empty string. Otherwise, signal an INVALID-CUSTOM-NAME
-  error. This error is immediately restartable with USE-FILE-BASE-NAME.
+- If NAME is not NIL, use it as the font's name instead of FILE's base name,
+  in which case it must be a non-empty string. Otherwise, signal an
+  INVALID-CUSTOM-NAME error. This error is immediately restartable with
+  USE-FILE-BASE-NAME.
 - The font's original design size may be overridden with DESIGN-SIZE
   (a real greater or equal to 1).
 - When FREEZE (NIL by default), freeze the font immediately after loading it.
