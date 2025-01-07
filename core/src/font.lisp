@@ -680,5 +680,4 @@ Otherwise, it returns T as a second value."
   ((direction :documentation "The font direction." :reader direction))
   (:documentation "The Level 0 Omega Font Metric class."))
 
-
 ;;; font.lisp ends here
