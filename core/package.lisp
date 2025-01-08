@@ -48,7 +48,7 @@
     ;; From src/util.lisp:
     :context :context-string
     :tfm :context :tfm-warning :tfm-error
-    :tfm-compliance :section
+    :tfm-compliance :reference
     :tfm-usage
     :tfm-compliance-warning :tfm-compliance-error
     :tfm-usage-warning :tfm-usage-error

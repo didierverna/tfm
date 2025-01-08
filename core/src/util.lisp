@@ -110,20 +110,30 @@ initialized with INITARGS."
 
 
 (define-condition tfm-compliance (tfm)
-  ((section
-    :documentation "The related TFtoPL section."
+  ((reference
+    :documentation "The related documentation reference.
+Possible values are numbers, referring to a TFtoPL section number,
+or a list of the form (:OMEGA . <NUMBER>), referring to an Omega User Manual
+section number."
     :allocation :class
     :initform nil
-    :reader section))
+    :reader reference))
   (:documentation "The TFM Compliance root condition.
 This is the mixin for conditions related to TFM compliance."))
 
 (defmethod print-object :after ((condition tfm-compliance) stream)
-  "Advertise CONDITION's relevant TFtoPL section."
-  (unless (or *print-escape* (not (section condition)))
-    (format stream
-	"~&See §~A of TFtoPL for more information."
-      (section condition))))
+  "Advertise CONDITION's documentation reference."
+  (with-slots (reference) condition
+    (unless (or *print-escape* (not reference))
+      (let (secref secnum)
+	(typecase reference
+	  (number
+	   (setq secref "TFtoPL" secnum reference))
+	  (t
+	   (setq secref "the Omega User Manual" secnum (cdr reference))))
+	(format stream "~&See §~A of ~A for more information."
+	  secnum secref)))))
+
 
 (define-condition tfm-compliance-warning (tfm-warning tfm-compliance)
   ()
@@ -164,7 +174,7 @@ This is the root condition for errors related to the use of the library."))
 
 
 (define-condition u16-overflow (tfm-compliance-error)
-  ((section :initform 8) ; slot merge
+  ((reference :initform 8) ; slot merge
    (value :documentation "The faulty value." :initarg :value :reader value))
   (:documentation "The U16 Overflow compliance error.
 It signals that an unsigned 16 bits integer is greater than 2^15."))
@@ -186,7 +196,8 @@ U16-OVERFLOW error."
 
 
 (define-condition u32-overflow (tfm-compliance-error)
-  ((value :documentation "The faulty value." :initarg :value :accessor value))
+  ((reference :initform '(:omega . 7.1)) ; slot merge
+   (value :documentation "The faulty value." :initarg :value :accessor value))
   (:documentation "The U32 Overflow compliance error.
 It signals that an unsigned 32 bits integer is greater than 2^31."))
 
@@ -209,7 +220,7 @@ U32-OVERFLOW error."
 
 
 (define-condition fix-word-overflow (tfm-compliance-error)
-  ((section :initform 9) ; slot merge
+  ((reference :initform 9) ; slot merge
    (value :documentation "The faulty value." :initarg :value :reader value))
   (:documentation "The Fix Word Overflow compliance error.
 It signals that a fix word is outside ]-16,+16[."))
@@ -259,7 +270,7 @@ This is a mixin for all conditions related to padded strings."))
 
 (define-condition invalid-padded-string-length
     (tfm-compliance-error padded-string)
-  ((section :initform 10) ; slot merge
+  ((reference :initform 10) ; slot merge
    (value
     :documentation "The invalid length."
     :initarg :value
@@ -279,7 +290,7 @@ maximum."))
 
 
 (define-condition invalid-padded-string (tfm-compliance-error padded-string)
-  ((section :initform 10) ; slot merge
+  ((reference :initform 10) ; slot merge
    (str :documentation "The invalid string." :initarg :str :reader str))
   (:documentation "The Invalid Padded String compliance error.
 It signals that a padded string is not in BCPL format (it contains parentheses

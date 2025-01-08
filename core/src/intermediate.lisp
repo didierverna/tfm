@@ -52,7 +52,7 @@ This structure is used to store decoded information from the char-info table
 
 
 (define-condition spurious-char-info (tfm-compliance-warning)
-  ((section :initform 11) ; slot merge
+  ((reference :initform 11) ; slot merge
    (char-info
     :documentation "The culprit char-info structure."
     :initarg :char-info
@@ -115,7 +115,7 @@ index of 0) but is not completely blank, signal a SPURIOUS-CHAR-INFO warning."
 
 
 (define-condition spurious-o0-char-info (spurious-char-info)
-  ((section :initform nil) ; slot merge
+  ((reference :initform '(:omega . 7.1)) ; slot merge
    (tag ; slot merge, even though a bit dirty
     :documentation "The RFU/TAG byte."
     :initarg :rfu&tag
