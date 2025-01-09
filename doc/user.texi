@@ -531,18 +531,18 @@ and Freezing}.
 @cindex Format, JFM
 @tfm{} detects the actual font format by analyzing the first bytes in
 the file (no assumptions are made based on the file's location or
-extension). Only plain TFM fonts are currently supported. If OFM (Omega)
-or JFM data is detected, @code{load-font} signals an @code{extended-tfm}
-warning, and returns @nil{}.
-@deftp {Warning} extended-tfm
-@warnsubindex{extended-tfm}@c
+extension). Both plain TFM and level 0 Omega (OFM) fonts are currently
+supported. If level 1 OFM or JFM data is detected, @code{load-font}
+signals an @code{unsupported-format} warning, and returns @nil{}.
+@deftp {Warning} unsupported-format
+@warnsubindex{unsupported-format}@c
 Readable slots:
 @itemize
 @item
-@clsrindex{extended-tfm,fmt}@c
-@code{fmt}: currently either @code{"OFM"} or @code{"JFM"}.
+@clsrindex{unsupported-format,fmt}@c
+@code{fmt}: currently either @code{:O1} (level 1 Omega) or @code{:JFM}.
 @item
-@clsrindex{extended-tfm,file}@c
+@clsrindex{unsupported-format,file}@c
 @findex load-font
 @code{file}: the @var{FILE} argument to @code{load-font}.
 @end itemize
@@ -553,14 +553,22 @@ If the font format is supported and loaded without any problems  (but
 @pxref{Abnormal Situations}), the return value of @code{load-font} is an
 instance of some font class. In the context of this library, the term
 ``font'' denotes such an instance.
+There are currently four different font classes.
+@itemize
+@item
 @clsindex{font}@c
+@code{font:} the class for regular TFM data.
+@item
 @clsindex{math-symbols-font}@c
 @clsindex{math-extension-font}@c
-There are currently three different font classes. The most general and
-frequent one is simply called @code{font}. @TeX{}, however, recognizes
-two special font categories for which the corresponding classes are
-@code{math-symbols-font}, and @code{math-extension-font}. Both of these
-classes are subclasses of @code{font}.
+@TeX{} also recognizes two special font categories for which the
+corresponding classes are @code{math-symbols-font}, and
+@code{math-extension-font}. Those classes are subclasses of @code{font}.
+@item
+@clsindex{o0-font}@c
+@code{o0-font:} the class for level 0 Omega (OFM) fonts. Also a subclass
+of @code{font}.
+@end itemize
 
 
 @c ---------------
