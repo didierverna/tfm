@@ -1025,12 +1025,12 @@ the change.
 @c ====================================================================
 @node Abnormal Situations, Other Considerations, Normal Use, Top
 @chapter Abnormal Situations
-@tpindex extended-tfm
-@warnsubindex{extended-tfm}@c
-We already mentioned the @code{extended-tfm} warning in @ref{Loading Fonts}.
-In fact, @tfm{} comes with a rich ontology of conditions (and restarts)
-that give you full control on the behavior to adopt when facing abnormal
-situations.
+@tpindex unsupported-format
+@warnsubindex{unsupported-format}@c
+We already mentioned the @code{unsupported-format} warning in
+@ref{Loading Fonts}. In fact, @tfm{} comes with a rich ontology of
+conditions (and restarts) that give you full control on the behavior to
+adopt when facing abnormal situations.
 
 @menu
 * Conditions Overview::         The root conditions hierarchy
