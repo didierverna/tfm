@@ -583,6 +583,7 @@ the slot readers described in the following sections.
 * General Information::         Global properties
 * Xerox PARC Headers::          Typeface description
 * Parameters::                  Geometry, spacing, and more
+* Level 0 Omega Fonts::         One additional property
 * Character Information::       Character-related properties
 @end menu
 
@@ -641,10 +642,11 @@ discards what's left of it.
 @item
 @clsrindex{font,encoding}@c
 @code{encoding}: the font's character coding scheme (an informal BCPL
-string, that is, plain ASCII and no parentheses). The class @tfm{}
-instantiates when loading a font depends on this string (@pxref{Loading
-Fonts}), and in particular, on the specific (case insensitive) values
-@code{"TeX math symbols"} and @code{"TeX math extension"}.
+string, that is, plain ASCII and no parentheses). Which of the three TFM
+classes is instantiated when loading a font depends on this string
+(@pxref{Loading Fonts}), and in particular, on the specific (case
+insensitive) values @code{"TeX math symbols"} and @code{"TeX math
+extension"}.
 @item
 @clsrindex{font,family}@c
 @code{family}: another BCPL string (for example @code{"CMR"}).
@@ -670,7 +672,7 @@ code is the concatenation of the upcased first letters of these values.
 For example, @code{"MRR"} stands for ``Medium Roman Regular''.
 @end itemize
 
-@node Parameters, Character Information, Xerox PARC Headers, Font Properties
+@node Parameters, Level 0 Omega Fonts, Xerox PARC Headers, Font Properties
 @subsection Parameters
 A font also contains a number of properties extracted from the so-called
 ``parameters'' section. They all default to 0.
@@ -737,7 +739,18 @@ Finally, if the font has any parameters left, they are collected in
 @code{parameters}, an array of numeric values (also expressed in design
 size units).
 
-@node Character Information,  , Parameters, Font Properties
+@node Level 0 Omega Fonts, Character Information, Parameters, Font Properties
+@subsection Level 0 Omega Fonts
+Compared to the plain TFM format, level 0 Omega fonts have one additional
+property.
+@itemize
+@item
+@clsindex{o0-font}@c
+@clsrindex{o0-font,direction}@c
+@code{direction}: the direction of the font.
+@end itemize
+
+@node Character Information,  , Level 0 Omega Fonts, Font Properties
 @subsection Character Information
 @cindex Character code
 TFM fonts contain at most 256 characters, represented by numerical codes
