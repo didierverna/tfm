@@ -389,9 +389,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 @node Introduction, Installation, Copying, Top
 @chapter Introduction
 TFM (for @TeX{} Font Metric) is the standard font description format
-used by @TeX{}. The @tfm{} library parses and decodes TFM files into an
-abstract data structure, providing easy access to the corresponding font
-information in Common Lisp.
+used by @TeX{}. The @tfm{} library parses and decodes @TeX{} Font Metric
+and similar formats into an astract data structure, providing easy
+access to the corresponding font information in Common Lisp. In addition
+to regular TFM data, the library also supports level 0 Omega (OFM)
+fonts.
 
 This is the @tfm{} User Manual. @tfm{} also has a
 @ifinfo
