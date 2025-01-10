@@ -676,7 +676,7 @@ Otherwise, it returns T as a second value."
 ;; Class
 ;; -----
 
-(defclass o0-font (font)
+(defclass ofm0-font (font)
   ((direction :documentation "The font direction." :reader direction))
   (:documentation "The Level 0 Omega Font Metric class."))
 

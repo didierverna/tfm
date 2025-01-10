@@ -468,7 +468,7 @@ DISCARD-EXTENSION-RECIPE."
     (unless (zerop nc)
       (loop :with char-info-reader
 	      := (typecase font
-		   (o0-font #'read-o0-char-info)
+		   (ofm0-font #'read-ofm0-char-info)
 		   (t #'read-char-info))
 	    :for i :from 0 :upto (1- nc)
 	    :for code :from (min-code font)
@@ -493,7 +493,7 @@ DISCARD-EXTENSION-RECIPE."
 			  (vector-push (read-fix-word) array))))
     (loop :with lig/kern-reader
 	    := (typecase font
-		 (o0-font #'read-o0-lig/kern)
+		 (ofm0-font #'read-ofm0-lig/kern)
 		 (t #'read-lig/kern))
 	  :repeat nl
 	  :do (vector-push (funcall lig/kern-reader) lig/kerns))
@@ -501,7 +501,7 @@ DISCARD-EXTENSION-RECIPE."
 	  :do (vector-push (read-fix-word) kerns))
     (loop :with exten-reader
 	    := (typecase font
-		 (o0-font #'read-o0-exten)
+		 (ofm0-font #'read-ofm0-exten)
 		 (t #'read-exten))
 	  :repeat ne
 	  :do (vector-push (funcall exten-reader) extens))
@@ -874,13 +874,13 @@ It signals that LF != 6 + LH + NC + NW + NH + ND + NI + NL + NK + NE + NP."))
   (np condition))
 
 
-(define-condition invalid-o0-section-lengths (invalid-section-lengths)
+(define-condition invalid-ofm0-section-lengths (invalid-section-lengths)
   ((reference :initform '(:omega . 7.1))) ; slot merge
   (:documentation "The Invalid Level 0 OFM Section Lengths compliance error.
 It signals that
 LF != 14 + LH + 2*NC + NW + NH + ND + NI + 2*NL + NK + 2*NE + NP."))
 
-(define-condition-report (condition invalid-o0-section-lengths)
+(define-condition-report (condition invalid-ofm0-section-lengths)
   "section lengths don't satisfy ~
 ~A (lf) = 14 + ~A (lh) + 2*~A (nc) + ~A (nw) + ~A (nh) + ~A (nd) + ~A (ni) ~
 + 2*~A (nl) + ~A (nk) + 2*~A (ne) + ~A (np)"
@@ -898,7 +898,7 @@ LF != 14 + LH + 2*NC + NW + NH + ND + NI + 2*NL + NK + 2*NE + NP."))
 
 
 (defun load-stream
-    (font lf &aux (fmt (etypecase font (o0-font :o0) (font :tfm))))
+    (font lf &aux (fmt (etypecase font (ofm0-font :ofm0) (font :tfm))))
   "Parse *STREAM* of declared length LF into FONT, and return it.
 
 If *STREAM* is shorter than expected, signal a FILE-UNDERFLOW error.
@@ -918,7 +918,7 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   ;; #### NOTE: the errors signalled below (directly, or by the WORD-READER)
   ;; are really too early to attempt any clever recovery.
-  (let* ((word-reader (ecase fmt (:o0 #'read-u32) (:tfm #'read-u16)))
+  (let* ((word-reader (ecase fmt (:ofm0 #'read-u32) (:tfm #'read-u16)))
 	 (lh (funcall word-reader))
 	 (bc (funcall word-reader))
 	 (ec (funcall word-reader))
@@ -930,7 +930,7 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 	 (nk (funcall word-reader))
 	 (ne (funcall word-reader))
 	 (np (funcall word-reader))
-	 (fd (when (eq fmt :o0) (funcall word-reader)))
+	 (fd (when (eq fmt :ofm0) (funcall word-reader)))
 	 nc)
     (let ((actual-size (file-length *stream*))
 	  (declared-size (* 4 lf)))
@@ -949,7 +949,7 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 		 :actual-size actual-size
 		 :declared-size declared-size)))))
     (unless (>= lh 2) (error 'invalid-header-length :value lh))
-    (unless (and (<= (1- bc) ec) (<= ec (if (eq fmt :o0) 65535 255)))
+    (unless (and (<= (1- bc) ec) (<= ec (if (eq fmt :ofm0) 65535 255)))
       (error 'invalid-character-range :bc bc :ec ec))
     (setq nc (+ ec (- bc) 1))
     (unless (zerop nc)
@@ -957,7 +957,7 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 	    (slot-value font 'max-code) ec))
     (loop :for length :in (list nw nh nd ni ne)
 	  :for min :in '(1 1 1 1 0)
-	  :for max :in (if (eq fmt :o0)
+	  :for max :in (if (eq fmt :ofm0)
 			 '(65536 256 256 256 256)
 			 '(256 16 16 64 256))
 	  :for name :in '("widths" "heights" "depths" "italic corrections"
@@ -965,15 +965,15 @@ length, signal an INVALID-[O0-]SECTION-LENGTHS error."
 	  :unless (<= min length max)
 	    :do (error 'invalid-table-length
 		  :value length :smallest min :largest max :name name))
-    (unless (= lf (if (eq fmt :o0)
+    (unless (= lf (if (eq fmt :ofm0)
 		    (+ 14 lh (* 2 nc) nw nh nd ni (* 2 nl) nk (* 2 ne) np)
 		    (+ 6 lh nc nw nh nd ni nl nk ne np)))
-      (error (if (eq fmt :o0)
-	       'invalid-o0-section-lengths
+      (error (if (eq fmt :ofm0)
+	       'invalid-ofm0-section-lengths
 	       'invalid-section-lengths)
 	:lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
 	:ne ne :np np))
-    (when (eq fmt :o0) (setf (slot-value font 'direction) fd))
+    (when (eq fmt :ofm0) (setf (slot-value font 'direction) fd))
 
     ;; 2. Parse the header section.
     (parse-header lh font)
@@ -1027,7 +1027,7 @@ Level 1 OFM and JFM formats might be supported in the future."))
 (define-condition-report (condition unsupported-format)
     "~A data is not supported yet"
   (ecase (fmt condition)
-    (:o1 "level 1 Omega (OFM)")
+    (:ofm1 "level 1 Omega (OFM)")
     (:jfm "JFM")))
 
 
@@ -1087,10 +1087,10 @@ CANCEL-LOADING, in which case this function simply returns NIL."
 	  (with-simple-restart (cancel-loading "Cancel loading this font.")
 	    (setq lf (read-u32))
 	    (setq font (load-stream
-			(apply #'make-instance 'o0-font :file file keys)
+			(apply #'make-instance 'ofm0-font :file file keys)
 			lf))))
 	 (1
-	  (warn 'unsupported-format :fmt :o1 :file file))
+	  (warn 'unsupported-format :fmt :ofm1 :file file))
 	 (t
 	  (with-simple-restart (cancel-loading "Cancel loading this font.")
 	    (error 'invalid-ofm-level :value lf)))))
