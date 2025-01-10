@@ -1,3 +1,3 @@
-LONG_VERSION    := 2.0 "Eiad Sans Serif"
-SHORT_VERSION   := 2.0
+LONG_VERSION    := 3.0 beta 0 "Eiad Typewriter"
+SHORT_VERSION   := 3.0b0
 COPYRIGHT_YEARS := 2018-2021, 2024, 2025
