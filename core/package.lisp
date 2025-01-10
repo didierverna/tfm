@@ -53,6 +53,7 @@
     :tfm-compliance-warning :tfm-compliance-error
     :tfm-usage-warning :tfm-usage-error
     :u16-overflow :value
+    :u32-overflow :value
     :fix-word-overflow :value
     :set-to-zero
     :padded-string
