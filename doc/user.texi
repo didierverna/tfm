@@ -540,7 +540,7 @@ Readable slots:
 @itemize
 @item
 @clsrindex{unsupported-format,fmt}@c
-@code{fmt}: currently either @code{:O1} (level 1 Omega) or @code{:JFM}.
+@code{fmt}: currently either @code{:OFM1} (level 1 Omega) or @code{:JFM}.
 @item
 @clsrindex{unsupported-format,file}@c
 @findex load-font
@@ -565,8 +565,8 @@ There are currently four different font classes.
 corresponding classes are @code{math-symbols-font}, and
 @code{math-extension-font}. Those classes are subclasses of @code{font}.
 @item
-@clsindex{o0-font}@c
-@code{o0-font:} the class for level 0 Omega (OFM) fonts. Also a subclass
+@clsindex{ofm0-font}@c
+@code{ofm0-font:} the class for level 0 Omega (OFM) fonts. Also a subclass
 of @code{font}.
 @end itemize
 
@@ -745,8 +745,8 @@ Compared to the plain TFM format, level 0 Omega fonts have one additional
 property.
 @itemize
 @item
-@clsindex{o0-font}@c
-@clsrindex{o0-font,direction}@c
+@clsindex{ofm0-font}@c
+@clsrindex{ofm0-font,direction}@c
 @code{direction}: the direction of the font.
 @end itemize
 

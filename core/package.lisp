@@ -93,7 +93,7 @@
     :math-extension-font :default-rule-thickness
     :big-op-spacing1 :big-op-spacing2 :big-op-spacing3 :big-op-spacing4
     :big-op-spacing5
-    :o0-font :direction
+    :ofm0-font :direction
 
     ;; From src/file.lisp:
     :invalid-design-size :value
@@ -117,7 +117,7 @@
     :invalid-header-length :value
     :invalid-character-range :bc :ec
     :invalid-section-lengths :lf :lh :nc :nw :nh :nd :ni :nl :nk :ne :np
-    :invalid-o0-section-lengths
+    :invalid-ofm0-section-lengths
     :invalid-table-length :value :smallest :largest
     :invalid-ofm-level :value
     :unsupported-format :fmt :file

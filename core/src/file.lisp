@@ -913,7 +913,7 @@ If the widths, heights, depths, italic corrections, or extens tables lengths
 are not within the expected range, signal an INVALID-TABLE-LENGTH error.
 
 Finally, if the declared sections lengths don't add up to the declared file
-length, signal an INVALID-[O0-]SECTION-LENGTHS error."
+length, signal an INVALID-[OFM0-]SECTION-LENGTHS error."
 
   ;; 1. Read the rest of the preamble and perform some sanity checks.
   ;; #### NOTE: the errors signalled below (directly, or by the WORD-READER)
@@ -1009,7 +1009,7 @@ It signals that a custom name is not a non-empty string."))
 (define-condition unsupported-format (tfm-warning)
   ((fmt
     :documentation "The unsupported format.
-Possible values include :O1 (meaning level 1 OFM data) and :JFM."
+Possible values include :OFM1 (meaning level 1 OFM data) and :JFM."
     :initarg :fmt
     :reader fmt)
    ;; #### NOTE: this slot is here for completeness, but since context-aware
