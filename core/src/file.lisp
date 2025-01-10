@@ -1084,8 +1084,8 @@ CANCEL-LOADING, in which case this function simply returns NIL."
        (setq lf (read-u16 nil))
        (case lf
 	 (0
-	  (setq lf (read-u32))
 	  (with-simple-restart (cancel-loading "Cancel loading this font.")
+	    (setq lf (read-u32))
 	    (setq font (load-stream
 			(apply #'make-instance 'o0-font :file file keys)
 			lf))))
