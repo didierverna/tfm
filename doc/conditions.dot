@@ -8,7 +8,7 @@ strict digraph {
   "spurious-[o0-]char-info"
   [shape=box color=green fixedsize=true width=2.3]
 
-  "character-list-cycle", "file-underflow", "u16-overflow",
+  "character-list-cycle", "file-underflow", "u16-overflow", "u32-overflow",
   "fix-word-overflow", "invalid-padded-string",
   "invalid-character-code", "invalid-character-range", "invalid-design-size",
   "invalid-header-length", "invalid-ligature-opcode",
@@ -23,6 +23,7 @@ strict digraph {
   "invalid-original-design-size" -> "cancel-loading";
   "file-underflow" -> "cancel-loading";
   "u16-overflow" -> "cancel-loading";
+  "u32-overflow" -> "cancel-loading";
   "invalid-header-length" -> "cancel-loading";
   "invalid-[o0-]section-lengths" -> "cancel-loading";
   "invalid-table-length" -> "cancel-loading";
