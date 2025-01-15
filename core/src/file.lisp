@@ -973,7 +973,18 @@ length, signal an INVALID-[OFM0-]SECTION-LENGTHS error."
 	       'invalid-section-lengths)
 	:lf lf :lh lh :nc nc :nw nw :nh nh :nd nd :ni ni :nl nl :nk nk
 	:ne ne :np np))
-    (when (eq fmt :ofm0) (setf (slot-value font 'direction) fd))
+    (when (eq fmt :ofm0)
+      (let ((direction (case (mod fd 8)
+			 (0 :top-left)
+			 (1 :left-top)
+			 (2 :top-right)
+			 (3 :left-bottom)
+			 (4 :bottom-left)
+			 (5 :right-top)
+			 (6 :bottom-right)
+			 (7 :right-bottom))))
+	(setf (slot-value font 'direction)
+	      (if (>= fd 7) (cons :natural direction) direction))))
 
     ;; 2. Parse the header section.
     (parse-header lh font)
