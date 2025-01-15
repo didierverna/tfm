@@ -747,7 +747,13 @@ property.
 @item
 @clsindex{ofm0-font}@c
 @clsrindex{ofm0-font,direction}@c
-@code{direction}: the direction of the font.
+@code{direction}: the direction of the font. There are eight possible
+directions in an OFM font: @kwd{top-left}, @kwd{top-right},
+@kwd{bottom-left}, @kwd{bottom-right}, @kwd{left-top},
+@kwd{left-bottom}, @kwd{right-top}, and @kwd{right-bottom}. However, the
+actual value for @code{direction} is either one of these keywords, or a
+pair of the form @code{(:natural . @r{@i{:direction}})} if the font
+provides a natural direction.
 @end itemize
 
 @node Character Information,  , Level 0 Omega Fonts, Font Properties
@@ -1215,7 +1221,7 @@ In that case, only a warning is signalled: the
 @code{invalid-original-design-size} warning. Finally, please consider
 that leaving that warning alone means that an invalid original design
 size will be kept around in the font, so if you plan on using it later
-on, you're looking for trouble. 
+on, you're looking for trouble.
 
 @page
 @ifinfo
